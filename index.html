@@ -54,8 +54,8 @@
 
     header {
       background: var(--glass-bg);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
       border-bottom: 2px solid var(--accent-color);
       padding: 22px 35px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -169,7 +169,7 @@
 
     .control-panel {
       background: var(--glass-bg);
-      backdrop-filter: blur(12px);
+      backdrop-filter: none;
       border: 1px solid var(--glass-border);
       padding: 18px 24px;
       border-radius: 14px;
@@ -252,7 +252,7 @@
       margin: 30px 0 15px;
       padding: 10px 18px;
       background: var(--glass-bg);
-      backdrop-filter: blur(10px);
+      backdrop-filter: none;
       border-left: 5px solid var(--accent-color);
       border-radius: 8px;
       display: flex;
@@ -269,7 +269,7 @@
 
     .card {
       background: var(--card-bg);
-      backdrop-filter: blur(10px);
+      backdrop-filter: none;
       border: 1px solid var(--glass-border);
       border-radius: 12px;
       padding: 16px;
@@ -317,7 +317,7 @@
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.72);
-      backdrop-filter: blur(8px);
+      backdrop-filter: none;
       z-index: 1000;
       display: flex;
       align-items: center;
@@ -399,7 +399,7 @@
 
     footer {
       background: var(--glass-bg);
-      backdrop-filter: blur(12px);
+      backdrop-filter: none;
       border-top: 1px solid var(--glass-border);
       padding: 20px 40px;
       margin-top: auto;
@@ -491,7 +491,7 @@
     #loginOverlay { position: fixed; inset: 0; z-index: 5000; display: none; align-items: center; justify-content: center; padding: 20px;
       background: linear-gradient(rgba(15,23,42,0.88), rgba(15,23,42,0.88)), linear-gradient(#0b0638,#0b0638) no-repeat center center / cover, #0f172a; }
     body.locked #loginOverlay { display: flex; }
-    .login-box { width: 100%; max-width: 380px; background: var(--glass-bg); backdrop-filter: blur(14px); border: 1px solid var(--glass-border);
+    .login-box { width: 100%; max-width: 380px; background: var(--glass-bg); backdrop-filter: none; border: 1px solid var(--glass-border);
       border-top: 3px solid var(--accent-color); border-radius: 16px; padding: 30px 26px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; }
     .login-box .login-icon { font-size: 2.6rem; margin-bottom: 6px; }
     .login-box h2 { font-size: 1.3rem; font-weight: 800; }
@@ -562,14 +562,14 @@
     /* ===== Ringkasan Laporan Tahunan ===== */
     #ringkasan { margin-bottom: 10px; }
     .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin-bottom:16px; }
-    .kpi { background:var(--card-bg); border:1px solid var(--glass-border); border-left:4px solid var(--accent-color); border-radius:12px; padding:14px 16px; backdrop-filter:blur(10px); }
+    .kpi { background:var(--card-bg); border:1px solid var(--glass-border); border-left:4px solid var(--accent-color); border-radius:12px; padding:14px 16px; backdrop-filter: none; }
     .kpi small { display:block; color:var(--text-sub); font-size:.74rem; letter-spacing:.5px; text-transform:uppercase; margin-bottom:6px; }
     .kpi b { font-size:1.7rem; font-weight:800; color:#fff; line-height:1.1; display:block; }
     .kpi span { font-size:.76rem; color:var(--text-sub); }
     .kpi .up { color:var(--success-color); } .kpi .down { color:#f87171; }
     .chart-grid { display:grid; grid-template-columns:1fr; gap:16px; }
     @media(min-width:992px){ .chart-grid { grid-template-columns:1fr 1fr; } }
-    .chart-card { background:var(--card-bg); border:1px solid var(--glass-border); border-radius:12px; padding:16px; backdrop-filter:blur(10px); min-width:0; }
+    .chart-card { background:var(--card-bg); border:1px solid var(--glass-border); border-radius:12px; padding:16px; backdrop-filter: none; min-width:0; }
     .chart-head { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
     .chart-head h3 { font-size:.95rem; color:#fff; }
     .chart-head select { background:rgba(15,23,42,.9); color:#fff; border:1px solid rgba(255,255,255,.2); border-radius:8px; padding:5px 10px; font-size:.8rem; }
@@ -666,7 +666,7 @@ body{
 header{
   position:fixed;top:0;left:0;right:0;height:var(--hdr-h);z-index:200;padding:0 34px;
   background:rgba(242,240,236,.9);border-bottom:1px solid var(--line);box-shadow:0 10px 28px -18px rgba(85,75,62,.35);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;
+  backdrop-filter: none;-webkit-backdrop-filter: none;display:flex;align-items:center;
 }
 header .header-content{width:100%;max-width:none;margin:0;display:flex;flex-direction:row;justify-content:space-between;align-items:center;gap:18px}
 .hd-left{display:flex;align-items:center;gap:16px;min-width:0}
@@ -1274,7 +1274,6 @@ html[data-theme="biru"] .side-link{font-size:.9rem;letter-spacing:0;line-height:
 </style>
 </head>
 <body class="locked" data-view="home">
-  <canvas id="nightSky" aria-hidden="true"></canvas>
 
   <div id="loginOverlay">
     <div class="login-box">
@@ -2214,32 +2213,13 @@ html[data-theme="biru"] .side-link{font-size:.9rem;letter-spacing:0;line-height:
 })();
 </script>
 <script>
-// Animasi grafik: semua grafik bergerak saat muncul, saat ganti menu, dan saat digulir ke layar.
+/* Animasi grafik dibuat singkat dan hanya saat grafik pertama kali dirender.
+   Tidak ada reset/update berulang saat pengguna menggulir halaman. */
 (function(){
-  if(typeof Chart==='undefined')return;
-  var calm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var D=calm?0:1500;
-  var A=Chart.defaults.animation;
-  A.duration=D; A.easing='easeOutQuart';
-  A.delay=function(c){return(c.type==='data'&&c.mode==='default')?Math.min(c.dataIndex*55,800)+c.datasetIndex*90:0;};
-  function seen(ch){return !!(ch.canvas&&ch.canvas.getClientRects().length);}
-  Chart.register({id:'permataGerak',
-    afterInit:function(ch){ch.$born=performance.now(); ch.$sawAnim=seen(ch);}
-  });
-  function replay(ch){
-    if(calm||!ch||!seen(ch))return;
-    var now=performance.now();
-    if(ch.$sawAnim&&now-(ch.$born||0)<1800)return;
-    ch.$born=now; ch.$sawAnim=true;
-    try{ch.reset(); ch.update();}catch(e){}
-  }
-  function watch(){
-    if(!('IntersectionObserver' in window))return;
-    var io=new IntersectionObserver(function(es){es.forEach(function(e){
-      if(e.isIntersecting)replay(Chart.getChart(e.target));});},{threshold:.3});
-    document.querySelectorAll('canvas').forEach(function(c){if(c.id!=='nightSky')io.observe(c);});
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch);else watch();
+  if(typeof Chart==='undefined') return;
+  var reduced=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  Chart.defaults.animation.duration = reduced ? 0 : 450;
+  Chart.defaults.animation.easing = 'easeOutQuart';
 })();
 </script>
 <script>
@@ -2565,44 +2545,7 @@ var PANDUAN = [
 })();
 </script>
 
-<script>
-(function(){
-  var cv=document.getElementById('nightSky'); if(!cv||!cv.getContext) return;
-  var cx=cv.getContext('2d'), W=0, H=0, stars=[], shoots=[], last=0, next=0;
-  var still=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function size(){
-    var d=Math.min(window.devicePixelRatio||1,2);
-    W=innerWidth; H=innerHeight; cv.width=W*d; cv.height=H*d; cx.setTransform(d,0,0,d,0,0);
-    var n=Math.round(W*H/9000); stars=[];
-    for(var i=0;i<n;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+.2,a:Math.random()*6.28,s:Math.random()*.02+.005});
-  }
-  function spawn(){
-    var ang=Math.PI/4+(Math.random()-.5)*.35, sp=9+Math.random()*6;
-    shoots.push({x:Math.random()*W*1.1,y:-20+Math.random()*H*.3,vx:-Math.cos(ang)*sp,vy:Math.sin(ang)*sp,len:90+Math.random()*90,life:1});
-  }
-  function draw(t){
-    cx.clearRect(0,0,W,H);
-    for(var i=0;i<stars.length;i++){var q=stars[i]; q.a+=q.s;
-      cx.globalAlpha=.35+.55*Math.abs(Math.sin(q.a)); cx.fillStyle='#fff';
-      cx.beginPath(); cx.arc(q.x,q.y,q.r,0,6.283); cx.fill();}
-    if(!still){
-      if(t>next){ spawn(); next=t+1800+Math.random()*3500; }
-      for(var j=shoots.length-1;j>=0;j--){var m=shoots[j];
-        m.x+=m.vx; m.y+=m.vy; m.life-=.012;
-        var mag=Math.hypot(m.vx,m.vy), tx=m.x-m.vx/mag*m.len, ty=m.y-m.vy/mag*m.len;
-        var g=cx.createLinearGradient(m.x,m.y,tx,ty);
-        g.addColorStop(0,'rgba(255,255,255,'+Math.max(m.life,0)+')'); g.addColorStop(1,'rgba(255,255,255,0)');
-        cx.globalAlpha=1; cx.strokeStyle=g; cx.lineWidth=1.8; cx.lineCap='round';
-        cx.beginPath(); cx.moveTo(m.x,m.y); cx.lineTo(tx,ty); cx.stroke();
-        cx.fillStyle='rgba(255,255,255,'+Math.max(m.life,0)+')'; cx.beginPath(); cx.arc(m.x,m.y,1.8,0,6.283); cx.fill();
-        if(m.life<=0||m.x<-200||m.y>H+200) shoots.splice(j,1);}
-    }
-    cx.globalAlpha=1;
-  }
-  function loop(t){ draw(t); if(!still) requestAnimationFrame(loop); }
-  size(); addEventListener('resize',size); requestAnimationFrame(loop);
-})();
-</script>
+
 
 <script>
 // Semua tautan http/https (termasuk kartu favorit & yang dibuat lewat JS) dibuka di tab baru
