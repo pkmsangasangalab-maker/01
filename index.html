@@ -1263,22 +1263,6 @@ html[data-theme="biru"] .side-link{font-size:.9rem;letter-spacing:0;line-height:
 #stokBulan option:disabled{display:none}
 </style>
 <style>
-#dailyPanel .dn-date{color:var(--ink-3);font-size:.82rem}
-#dailyPanel .dn-lbl{display:block;font-size:.8rem;color:var(--ink-2);margin:14px 0 6px}
-#dailyPanel .dn-text{width:100%;box-sizing:border-box;resize:vertical;min-height:110px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.7);color:var(--ink);font:inherit;line-height:1.5}
-html[data-theme="biru"] #dailyPanel .dn-text{background:#fff;border-color:#c6daf2}
-#dailyPanel .dn-btns{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
-#dailyPanel .dn-stamp{margin-left:auto;font-size:.76rem;color:var(--ink-3)}
-#dailyPanel .dn-today h4{margin:10px 0 4px;font-size:.84rem;font-weight:600;color:var(--ink-2)}
-#dailyPanel .dn-today h4 b{background:var(--sky-soft);border-radius:99px;padding:1px 8px;font-size:.74rem;color:var(--sky-ink)}
-#dailyPanel .dn-it{display:flex;align-items:center;gap:10px;padding:7px 2px;border-top:1px solid var(--line);cursor:pointer;font-size:.9rem;color:var(--ink)}
-#dailyPanel .dn-it i{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
-#dailyPanel .dn-it span{flex:1;min-width:0;overflow-wrap:anywhere}
-#dailyPanel .dn-it.done span{text-decoration:line-through;color:var(--ink-3)}
-#dailyPanel .dn-it .late{color:#c9615a;white-space:nowrap}
-#dailyPanel .dn-empty{font-size:.85rem;color:var(--ink-2);margin:6px 0}
-</style>
-<style>
 .g-opts{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:10px 0 4px;font-size:.84rem;color:var(--ink-2)}
 .g-opts label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--ink)}
 .g-box{margin:8px 0 12px;padding:10px 14px;border-radius:14px;background:var(--sky-soft);border:1px solid var(--sky);font-size:.84rem;line-height:1.55;color:var(--ink)}
@@ -1837,7 +1821,6 @@ html[data-theme="biru"] #dailyPanel .dn-text{background:#fff;border-color:#c6daf
         <p class="tasks-subtitle">Pantau pekerjaan, jadwal tenggat, dan backup data laboratorium dari satu tampilan. Data tersimpan di browser perangkat ini.</p>
       </div>
       <div class="task-actions">
-        <button class="task-btn primary" type="button" onclick="focusTaskForm()">＋ Tambah Tugas</button>
         <a rel="noopener noreferrer" class="task-btn" href="https://tasks.google.com/tasks/" target="_blank">↗ Google Tasks</a>
       </div>
     </div>
@@ -1858,24 +1841,10 @@ html[data-theme="biru"] #dailyPanel .dn-text{background:#fff;border-color:#c6daf
             <span>Sambungkan ke:</span>
             <label><input type="checkbox" id="gCal"> 📅 Google Calendar</label>
             <label><input type="checkbox" id="gTask"> ✅ Google Tasks</label>
-            <label><input type="checkbox" id="gNote"> 📝 Catatan Harian</label>
           </div>
           <div class="g-box" id="gBox" hidden></div>
           <div id="taskList" class="task-list"></div>
           <div id="taskEmpty" class="task-empty">Belum ada tugas. Isi kolom di atas lalu klik <b>Tambah</b> untuk membuat daftar pekerjaan.</div>
-        </div>
-        <div class="chart-card td-panel" id="dailyPanel">
-          <div class="chart-head"><h3><svg class="ic" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg> Catatan Harian</h3><small class="dn-date" id="dnDate"></small></div>
-          <div class="dn-today" id="dailyToday"></div>
-          <label class="dn-lbl" for="labNotesInput">Catatan bebas (satu baris = satu tugas bila dijadikan tugas)</label>
-          <textarea id="labNotesInput" class="dn-text" rows="5" placeholder="Tulis catatan hari ini, misalnya: cek stok reagen HB, kalibrasi fotometer…"></textarea>
-          <div class="dn-btns">
-            <button class="task-btn primary" type="button" onclick="saveDailyNotes()">Simpan catatan</button>
-            <button class="task-btn" type="button" onclick="notesToTasks()">Jadikan tugas</button>
-            <button class="task-btn" type="button" onclick="notesToCalendar()">📅 Ke Google Calendar</button>
-            <button class="task-btn" type="button" onclick="notesToGTasks()">✅ Ke Google Tasks</button>
-            <span class="dn-stamp" id="dnStamp" aria-live="polite"></span>
-          </div>
         </div>
       </div>
 
@@ -3315,55 +3284,6 @@ var PANDUAN = [
 })();
 </script>
 <script>
-// Catatan Harian: catatan tersimpan + ringkasan tugas hari ini yang ikut berubah saat tugas ditambah.
-(function(){
-  var $=function(i){return document.getElementById(i)}, ta=$('labNotesInput'); if(!ta)return;
-  var E=function(t){return String(t==null?'':t).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})};
-  var p2=function(n){return String(n).padStart(2,'0')};
-  var today=function(){var d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
-  var fmt=function(d){return new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})};
-  var PC={Tinggi:'#c9615a',Sedang:'#c99a52',Rendah:'#5f9f7f'};
-  function stamp(t){var e=$('dnStamp'); if(e)e.textContent=t;}
-  try{ta.value=storeGet('permata_lab_notes')||'';}catch(e){}
-  window.saveDailyNotes=function(quiet){
-    try{storeSet('permata_lab_notes',ta.value);}catch(e){}
-    stamp('Tersimpan '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}).replace('.',':'));
-    if(quiet!==true&&typeof showToast==='function')showToast('Catatan harian disimpan.');
-  };
-  var tm=null; ta.addEventListener('input',function(){stamp('Menyimpan…');clearTimeout(tm);tm=setTimeout(function(){saveDailyNotes(true)},700);});
-  window.notesToTasks=function(){saveDailyNotes(true); if(typeof addTasksFromNotes==='function')addTasksFromNotes();};
-  window.copyDailyNotes=function(){
-    var t=ta.value.trim(); if(!t){if(typeof showToast==='function')showToast('Tulis catatan dulu.','error');return;}
-    var ok=function(){if(typeof showToast==='function')showToast('Catatan disalin.');};
-    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,function(){prompt('Salin teks ini:',t);}); else prompt('Salin teks ini:',t);
-  };
-  function row(t,i){
-    var late=!t.done&&t.due&&t.due<today();
-    return '<label class="dn-it'+(t.done?' done':'')+'"><input type="checkbox" data-i="'+i+'"'+(t.done?' checked':'')+'><i style="background:'+(PC[t.prio]||'#8f98a3')+'"></i><span>'+E(t.text)+'</span>'+(late?'<small class="late">terlambat '+fmt(t.due)+'</small>':'')+'</label>';
-  }
-  function renderToday(){
-    var box=$('dailyToday'); if(!box)return;
-    var td=today(), all=getLabTasks(), g={late:[],now:[],none:[]};
-    all.forEach(function(t,i){
-      if(!t.due){ if(!t.done)g.none.push([t,i]); }
-      else if(t.due===td)g.now.push([t,i]);
-      else if(t.due<td&&!t.done)g.late.push([t,i]);
-    });
-    var d=$('dnDate'); if(d)d.textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-    function sec(title,arr){return arr.length?'<h4>'+title+' <b>'+arr.length+'</b></h4>'+arr.map(function(x){return row(x[0],x[1]);}).join(''):'';}
-    var h=sec('Terlambat',g.late)+sec('Hari ini',g.now)+sec('Tanpa tenggat',g.none);
-    box.innerHTML=h||'<p class="dn-empty">Belum ada tugas untuk hari ini. Tugas yang Anda tambah akan muncul di sini.</p>';
-  }
-  $('dailyToday').addEventListener('change',function(e){
-    var c=e.target; if(!c||c.type!=='checkbox')return;
-    var m=$('labtask_'+c.getAttribute('data-i')); if(m)m.click();
-  });
-  var prev=window.renderTasksDashboard;
-  window.renderTasksDashboard=function(){var r=prev&&prev.apply(this,arguments); renderToday(); return r;};
-  renderToday();
-})();
-</script>
-<script>
 // Sambungan Tambah Tugas -> Catatan Harian, Google Calendar, Google Tasks.
 (function(){
   var $=function(i){return document.getElementById(i)};
@@ -3377,7 +3297,7 @@ var PANDUAN = [
   var E=function(t){return String(t==null?'':t).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})};
 
   /* pilihan sambungan diingat per perangkat (bawaan: semua aktif) */
-  var KEY='permata_g_opts', ids=['gCal','gTask','gNote'], saved=null;
+  var KEY='permata_g_opts', ids=['gCal','gTask'], saved=null;
   try{saved=JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){}
   ids.forEach(function(id,i){var c=$(id); if(!c)return; c.checked=saved?!!saved[i]:true;
     c.addEventListener('change',function(){try{localStorage.setItem(KEY,JSON.stringify(ids.map(function(k){return $(k).checked;})));}catch(e){}});});
@@ -3397,26 +3317,16 @@ var PANDUAN = [
   function box(html){var b=$('gBox'); if(!b)return; b.hidden=false; b.innerHTML=html;}
   function toast(m,t){if(typeof showToast==='function')showToast(m,t);}
 
-  /* catatan harian: baris yang berawalan "• " adalah log otomatis, bukan tugas baru */
-  function logNote(t){
-    var ta=$('labNotesInput'); if(!ta)return;
-    var line='• '+fmt(today())+': '+t.text+' ['+(t.prio||'Sedang')+']'+(t.due?' · tenggat '+fmt(t.due):'')+(t.rep?' · berulang':'');
-    ta.value=(ta.value.replace(/\s+$/,'')+(ta.value.trim()?'\n':'')+line);
-    if(window.saveDailyNotes)saveDailyNotes(true);
-  }
-
   window.focusTaskForm=function(){var f=$('tfText'); if(!f)return; f.scrollIntoView({behavior:'smooth',block:'center'}); try{f.focus({preventScroll:true});}catch(e){f.focus();}};
 
   window.addTaskForm=function(){
     var tx=$('tfText').value.trim(); if(!tx){$('tfText').focus();return;}
     var t={text:tx,done:false,due:$('tfDue').value,prio:$('tfPrio').value,rep:$('tfRep').value};
     var a=getLabTasks(); a.push(t); saveLabTasks(a);
-    var wantCal=$('gCal').checked, wantTask=$('gTask').checked, wantNote=$('gNote').checked;
+    var wantCal=$('gCal').checked, wantTask=$('gTask').checked;
     $('tfText').value=''; $('tfDue').value='';
-    if(wantNote)logNote(t);
     renderTasksDashboard();
     var parts=['Tugas ditambahkan.'], links=[];
-    if(wantNote)parts.push('Masuk Catatan Harian.');
     var calHref=taskCalUrl(t), win=null;
     if(wantCal){ win=window.open(calHref,'_blank','noopener'); links.push('<a href="'+E(calHref)+'" target="_blank" rel="noopener">📅 Buka Google Calendar</a>'); }
     if(wantTask){
@@ -3432,29 +3342,6 @@ var PANDUAN = [
       (wantTask?'Di Google Tasks klik <b>Tambahkan tugas</b>, lalu tempel (Ctrl+V). ':'')+
       'Bila tab tidak terbuka, pakai tautan: '+links.join(' · '));
     else if($('gBox'))$('gBox').hidden=true;
-  };
-
-  /* panel catatan harian -> Google */
-  function noteLines(){var ta=$('labNotesInput');return ta?ta.value.split('\n').map(function(x){return x.trim()}).filter(Boolean):[];}
-  window.notesToCalendar=function(){
-    var l=noteLines(); if(!l.length){toast('Tulis catatan dulu.','error');return;}
-    if(window.saveDailyNotes)saveDailyNotes(true);
-    var href=calUrl('Catatan Harian Lab',today(),l.join('\n'));
-    window.open(href,'_blank','noopener');
-    box('<b>Catatan hari ini dikirim ke Google Calendar.</b> Klik <b>Simpan</b> pada formulir acara yang terbuka. Bila tab tidak terbuka: <a href="'+E(href)+'" target="_blank" rel="noopener">📅 Buka Google Calendar</a>');
-  };
-  window.notesToGTasks=function(){
-    var l=noteLines().filter(function(x){return x.charAt(0)!=='•';}); if(!l.length){toast('Tidak ada baris catatan yang bisa dikirim.','error');return;}
-    copy(l.join('\n'));
-    window.open(TASKS_URL,'_blank','noopener');
-    box('<b>'+l.length+' baris catatan disalin.</b> Di Google Tasks klik <b>Tambahkan tugas</b>, tempel (Ctrl+V), lalu Enter; ulangi bila perlu satu baris per tugas. <a href="'+TASKS_URL+'" target="_blank" rel="noopener">✅ Buka Google Tasks</a>');
-  };
-  window.notesToTasks=function(){
-    var ta=$('labNotesInput'); if(!ta)return;
-    var l=noteLines().filter(function(x){return x.charAt(0)!=='•';});
-    if(!l.length){toast('Tulis tugas terlebih dahulu (baris berawalan • adalah log otomatis).','error');return;}
-    var a=getLabTasks(),n=0; l.forEach(function(x){if(!a.some(function(t){return t.text===x&&!t.done;})){a.push({text:x,done:false,due:'',prio:'Sedang',rep:''});n++;}});
-    saveLabTasks(a); if(window.saveDailyNotes)saveDailyNotes(true); renderTasksDashboard(); toast(n+' tugas ditambahkan.');
   };
 
   /* tombol 📅 / ✅ di tiap tugas */
