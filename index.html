@@ -2155,11 +2155,9 @@ table.hm tr:nth-child(2n) td.c{animation-delay:.08s}table.hm tr:nth-child(3n) td
   if(typeof Chart==='undefined')return;
   var calm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   var D=calm?0:1500;
-  Chart.defaults.animation={
-    duration:D, easing:'easeOutQuart',
-    delay:function(c){return(c.type==='data'&&c.mode==='default')?Math.min(c.dataIndex*55,800)+c.datasetIndex*90:0;}
-  };
-  Chart.defaults.transitions.active={animation:{duration:calm?0:250}};
+  var A=Chart.defaults.animation;
+  A.duration=D; A.easing='easeOutQuart';
+  A.delay=function(c){return(c.type==='data'&&c.mode==='default')?Math.min(c.dataIndex*55,800)+c.datasetIndex*90:0;};
   function seen(ch){return !!(ch.canvas&&ch.canvas.getClientRects().length);}
   Chart.register({id:'permataGerak',
     afterInit:function(ch){ch.$born=performance.now(); ch.$sawAnim=seen(ch);}
