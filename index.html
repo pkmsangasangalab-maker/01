@@ -1272,6 +1272,85 @@ html[data-theme="biru"] .side-link{font-size:.9rem;letter-spacing:0;line-height:
 .g-act a:hover,.g-act button:hover{background:var(--sky-soft)}
 .task-item .g-act+.task-delete{margin-left:0}
 </style>
+<style id="pm-dark">
+:is(body[data-view="stok"],body[data-view="kelurahan"]){background:linear-gradient(160deg,#050f2e,#0a2559 60%,#06163d) fixed!important}
+html:has(body[data-view="stok"]),html:has(body[data-view="kelurahan"]){background:#06143a!important}
+:is(body[data-view="stok"],body[data-view="kelurahan"]) .app-sidebar{background:linear-gradient(180deg,#071a47,#06143a)!important;border-right:1px solid rgba(80,140,255,.2)!important}
+:is(body[data-view="stok"],body[data-view="kelurahan"]) .side-link.active{background:#1d6fe0!important;box-shadow:none!important}
+:is(body[data-view="stok"],body[data-view="kelurahan"]) .side-link.active .ic{color:#fff!important}
+:is(body[data-view="stok"],body[data-view="kelurahan"]) .sidebar-brand .ic{color:#7cc4ff}
+:is(body[data-view="stok"],body[data-view="kelurahan"]) .side-user{background:rgba(255,255,255,.07)}
+:is(body[data-view="stok"],body[data-view="kelurahan"]) .su-name{color:#fff}:is(body[data-view="stok"],body[data-view="kelurahan"]) .su-role{color:#9fb6e6}
+:is(body[data-view="stok"],body[data-view="kelurahan"]) .su-actions .btn-action{background:rgba(255,255,255,.1)!important;color:#fff!important}
+:is(body[data-view="stok"],body[data-view="kelurahan"]) .su-actions .btn-action.primary{background:#1d6fe0!important}
+:is(body[data-view="stok"],body[data-view="kelurahan"]) header .header-content{background:rgba(10,32,84,.75);border-color:rgba(80,140,255,.28);box-shadow:none}
+:is(body[data-view="stok"],body[data-view="kelurahan"]) .hd-title h1{color:#fff!important}:is(body[data-view="stok"],body[data-view="kelurahan"]) .hd-title p{color:#9fb6e6!important}
+:is(body[data-view="stok"],body[data-view="kelurahan"]) .date-chip{background:rgba(255,255,255,.08)!important;color:#dbe7ff!important}
+#stokLive>.section-title,#stokLive>.chart-card,#kelLive>.section-title{display:none!important}
+#kelLive>.chart-card>*{display:none!important}
+#kelLive.dk-more>.chart-card>.kl-heat,#kelLive.dk-more>.chart-card>.stok-wrap{display:block!important;background:#fff;color:#16302a;border-radius:12px;padding:12px;margin-bottom:14px}
+#kelLive.dk-more>.chart-card>#klNote{display:block!important;color:#9fb6e6}
+.dk{font-family:'Poppins','Segoe UI',sans-serif;color:#e8efff}
+.dk-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.dk-ico{width:52px;height:52px;border-radius:14px;background:#1d6fe0;display:grid;place-items:center;color:#fff;flex:none}
+.dk-head h2{font-size:1.6rem;font-weight:600;line-height:1.1;color:#fff}
+.dk-head p{font-size:.82rem;color:#b9c9ee}
+.dk-ctl{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.dk-f{display:flex;flex-direction:column;background:rgba(10,32,84,.75);border:1px solid rgba(80,140,255,.35);border-radius:10px;padding:6px 12px;min-width:150px}
+.dk-f small{font-size:.62rem;color:#ffd24a}
+.dk-f select{background:transparent;border:0;color:#fff;font-size:.85rem;outline:0;font-family:inherit}
+.dk-f select option{color:#111}
+.dk-btn{border:0;border-radius:8px;padding:11px 18px;font-weight:700;font-size:.8rem;color:#fff;cursor:pointer;text-decoration:none;font-family:inherit;white-space:nowrap}
+.dk-btn.g{background:#12a36c}.dk-btn.r{background:#e5383b}.dk-btn.b{background:#1d6fe0}
+.dk-btn.o{background:transparent;border:1px solid #38a0ff;color:#7cc4ff;padding:8px 16px}
+.dk-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+.dk-k{display:flex;gap:14px;align-items:center;padding:14px 16px;border-radius:12px;background:rgba(12,36,92,.7);border:1px solid rgba(80,140,255,.28);min-width:0}
+.dk-k.ok{border-color:rgba(18,163,108,.55);background:rgba(8,70,70,.45)}
+.dk-k.warn{border-color:rgba(245,168,0,.55);background:rgba(80,60,10,.4)}
+.dk-k.bad{border-color:rgba(229,56,59,.55);background:rgba(80,20,40,.45)}
+.dk-k .ik{width:58px;height:58px;border-radius:12px;display:grid;place-items:center;color:#fff;flex:none}
+.dk-k small{display:block;font-size:.78rem;color:#c9d7f7}
+.dk-k small.t{font-size:.82rem;font-weight:500}
+.dk-k b{display:block;font-size:1.7rem;line-height:1.15;font-weight:600;color:#fff}
+.dk-k b.m{font-size:1.2rem}
+.dk-grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:14px;align-items:start}
+.dk-gr2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px}
+.dk-p{border-radius:12px;background:rgba(10,30,80,.72);border:1px solid rgba(80,140,255,.28);padding:14px 16px;margin-bottom:14px}
+.dk-p h3{font-size:.95rem;font-weight:600;color:#fff;margin-bottom:10px}
+.dk-t{width:100%;border-collapse:collapse;font-size:.78rem}
+.dk-t th{background:rgba(29,111,224,.28);color:#dbe7ff;text-align:left;padding:8px 10px;font-weight:600;white-space:nowrap}
+.dk-t td{padding:8px 10px;border-bottom:1px solid rgba(80,140,255,.15);color:#e8efff}
+.dk-t td.warn,.dk-t td.bad{color:#ff6b6b;font-weight:600}
+.dk-t .dk-det td{background:rgba(29,111,224,.12);font-size:.74rem;color:#b9c9ee}
+.dk-pill{display:inline-block;min-width:62px;text-align:center;padding:2px 10px;border-radius:6px;font-size:.72rem;font-weight:700}
+.dk-pill.ok{background:#12a36c;color:#fff}.dk-pill.warn{background:#f5b301;color:#3b2a00}.dk-pill.bad{background:#e5383b;color:#fff}
+.dk-lihat{background:#1d6fe0;color:#fff;border:0;border-radius:5px;padding:4px 18px;font-size:.72rem;cursor:pointer;font-family:inherit}
+.dk-filter{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.dk-filter input,.dk-filter select{background:rgba(6,20,60,.8);border:1px solid rgba(80,140,255,.35);color:#e8efff;border-radius:8px;padding:8px 12px;font-size:.8rem;font-family:inherit}
+.dk-filter input{flex:1;min-width:160px}
+.dk-filter select option{color:#111}
+.dk-pg{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:.75rem;color:#b9c9ee;flex-wrap:wrap;gap:8px}
+.dk-pg div{display:flex;gap:6px}
+.dk-pg button{width:30px;height:30px;border-radius:6px;border:1px solid rgba(80,140,255,.4);background:transparent;color:#cfe0ff;cursor:pointer}
+.dk-pg button.on{background:#1d6fe0;border-color:#1d6fe0;color:#fff}
+.dk-ch{position:relative;height:230px}
+.dk-ch.t{height:250px}
+.dk-don{display:flex;align-items:center;gap:18px}
+.dk-ch.s{width:150px;height:150px;flex:none}
+.dk-don ul{list-style:none;flex:1;margin:0;padding:0}
+.dk-don li{display:flex;align-items:center;gap:8px;font-size:.78rem;padding:5px 0}
+.dk-don li i{width:10px;height:10px;border-radius:50%}
+.dk-don li span{flex:1}.dk-don li b{font-weight:500;color:#cfe0ff}
+.dk-bot{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:14px}
+.dk-b{display:flex;align-items:center;gap:14px;margin-bottom:14px;color:inherit;text-decoration:none}
+.dk-b .ik{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;background:rgba(29,111,224,.25);color:#7cc4ff;flex:none}
+.dk-b small{display:block;font-size:.82rem;color:#fff;font-weight:500}
+.dk-b em{font-style:normal;font-size:.72rem;color:#9fb6e6}
+.dk-b .dk-btn,.dk-b .dk-chev{margin-left:auto}
+.dk-wide{background:linear-gradient(90deg,rgba(29,111,224,.45),rgba(10,30,80,.72))}
+@media(max-width:1100px){.dk-grid,.dk-gr2,.dk-bot{grid-template-columns:1fr}.dk-kpis{grid-template-columns:repeat(2,1fr)}.dk-ctl{margin-left:0}}
+@media(max-width:560px){.dk-kpis{grid-template-columns:1fr}.dk-don{flex-direction:column}}
+</style>
 </head>
 <body class="locked" data-view="home">
 
@@ -1717,6 +1796,7 @@ html[data-theme="biru"] .side-link{font-size:.9rem;letter-spacing:0;line-height:
 
     <!-- Stok reagensia (dashboard, tampil di tampilan awal) -->
     <section id="stokLive" data-view="stok">
+      <div class="dk" id="dkRootS"></div>
       <div class="section-title"><i class="fa-solid fa-boxes-stacked"></i> STOK REAGENSIA (DATA LANGSUNG)</div>
       <div class="chart-card">
         <div class="stok-tools">
@@ -1789,6 +1869,7 @@ html[data-theme="biru"] .side-link{font-size:.9rem;letter-spacing:0;line-height:
     </section>
 
   <section id="kelLive" data-view="kelurahan">
+      <div class="dk" id="dkRootK"></div>
       <div class="section-title"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg> TREN PEMERIKSAAN PER KELURAHAN</div>
       <div class="chart-card">
         <div class="stok-tools">
@@ -2617,7 +2698,7 @@ var PANDUAN = [
     $('stokTbl').tBodies[0].innerHTML=rows||'<tr><td colspan="8">Tidak ada reagen yang cocok.</td></tr>';
     $('stokN').textContent=m.items.length; $('stokH').textContent=h; $('stokM').textContent=w;
     $('stokA').textContent=m.items.filter(function(x){return status(x)==='Aman';}).length;
-    charts(m); usage(); skRender(m);
+    charts(m); usage(); skRender(m); dkS(m);
   }
   var sc={};
   function charts(m){
@@ -2767,6 +2848,75 @@ var PANDUAN = [
     var b=(ev&&ev.currentTarget)||$('stokSalin'),o=b.innerHTML,ok=function(){b.textContent='✔ Tersalin';setTimeout(function(){b.innerHTML=o;},1800);};
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,function(){prompt('Salin teks ini:',t);});}
     else prompt('Salin teks ini:',t);
+  }
+
+  /* ===== Tampilan gelap (sesuai mockup): kartu ringkasan, daftar stok, grafik kategori & status ===== */
+  var DK={p:1,ok:0,it:[]}, DKCOL=['#1d6fe0','#12a36c','#f5a800','#8b4ee0','#10b8d6'], DKCAT=['Kimia Klinik','Imunologi','Mikrobiologi','Hematologi','Urinalisa'], DKL={ok:'Aman',warn:'Menipis',bad:'Habis'};
+  // Sheet stok belum punya kolom kategori / satuan / expired: kategori ditebak dari nama reagen (ubah pola di sini bila perlu)
+  function dkCat(n){n=n.toLowerCase();
+    if(/hba1c|hiv|hbsag|hcv|widal|tpha|vdrl|rapid|dengue|ns1|\bigg\b|\bigm\b|crp|\brf\b|anti|hcg|sifilis|malaria|tubex|troponin|\btsh\b|\bft4\b/.test(n))return 1;
+    if(/hemato|lyse|diluent|cleaner|edta|rinse|\bcbc\b|sysmex|\bhb\b/.test(n))return 3;
+    if(/urin|strip|sedimen/.test(n))return 4;
+    if(/agar|gram|ziehl|giemsa|\bbta\b|kultur|pewarna|lugol|methyl|carbol|oil|imersi|parasit|mikro/.test(n))return 2;
+    return 0;}
+  function dkSt(x){var s=status(x);return s==='Habis'?'bad':s==='Order'?'warn':'ok';}
+  function dkSvg(p){return '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';}
+  var DKFL='<path d="M9 3h6M10 3v6L5 19a1.6 1.6 0 0 0 1.4 2.3h11.2A1.6 1.6 0 0 0 19 19l-5-10V3M7.5 15h9"/>';
+  function dkInit(){
+    DK.ok=1; var L=URL_SHEET;
+    $('dkRootS').innerHTML='<div class="dk-head"><span class="dk-ico">'+dkSvg(DKFL)+'</span><div><h2>Stok Reagensia</h2><p>Monitoring ketersediaan reagensia laboratorium secara real-time</p></div>'+
+      '<div class="dk-ctl"><label class="dk-f"><small>Periode Stok</small><select id="dkBln"></select></label>'+
+      '<a class="dk-btn g staff-only" target="_blank" rel="noopener noreferrer" href="'+L+'" title="Tambah reagen lewat Google Sheets">＋ TAMBAH REAGEN</a>'+
+      '<a class="dk-btn r staff-only" target="_blank" rel="noopener noreferrer" href="'+L+'" title="Hapus reagen lewat Google Sheets">Hapus Reagen</a></div></div>'+
+      '<div class="dk-kpis" id="dkKp"></div>'+
+      '<div class="dk-grid"><div class="dk-p"><h3>Daftar Stok Reagensia</h3>'+
+      '<div class="dk-filter"><input id="dkQ" type="search" autocomplete="off" placeholder="Cari reagensia..."><select id="dkC"><option value="">Semua Kategori</option>'+DKCAT.map(function(c,i){return '<option value="'+i+'">'+c+'</option>';}).join('')+'</select>'+
+      '<select id="dkSt"><option value="">Semua Status</option><option value="ok">Aman</option><option value="warn">Menipis</option><option value="bad">Habis</option></select></div>'+
+      '<div style="overflow-x:auto"><table class="dk-t" id="dkT"><thead><tr><th>No</th><th>Nama Reagensia</th><th>Kategori</th><th>Stok Saat Ini</th><th>Satuan</th><th>Status</th><th>Tanggal Expired</th><th>Aksi</th></tr></thead><tbody></tbody></table></div>'+
+      '<div class="dk-pg"><span id="dkI"></span><div id="dkP"></div></div></div>'+
+      '<div><div class="dk-p"><h3>Stok Reagensia per Kategori</h3><div class="dk-ch"><canvas id="dkBar"></canvas></div></div>'+
+      '<div class="dk-p"><h3>Persentase Status Stok</h3><div class="dk-don"><div class="dk-ch s"><canvas id="dkDon"></canvas></div><ul id="dkLg"></ul></div></div></div></div>'+
+      '<div class="dk-bot"><div class="dk-p dk-b"><span class="ik">'+dkSvg('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/>')+'</span><div><small>Kartu Stok Harian (Reagensia Pilihan)</small><em id="dkTgl"></em></div><a class="dk-btn o" target="_blank" rel="noopener noreferrer" href="'+L+'">Lihat Semua</a></div>'+
+      '<div class="dk-p dk-b"><span class="ik">'+dkSvg('<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>')+'</span><div><small>Ringkasan Bulanan</small><em id="dkBl"></em></div><button type="button" class="dk-btn o" onclick="window.__pmGo&&__pmGo(\'ringkasan\')">Lihat Detail</button></div>'+
+      '<a class="dk-p dk-b dk-wide" target="_blank" rel="noopener noreferrer" href="'+L+'"><span class="ik">'+dkSvg(DKFL)+'</span><div><small>Kelola stok reagensia dengan lebih mudah</small><em>Tambah reagensia baru, pantau stok harian dan bulanan secara otomatis.</em></div><span class="dk-chev">›</span></a></div>';
+    $('dkTgl').textContent=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+    ['dkQ','dkC','dkSt'].forEach(function(i){$(i).addEventListener(i==='dkQ'?'input':'change',function(){DK.p=1;dkTbl();});});
+    $('dkBln').addEventListener('change',function(){$('stokBulan').selectedIndex=+this.value;DK.p=1;render();});
+    $('dkP').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;DK.p=Math.max(1,+b.dataset.p);dkTbl();});
+    $('dkT').addEventListener('click',function(e){var b=e.target.closest('.dk-lihat');if(!b)return;var r=b.closest('tr').nextElementSibling;if(r)r.hidden=!r.hidden;});
+  }
+  function dkTbl(){
+    var q=$('dkQ').value.toLowerCase().trim(), c=$('dkC').value, s=$('dkSt').value;
+    var f=DK.it.filter(function(r){return (!q||r.x.n.toLowerCase().indexOf(q)>=0)&&(c===''||r.c==+c)&&(!s||r.st===s);});
+    var pg=Math.max(1,Math.ceil(f.length/6)); DK.p=Math.min(DK.p,pg);
+    var a=(DK.p-1)*6, rows=f.slice(a,a+6).map(function(r,i){var x=r.x;
+      return '<tr><td>'+(a+i+1)+'</td><td>'+esc(x.n)+'</td><td>'+DKCAT[r.c]+'</td><td'+(r.st!=='ok'?' class="'+r.st+'"':'')+'>'+x.e+'</td><td>–</td><td><span class="dk-pill '+r.st+'">'+DKL[r.st]+'</span></td><td>–</td><td><button type="button" class="dk-lihat">Lihat</button></td></tr>'+
+        '<tr class="dk-det" hidden><td colspan="8">Sumber: <b>'+esc(x.s||'–')+'</b> · Stok awal: <b>'+x.a+'</b> · Masuk: <b>'+x.i+'</b> · Keluar: <b>'+x.o+'</b> · Stok akhir: <b>'+x.e+'</b> · Buffer: <b>'+(x.b==null?'–':x.b)+'</b></td></tr>';}).join('');
+    $('dkT').tBodies[0].innerHTML=rows||'<tr><td colspan="8">Tidak ada reagensia yang cocok.</td></tr>';
+    $('dkI').textContent='Menampilkan '+(f.length?a+1:0)+' - '+Math.min(a+6,f.length)+' dari '+f.length+' data';
+    var s0=Math.max(1,Math.min(DK.p-2,pg-4)), b='<button type="button" data-p="'+(DK.p-1)+'">‹</button>';
+    for(var i=s0;i<=Math.min(pg,s0+4);i++)b+='<button type="button" data-p="'+i+'"'+(i===DK.p?' class="on"':'')+'>'+i+'</button>';
+    $('dkP').innerHTML=b+'<button type="button" data-p="'+(DK.p+1)+'">›</button>';
+  }
+  function dkS(m){
+    if(!$('dkRootS'))return; if(!DK.ok)dkInit();
+    var it=m.items.map(function(x){return {x:x,st:dkSt(x),c:dkCat(x.n)};}), n=it.length, cn={ok:0,warn:0,bad:0}, cc=[0,0,0,0,0];
+    it.forEach(function(r){cn[r.st]++;cc[r.c]++;}); DK.it=it;
+    $('dkBln').innerHTML=bulan.map(function(b,i){return '<option value="'+i+'">'+esc(b.name+(b.yr?' '+b.yr:''))+'</option>';}).join(''); $('dkBln').value=$('stokBulan').selectedIndex;
+    function kp(c,col,ic,t,v,tc){return '<div class="dk-k '+c+'"><span class="ik" style="background:'+col+'">'+dkSvg(ic)+'</span><div><small class="t" style="color:'+tc+'">'+t+'</small><b>'+v+'</b><small>jenis reagensia</small></div></div>';}
+    $('dkKp').innerHTML=kp('','#1d6fe0',DKFL,'Total Reagensia',n,'#c9d7f7')+kp('ok','#12a36c','<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>','Stok Aman',cn.ok,'#34d399')+
+      kp('warn','#f5a800','<path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17.5v.01"/>','Stok Menipis',cn.warn,'#fbbf24')+kp('bad','#e5383b','<path d="m6 6 12 12M18 6 6 18"/>','Stok Habis',cn.bad,'#ff8a8a');
+    dkTbl(); $('dkBl').textContent=m.name+(m.yr?' '+m.yr:'');
+    $('dkLg').innerHTML=['ok','warn','bad'].map(function(k){var col={ok:'#12a36c',warn:'#f5b301',bad:'#e5383b'}[k];return '<li><i style="background:'+col+'"></i><span>'+DKL[k]+'</span><b>'+cn[k]+' ('+(n?Math.round(cn[k]/n*100):0)+'%)</b></li>';}).join('');
+    if(typeof Chart==='undefined')return;
+    var tc='#b9c9ee', gr='rgba(255,255,255,.08)';
+    [$('dkBar'),$('dkDon')].forEach(function(c){var o=Chart.getChart(c);if(o)o.destroy();});
+    new Chart($('dkBar'),{type:'bar',data:{labels:DKCAT,datasets:[{data:cc,backgroundColor:DKCOL,borderRadius:4,maxBarThickness:46}]},
+      options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},scales:{x:{grid:{display:false},ticks:{color:tc,font:{size:10}}},y:{beginAtZero:true,grid:{color:gr},border:{display:false},ticks:{color:tc,precision:0}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.parsed.y+' jenis reagensia';}}}}},
+      plugins:[{id:'dkv',afterDatasetsDraw:function(ch){var c=ch.ctx;c.save();c.fillStyle='#fff';c.font='600 12px Poppins,sans-serif';c.textAlign='center';ch.getDatasetMeta(0).data.forEach(function(b,i){c.fillText(ch.data.datasets[0].data[i],b.x,b.y-5);});c.restore();}}]});
+    new Chart($('dkDon'),{type:'doughnut',data:{labels:['Aman','Menipis','Habis'],datasets:[{data:[cn.ok,cn.warn,cn.bad],backgroundColor:['#12a36c','#f5b301','#e5383b'],borderColor:'#0a1e50',borderWidth:3}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}},
+      plugins:[{id:'dkc',afterDraw:function(ch){var a=ch.chartArea,c=ch.ctx,x=(a.left+a.right)/2,y=(a.top+a.bottom)/2;c.save();c.textAlign='center';c.fillStyle='#fff';c.font='700 26px Poppins,sans-serif';c.fillText(n,x,y+6);c.fillStyle='#b9c9ee';c.font='10px Poppins,sans-serif';c.fillText('Total Reagensia',x,y+22);c.restore();}}]});
   }
   function load(){
     $('stokNote').textContent='Memuat data…';
@@ -3210,7 +3360,51 @@ var PANDUAN = [
     n.push('Kategori Mikrobiologi dan Parasitologi digabung; nama kategori yang berbeda antar tahun disamakan.');
     $('klNote').innerHTML=n.join(' ');
   }
-  function render(){var st=state(); kpi(st); top5(st); charts(st); heat(st); table(st); note();}
+
+  /* ===== Tampilan gelap (sesuai mockup): kartu ringkasan, tren per kelurahan, perbandingan ===== */
+  var DKC5=['#1d6fe0','#12a36c','#f5a800','#8b4ee0','#10b8d6'], dkI=false, dkSel='all';
+  function dkSv(p){return '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';}
+  var DKPIN='<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>';
+  function dkWrap(k){var i=k.lastIndexOf(' ');return k.length>11&&i>0?[k.slice(0,i),k.slice(i+1)]:k;}
+  function dkInitK(){
+    dkI=true;
+    $('dkRootK').innerHTML='<div class="dk-head"><span class="dk-ico">'+dkSv(DKPIN)+'</span><div><h2>Tren Perkelurahan</h2><p>Analisis tren hasil pemeriksaan lab berdasarkan wilayah kelurahan</p></div>'+
+      '<div class="dk-ctl"><label class="dk-f"><small>Periode</small><select id="dkKT"></select></label><label class="dk-f"><small>Jenis Pemeriksaan</small><select id="dkKC"></select></label><label class="dk-f"><small>Kelurahan</small><select id="dkKK"></select></label></div></div>'+
+      '<div class="dk-kpis" id="dkKKp"></div>'+
+      '<div class="dk-gr2"><div class="dk-p"><h3>Tren Pemeriksaan per Kelurahan</h3><div class="dk-ch t"><canvas id="dkKL"></canvas></div></div>'+
+      '<div class="dk-p"><h3>Perbandingan Jumlah Pemeriksaan per Kelurahan</h3><div class="dk-ch t"><canvas id="dkKB"></canvas></div></div></div>'+
+      '<div class="dk-p dk-b"><span class="ik">'+dkSv(DKPIN)+'</span><div><small>Sebaran Pemeriksaan per Kelurahan</small><em>Klik tombol untuk melihat tabel dan heatmap detail per kelurahan</em></div><button type="button" class="dk-btn b" id="dkKM">Lihat Detail</button></div>';
+    $('dkKT').addEventListener('change',function(){$('klTahun').value=this.value;render();});
+    $('dkKC').addEventListener('change',function(){$('klKat').value=this.value;render();});
+    $('dkKK').addEventListener('change',function(){dkSel=this.value;render();});
+    $('dkKM').addEventListener('click',function(){var s=$('kelLive');s.classList.toggle('dk-more');this.textContent=s.classList.contains('dk-more')?'Sembunyikan':'Lihat Detail';});
+  }
+  function dkK(st){
+    if(!$('dkRootK'))return; if(!dkI)dkInitK();
+    var cap=function(s){return s.charAt(0)+s.slice(1).toLowerCase();}, kl=D.kel.filter(function(k){return !isLain(k);});
+    if(kl.indexOf(dkSel)<0)dkSel='all';
+    $('dkKT').innerHTML=D.years.slice().reverse().map(function(y){return '<option value="'+y+'">Januari '+y+' - '+cap(BLN[monthsOf(y)-1])+' '+y+'</option>';}).join(''); $('dkKT').value=st.y;
+    $('dkKC').innerHTML='<option value="all">Semua Pemeriksaan</option>'+CATS.map(function(c,i){return '<option value="'+i+'">'+esc(c)+'</option>';}).join(''); $('dkKC').value=st.cat;
+    $('dkKK').innerHTML='<option value="all">Semua Kelurahan</option>'+kl.map(function(k){return '<option value="'+esc(k)+'">'+esc(k)+'</option>';}).join(''); $('dkKK').value=dkSel;
+    var cats=catIdx(st), y=st.y, py=prevYear(y), ks=kels(st), T=0, top=null, low=null, tr=null;
+    ks.forEach(function(k){var v=val(y,k,cats); if(v==null)return; T+=v; if(isLain(k))return; if(!top||v>top.v)top={k:k,v:v}; if(v>0&&(!low||v<low.v))low={k:k,v:v};});
+    if(py)for(var c=0;c<7;c++){var a=0,b=0; ks.forEach(function(k){a+=val(y,k,[c])||0; b+=val(py,k,[c])||0;}); if(b>0){var p=pct(a/monthsOf(y),b/monthsOf(py)); if(!tr||p>tr.p)tr={c:c,p:p};}}
+    function kp(col,ic,t,v,s,tc,m){return '<div class="dk-k"><span class="ik" style="background:'+col+'">'+dkSv(ic)+'</span><div><small class="t" style="color:'+tc+'">'+t+'</small><b'+(m?' class="m"':'')+'>'+esc(v)+'</b><small>'+esc(s)+'</small></div></div>';}
+    $('dkKKp').innerHTML=kp('#1d6fe0','<circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/>','Total Pemeriksaan',fmt(T),'kali','#c9d7f7')+
+      kp('#12a36c','<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3.5 2.5-5.5 6-5.5s6 2 6 5.5M16 14.5c3 0 5 1.6 5 4.5"/>','Kelurahan Terbanyak',top?top.k:'–',top?fmt(top.v)+' pemeriksaan':'','#22d3b0',1)+
+      kp('#8b4ee0','<path d="M4 20h16M6 16l4-5 3 3 5-7"/>','Tren Tertinggi',tr?CATS[tr.c]:'–',tr?sgn(tr.p)+' (vs periode sebelumnya)':'Belum ada periode pembanding','#b58cff',1)+
+      kp('#0ea5e9','<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>','Kelurahan Terendah',low?low.k:'–',low?fmt(low.v)+' pemeriksaan':'','#38bdf8',1);
+    if(typeof Chart==='undefined')return;
+    var list=topList(st).slice(0,5).map(function(x){return x.k;}); if(dkSel!=='all')list=[dkSel];
+    var ys=D.years, tc='#b9c9ee', gr='rgba(255,255,255,.08)';
+    ['dkKL','dkKB'].forEach(function(i){var o=Chart.getChart($(i));if(o)o.destroy();});
+    new Chart($('dkKL'),{type:'line',data:{labels:ys.map(lab),datasets:list.map(function(k,i){var col=DKC5[i%5];return {label:k,data:ys.map(function(yy){return disp(yy,k,st);}),borderColor:col,backgroundColor:col,borderWidth:2.5,tension:.3,pointRadius:3,pointHoverRadius:5,spanGaps:true,segment:{borderDash:function(x){return isPartial(ys[x.p1DataIndex])?[6,4]:undefined;}}};})},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{grid:{display:false},ticks:{color:tc,font:{size:10}}},y:{beginAtZero:true,grid:{color:gr},border:{display:false},ticks:{color:tc}}},plugins:{legend:{position:'top',align:'end',labels:{usePointStyle:true,pointStyle:'circle',boxWidth:7,color:'#dbe7ff',font:{size:10}}}}}});
+    new Chart($('dkKB'),{type:'bar',data:{labels:list.map(dkWrap),datasets:[{data:list.map(function(k){return disp(y,k,st)||0;}),backgroundColor:list.map(function(k,i){return DKC5[i%5];}),borderRadius:4,maxBarThickness:52}]},
+      options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},scales:{x:{grid:{display:false},ticks:{color:tc,font:{size:10},maxRotation:0}},y:{beginAtZero:true,grid:{color:gr},border:{display:false},ticks:{color:tc}}},plugins:{legend:{display:false}}},
+      plugins:[{id:'dkv',afterDatasetsDraw:function(ch){var c=ch.ctx;c.save();c.fillStyle='#fff';c.font='600 12px Poppins,sans-serif';c.textAlign='center';ch.getDatasetMeta(0).data.forEach(function(b,i){c.fillText(fv(ch.data.datasets[0].data[i],st),b.x,b.y-5);});c.restore();}}]});
+  }
+  function render(){var st=state(); kpi(st); top5(st); charts(st); heat(st); table(st); note(); dkK(st);}
   function load(){
     var b=$('klMuat'); b.disabled=true;
     fetch('https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&gid='+GID+'&_='+Date.now(),{cache:'no-store'})
