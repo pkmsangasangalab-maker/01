@@ -3236,6 +3236,28 @@ var PANDUAN = [
   }
   moveChart();
 
+  // Grafik beranda "berjalan": ukur ulang + putar ulang animasi setiap kali Beranda tampil
+  // (setelah login, klik menu Beranda, atau saat halaman pertama dibuka).
+  // Grafik dibuat saat masih tersembunyi, jadi tanpa ini animasinya selesai sebelum terlihat.
+  var _hcBusy=null;
+  function replayHomeChart(){
+    if(typeof Chart==='undefined'||!Chart.getChart) return;
+    var b=document.body;
+    if(b.classList.contains('locked')||b.getAttribute('data-view')!=='home') return;
+    var cv=$('chTren'); if(!cv||!cv.parentElement||!cv.parentElement.offsetWidth) return;
+    var ch=Chart.getChart(cv); if(!ch) return;
+    var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    ch.options.animation={duration:reduced?0:1000,easing:'easeOutQuart'};
+    try{ ch.resize(); ch.reset(); ch.update(); }catch(e){}
+  }
+  function scheduleReplay(ms){ clearTimeout(_hcBusy); _hcBusy=setTimeout(replayHomeChart,ms||150); }
+  var _sv2=window.setView;
+  window.setView=function(v){ var r=_sv2.apply(this,arguments); if(v==='home') scheduleReplay(120); return r; };
+  new MutationObserver(function(){ if(!document.body.classList.contains('locked')) scheduleReplay(200); })
+    .observe(document.body,{attributes:true,attributeFilter:['class']});
+  window.addEventListener('load',function(){ scheduleReplay(400); });
+  var _ys=$('yearSel'); if(_ys) _ys.addEventListener('change',function(){ scheduleReplay(60); });
+
   function txt(id){var e=$(id);return e?e.textContent.trim():'';}
   function fmtT(d){return d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}).replace('.',':');}
   var loadedAt=new Date();
