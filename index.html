@@ -2932,14 +2932,18 @@ var PANDUAN = [
   }
 
   /* ===== Tampilan gelap (sesuai mockup): kartu ringkasan, daftar stok, grafik kategori & status ===== */
-  var DK={p:1,ok:0,it:[]}, DKCOL=['#1d6fe0','#12a36c','#f5a800','#8b4ee0','#10b8d6'], DKCAT=['Kimia Klinik','Imunologi','Mikrobiologi','Hematologi','Urinalisa'], DKL={ok:'Aman',warn:'Perlu Order',bad:'Habis'};
+  var DK={p:1,ok:0,it:[]}, DKCOL=['#1d6fe0','#12a36c','#f5a800','#8b4ee0','#10b8d6','#8a96b0'], DKCAT=['Kimia Klinik','Imunologi','Mikrobiologi','Hematologi','Urinalisa','Lain-lain'], DKL={ok:'Aman',warn:'Perlu Order',bad:'Habis'};
   // Sheet stok belum punya kolom kategori / satuan / expired: kategori ditebak dari nama reagen (ubah pola di sini bila perlu)
   function dkCat(n){n=n.toLowerCase();
-    if(/hba1c|hiv|hbsag|hcv|widal|tpha|vdrl|rapid|dengue|ns1|\bigg\b|\bigm\b|crp|\brf\b|anti|hcg|sifilis|malaria|tubex|troponin|\btsh\b|\bft4\b/.test(n))return 1;
-    if(/hemato|lyse|diluent|cleaner|edta|rinse|\bcbc\b|sysmex|\bhb\b/.test(n))return 3;
-    if(/urin|strip|sedimen/.test(n))return 4;
-    if(/agar|gram|ziehl|giemsa|\bbta\b|kultur|pewarna|lugol|methyl|carbol|oil|imersi|parasit|mikro/.test(n))return 2;
-    return 0;}
+    // Urutan pengecekan penting: bahan habis pakai dulu, lalu Urinalisa, Hematologi, Kimia Klinik, Imunologi, Mikrobiologi.
+    // 0 Kimia Klinik, 1 Imunologi, 2 Mikrobiologi, 3 Hematologi, 4 Urinalisa, 5 Lain-lain (bahan habis pakai / penunjang)
+    if(/needle|jarum|cover\s*gla|pipet|spirt|spirit|alkohol|water\s*one|waterone|aquadest|aquabides|alkaline|washing|pot\s*urin|tabung|non\s*edta|handscoon|kapas|object\s*gla/.test(n))return 5;
+    if(/urin\s*\d|param|sedimen|urinalisa/.test(n))return 4;
+    if(/hemato|lyse|lysse|diluent|dilluent|cleaner|edta|rinse|\bcbc\b|sysmex|\bhb\b|anti\s*sera|golda|golongan\s*darah/.test(n))return 3;
+    if(/fortest|fortes|glukosa|glucose|\bau\b|asam\s*urat|chol|\btg\b|trigli|hdl|ldl|ureum|urea|kreatinin|creatinin|sgot|sgpt|bilirubin|albumin|hba1c/.test(n))return 0;
+    if(/hiv|hbs\s*ag|hbsag|hcv|widal|salmonella|typhy|typhoid|tifoid|tpha|vdrl|rapid|dengue|ns\s*1|\bigg\b|\bigm\b|crp|\brf\b|anti|hcg|kehamilan|pp\s*test|plano|sifilis|syphilis|malaria|napza|narkoba|\bfob\b|tubex|troponin|\btsh\b|\bft4\b|\bhir\b/.test(n))return 1;
+    if(/tcm|cartridge|catridge|xpert|agar|gram|ziehl|giemsa|\bbta\b|kultur|pewarna|lugol|methyl|carbol|oil|imersi|parasit|mikro/.test(n))return 2;
+    return 5;}
   function dkSt(x){var s=status(x);return s==='Habis'?'bad':s==='Order'?'warn':'ok';}
   function dkSvg(p){return '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';}
   var DKFL='<path d="M9 3h6M10 3v6L5 19a1.6 1.6 0 0 0 1.4 2.3h11.2A1.6 1.6 0 0 0 19 19l-5-10V3M7.5 15h9"/>';
@@ -2997,7 +3001,7 @@ var PANDUAN = [
   }
   function dkS(m){
     if(!$('dkRootS'))return; if(!DK.ok)dkInit();
-    var it=m.items.map(function(x){return {x:x,st:dkSt(x),c:dkCat(x.n)};}), n=it.length, cn={ok:0,warn:0,bad:0}, cc=[0,0,0,0,0];
+    var it=m.items.map(function(x){return {x:x,st:dkSt(x),c:dkCat(x.n)};}), n=it.length, cn={ok:0,warn:0,bad:0}, cc=[0,0,0,0,0,0];
     it.forEach(function(r){cn[r.st]++;cc[r.c]++;}); DK.it=it;
     $('dkBln').innerHTML=bulan.map(function(b,i){return '<option value="'+i+'">'+esc(b.name+(b.yr?' '+b.yr:''))+'</option>';}).join(''); $('dkBln').value=$('stokBulan').selectedIndex;
     function kp(c,col,ic,t,v,tc){return '<div class="dk-k '+c+'"><span class="ik" style="background:'+col+'">'+dkSvg(ic)+'</span><div><small class="t" style="color:'+tc+'">'+t+'</small><b>'+v+'</b><small>jenis reagensia</small></div></div>';}
@@ -3235,28 +3239,6 @@ var PANDUAN = [
     }
   }
   moveChart();
-
-  // Grafik beranda "berjalan": ukur ulang + putar ulang animasi setiap kali Beranda tampil
-  // (setelah login, klik menu Beranda, atau saat halaman pertama dibuka).
-  // Grafik dibuat saat masih tersembunyi, jadi tanpa ini animasinya selesai sebelum terlihat.
-  var _hcBusy=null;
-  function replayHomeChart(){
-    if(typeof Chart==='undefined'||!Chart.getChart) return;
-    var b=document.body;
-    if(b.classList.contains('locked')||b.getAttribute('data-view')!=='home') return;
-    var cv=$('chTren'); if(!cv||!cv.parentElement||!cv.parentElement.offsetWidth) return;
-    var ch=Chart.getChart(cv); if(!ch) return;
-    var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    ch.options.animation={duration:reduced?0:1000,easing:'easeOutQuart'};
-    try{ ch.resize(); ch.reset(); ch.update(); }catch(e){}
-  }
-  function scheduleReplay(ms){ clearTimeout(_hcBusy); _hcBusy=setTimeout(replayHomeChart,ms||150); }
-  var _sv2=window.setView;
-  window.setView=function(v){ var r=_sv2.apply(this,arguments); if(v==='home') scheduleReplay(120); return r; };
-  new MutationObserver(function(){ if(!document.body.classList.contains('locked')) scheduleReplay(200); })
-    .observe(document.body,{attributes:true,attributeFilter:['class']});
-  window.addEventListener('load',function(){ scheduleReplay(400); });
-  var _ys=$('yearSel'); if(_ys) _ys.addEventListener('change',function(){ scheduleReplay(60); });
 
   function txt(id){var e=$(id);return e?e.textContent.trim():'';}
   function fmtT(d){return d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}).replace('.',':');}
