@@ -3142,7 +3142,7 @@ var PANDUAN = [
 <script>
 // ===== Indikator Mutu Lab: Waktu Tunggu (1 Google Sheet, tahun dinamis) =====
 (function(){
-  var SHEET_ID='1kvkQXjqyGytj7MSHAz_a6zoznmHKAITRkXrtV5lWMlc', GID='632273053';
+  var SHEET_ID='1kvkQXjqyGytj7MSHAz_a6zoznmHKAITRkXrtV5lWMlc', GID='0';
   var BAIK=95, TARGET=80;
   var BLN=['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'];
   var SHORT=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
@@ -3164,7 +3164,22 @@ var PANDUAN = [
     var n=parseFloat(s);return isNaN(n)?null:n;}
   function monthIdx(s){var u=String(s||'').toUpperCase().trim();if(!u)return -1;for(var i=0;i<12;i++)if(u.indexOf(BLN[i])===0)return i;return -1;}
   // Baris = tahun, kolom = nama bulan. Mengembalikan {tahun:[12 nilai]} hanya untuk tahun yang punya minimal 1 bulan terisi.
-  function parseSheet(rows){
+  function parseLong(rows){
+    // Format panjang (tab input "DATA REKAP INDIKATOR MUTU"): NOMOR | TAHUN | BULAN | nilai %, satu baris per bulan.
+    var out={},i,j;
+    for(i=0;i<rows.length;i++){var r=rows[i];
+      for(j=0;j<r.length-1;j++){
+        var ys=String(r[j]||'').replace(/^(2)[.,](\d{3})$/,'$1$2').trim();
+        if(!/^(19|20)\d\d$/.test(ys))continue;
+        var m=monthIdx(r[j+1]); if(m<0)continue;
+        var n=null,k; for(k=j+2;k<r.length&&n==null;k++)n=numId(r[k]);
+        if(n==null)break;
+        if(n>0&&n<=1)n=Math.round(n*1000)/10; // sel berformat desimal (0,8) -> 80
+        if(!out[ys])out[ys]=[N,N,N,N,N,N,N,N,N,N,N,N];
+        out[ys][m]=n; break;}}
+    return out;}
+  function parseSheet(rows){var a=parseMatrix(rows);return Object.keys(a).length?a:parseLong(rows);}
+  function parseMatrix(rows){
     var hi=-1,yc=-1,mc={},i,j;
     for(i=0;i<rows.length&&hi<0;i++){
       var t=-1,cnt=0,map={};
