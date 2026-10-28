@@ -3373,19 +3373,22 @@ var PANDUAN = [
 })();
 </script>
 <script>
-// ===== Tren pemeriksaan per kelurahan (Google Sheets, tab "RKP PEMERIKSAAN BY KELURAHAN") =====
+// ===== Tren pemeriksaan per kelurahan (Google Sheets REKAP_LAB_DAN_STOK_OPNAME_2026, tab "REKAP KELURAHAN") =====
 (function(){
-  var SID='1cwQoPEtHT33xWXUfFA05P14LKhrZje438RFLBFmNRts', GID='152814183';
+  var SID='1axwil6eYFLv8OPg44DwEL0SHawrB5r_tdzWnhR78clg', GID='1506686793';
   var URL_SHEET='https://docs.google.com/spreadsheets/d/'+SID+'/edit?gid='+GID;
-  // Tahun yang belum penuh: jumlah bulan yang sudah terisi. Label di sheet (mis. "JANUARI-SEPTEMBER") otomatis diutamakan.
-  var BULAN_TERISI={2026:9};
+  // Tahun yang belum penuh: jumlah bulan yang sudah terisi (2026 = riwayat Jan-Sep + Oktober dari INPUT KELURAHAN).
+  // Label di sheet (mis. "JANUARI-OKTOBER") otomatis diutamakan.
+  var BULAN_TERISI={2026:10};
   var BLN=['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'];
   var SHORT=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
   var CATS=['Kimia Klinik','Hematologi','Imunologi','Urinalisa','NAPZA / Toksikologi','Mikrobiologi & Parasitologi','Lain-lain'];
-  // Cadangan urutan kolom bila judul kolom tidak terbaca (indeks kategori per kolom, sebelum kolom Total)
-  var LAYOUT={2021:[2,0,1,3,4,5,5],2022:[2,0,1,3,4,5,5],2023:[2,0,1,3,4,5,5],2024:[0,1,2,3,4,5,5],2025:[0,1,2,4,3,5,5],2026:[0,2,1,3,4,5,5]};
+  // Cadangan urutan kolom bila judul kolom tidak terbaca (indeks kategori per kolom, sebelum kolom Total).
+  // Sheet REKAP KELURAHAN memakai urutan yang sama untuk semua tahun: Kimia Klinik, Imunologi, Hematologi, Urinalisa, NAPZA, Mikrobiologi & Parasitologi, Parasitologi.
+  var LAYOUT={2021:[0,2,1,3,4,5,5],2022:[0,2,1,3,4,5,5],2023:[0,2,1,3,4,5,5],2024:[0,2,1,3,4,5,5],2025:[0,2,1,3,4,5,5],2026:[0,2,1,3,4,5,5]};
   var PAL=['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#008300','#6250d6'], GRAY='#898781', EXTRA='#b7b1a7', SURF='#f2f0ec';
-  var FALL={"years":[2021,2022,2023,2024,2025,2026],"kel":["Sanga Sanga Dalam","Jawa","Sanga Sanga Muara","Pendingin","Sarijaya","Bantuas","Muara Kembang","Lainnya (luar wilayah / tidak diisi)"],"months":{"2026":9},"val":{"2021":{"Sanga Sanga Dalam":[333,310,1278,154,44,45,0],"Jawa":[117,144,489,75,28,10,0],"Sanga Sanga Muara":[46,123,242,78,2,7,0],"Pendingin":[62,173,391,101,11,10,0],"Sarijaya":[21,45,219,20,4,3,0],"Bantuas":[3,8,42,3,7,1,0],"Muara Kembang":[5,3,7,0,0,2,0],"Lainnya (luar wilayah / tidak diisi)":[39,40,541,14,7,3,0]},"2022":{"Sanga Sanga Dalam":[499,380,595,180,173,74,0],"Jawa":[147,181,246,97,75,32,0],"Sanga Sanga Muara":[85,136,165,60,34,43,0],"Pendingin":[87,173,243,100,46,47,0],"Sarijaya":[30,60,84,18,27,12,0],"Bantuas":[16,9,27,5,49,2,0],"Muara Kembang":[4,3,9,3,24,2,0],"Lainnya (luar wilayah / tidak diisi)":[68,59,307,28,31,8,0]},"2023":{"Sanga Sanga Dalam":[897,844,429,182,148,103,0],"Jawa":[391,334,200,96,77,33,0],"Sanga Sanga Muara":[423,219,179,85,53,35,0],"Pendingin":[238,224,186,99,56,19,0],"Sarijaya":[203,105,68,29,32,13,0],"Bantuas":[23,40,42,12,35,3,0],"Muara Kembang":[17,12,11,7,12,0,0],"Lainnya (luar wilayah / tidak diisi)":[72,48,92,11,15,4,0]},"2024":{"Sanga Sanga Dalam":[782,738,544,183,176,101,0],"Jawa":[360,277,207,82,85,39,0],"Sanga Sanga Muara":[254,216,151,96,31,31,0],"Pendingin":[337,241,196,106,27,45,0],"Sarijaya":[116,102,90,30,30,14,0],"Bantuas":[24,31,37,9,31,6,0],"Muara Kembang":[20,12,21,6,10,3,0],"Lainnya (luar wilayah / tidak diisi)":[52,32,93,10,17,6,0]},"2025":{"Sanga Sanga Dalam":[757,290,394,227,190,83,0],"Jawa":[339,161,157,74,76,26,0],"Sanga Sanga Muara":[180,98,135,51,88,81,0],"Pendingin":[288,161,174,49,100,26,0],"Sarijaya":[123,53,66,24,39,57,0],"Bantuas":[18,13,11,42,7,1,0],"Muara Kembang":[13,6,7,21,3,1,0],"Lainnya (luar wilayah / tidak diisi)":[106,76,60,17,35,2,0]},"2026":{"Sanga Sanga Dalam":[645,376,207,199,90,24,0],"Jawa":[238,169,112,90,59,20,0],"Sanga Sanga Muara":[186,165,110,96,41,18,0],"Pendingin":[184,167,93,87,44,11,0],"Sarijaya":[115,69,43,45,21,5,0],"Bantuas":[22,20,13,8,15,1,0],"Muara Kembang":[7,10,9,4,18,0,0],"Lainnya (luar wilayah / tidak diisi)":[98,51,69,25,9,4,0]}}};
+  // Data cadangan (snapshot REKAP KELURAHAN, 28 Okt 2026) dipakai bila Google Sheets belum terbaca.
+  var FALL={"years":[2021,2022,2023,2024,2025,2026],"kel":["Sanga Sanga Dalam","Jawa","Sanga Sanga Muara","Pendingin","Sarijaya","Bantuas","Muara Kembang","Lainnya (luar wilayah / tidak diisi)"],"months":{"2026":10},"val":{"2021":{"Sanga Sanga Dalam":[333,310,1278,154,44,45,0],"Jawa":[117,144,489,75,28,10,0],"Sanga Sanga Muara":[46,123,242,78,2,7,0],"Pendingin":[62,173,391,101,11,10,0],"Sarijaya":[21,45,219,20,4,3,0],"Bantuas":[3,8,42,3,7,1,0],"Muara Kembang":[5,3,7,0,0,2,0],"Lainnya (luar wilayah / tidak diisi)":[39,40,541,14,7,3,0]},"2022":{"Sanga Sanga Dalam":[499,380,595,180,173,74,0],"Jawa":[147,181,246,97,75,32,0],"Sanga Sanga Muara":[85,136,165,60,34,43,0],"Pendingin":[87,173,243,100,46,47,0],"Sarijaya":[30,60,84,18,27,12,0],"Bantuas":[16,9,27,5,49,2,0],"Muara Kembang":[4,3,9,3,24,2,0],"Lainnya (luar wilayah / tidak diisi)":[68,59,307,28,31,8,0]},"2023":{"Sanga Sanga Dalam":[897,844,429,182,148,103,0],"Jawa":[391,334,200,96,77,33,0],"Sanga Sanga Muara":[423,219,179,85,53,35,0],"Pendingin":[238,224,186,99,56,19,0],"Sarijaya":[203,105,68,29,32,13,0],"Bantuas":[23,40,42,12,35,3,0],"Muara Kembang":[17,12,11,7,12,0,0],"Lainnya (luar wilayah / tidak diisi)":[72,48,92,11,15,4,0]},"2024":{"Sanga Sanga Dalam":[782,738,544,183,176,101,0],"Jawa":[360,277,207,82,85,39,0],"Sanga Sanga Muara":[254,216,151,96,31,31,0],"Pendingin":[337,241,196,106,27,45,0],"Sarijaya":[116,102,90,30,30,14,0],"Bantuas":[24,31,37,9,31,6,0],"Muara Kembang":[20,12,21,6,10,3,0],"Lainnya (luar wilayah / tidak diisi)":[52,32,93,10,17,6,0]},"2025":{"Sanga Sanga Dalam":[757,290,394,227,190,83,0],"Jawa":[339,161,157,74,76,26,0],"Sanga Sanga Muara":[180,98,135,51,88,81,0],"Pendingin":[288,161,174,49,100,26,0],"Sarijaya":[123,53,66,24,39,57,0],"Bantuas":[18,13,11,42,7,1,0],"Muara Kembang":[13,6,7,21,3,1,0],"Lainnya (luar wilayah / tidak diisi)":[106,76,60,17,35,2,0]},"2026":{"Sanga Sanga Dalam":[713,400,210,208,91,29,0],"Jawa":[269,184,116,92,63,24,0],"Sanga Sanga Muara":[198,175,115,98,42,24,0],"Pendingin":[209,174,99,89,44,12,0],"Sarijaya":[126,73,45,46,21,5,0],"Bantuas":[22,21,13,9,15,1,0],"Muara Kembang":[12,10,9,4,18,1,0],"Lainnya (luar wilayah / tidak diisi)":[106,54,71,25,9,5,0]}}};
   var D=FALL, live=false, C={}, timer=null;
   function $(i){return document.getElementById(i);}
   function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -3406,10 +3409,11 @@ var PANDUAN = [
   function title(n){return isLain(n)?'Lainnya (luar wilayah / tidak diisi)':n.toLowerCase().replace(/(^|\s)(\S)/g,function(m,a,b){return a+b.toUpperCase();});}
   function parse(rows){
     var out={years:[],kel:[],months:{},val:{}},i,j,c,k,lain=false;
-    var years=[]; rows.forEach(function(r){var m=/^tahun\s+(\d{4})/i.exec(String(r[0]||'').trim()); if(m)years.push(+m[1]);});
     var known=Object.keys(LAYOUT).map(Number).sort(function(a,b){return a-b;});
+    // Judul blok: "TAHUN 2026" (dihitung otomatis dari INPUT KELURAHAN) dan "RIWAYAT 2026 (...)" (format lama).
+    // Blok dengan tahun yang sama dijumlahkan.
     for(i=0;i<rows.length;i++){
-      var m=/^tahun\s+(\d{4})/i.exec(String(rows[i][0]||'').trim()); if(!m)continue;
+      var m=/^(?:tahun|riwayat)\s+(\d{4})/i.exec(String(rows[i][0]||'').trim()); if(!m)continue;
       var y=+m[1], label='';
       for(c=1;c<rows[i].length;c++)label+=' '+String(rows[i][c]||'');
       var mm=/JANUARI\s*-\s*([A-Z]+)/.exec(label.toUpperCase());
@@ -3426,7 +3430,11 @@ var PANDUAN = [
         var name=title(nm); vals[name]=v;
         if(isLain(name)){lain=true;} else if(out.kel.indexOf(name)<0)out.kel.push(name);
       }
-      if(Object.keys(vals).length){out.val[y]=vals; if(out.years.indexOf(y)<0)out.years.push(y);}
+      if(Object.keys(vals).length){
+        if(out.val[y]){Object.keys(vals).forEach(function(n){var a=out.val[y][n]||(out.val[y][n]=[0,0,0,0,0,0,0]); for(var q=0;q<7;q++)a[q]+=vals[n][q];});}
+        else out.val[y]=vals;
+        if(out.years.indexOf(y)<0)out.years.push(y);
+      }
     }
     if(lain)out.kel.push(title('LAINNYA'));
     out.years.sort(function(a,b){return a-b;});
@@ -3560,7 +3568,7 @@ var PANDUAN = [
   }
   function note(){
     var n=[],part=D.years.filter(isPartial);
-    n.push(live?'Data langsung dari Google Sheets, tab "RKP Pemeriksaan by Kelurahan". <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>.':'Menampilkan data cadangan (Google Sheets belum terbaca; pastikan dibagikan "siapa saja yang memiliki link").');
+    n.push(live?'Data langsung dari Google Sheets, tab "REKAP KELURAHAN". <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>.':'Menampilkan data cadangan (Google Sheets belum terbaca; pastikan dibagikan "siapa saja yang memiliki link").');
     if(part.length)n.push('Tahun bertanda * belum penuh ('+part.map(function(y){return y+': '+rangeTxt(y);}).join('; ')+'). Pakai ukuran "Rata-rata per bulan" untuk membandingkan secara adil.');
     n.push('Kategori Mikrobiologi dan Parasitologi digabung; nama kategori yang berbeda antar tahun disamakan.');
     $('klNote').innerHTML=n.join(' ');
