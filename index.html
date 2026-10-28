@@ -2807,12 +2807,12 @@ var PANDUAN = [
 </script>
 
 <script>
-// Stok reagensia: dibaca langsung dari Google Sheets (sheet harus bisa dilihat siapa pun yang punya link)
+// Stok reagensia: dibaca langsung dari Google Sheets REKAP_LAB_DAN_STOK_OPNAME_2026, tab "STOK OPNAME" (sheet harus bisa dilihat siapa pun yang punya link)
 (function(){
-  var SID='1cwQoPEtHT33xWXUfFA05P14LKhrZje438RFLBFmNRts', GID='2044629781';
+  var SID='1axwil6eYFLv8OPg44DwEL0SHawrB5r_tdzWnhR78clg', GID='131724345';
   var URL_CSV='https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&gid='+GID;
   var URL_SHEET='https://docs.google.com/spreadsheets/d/'+SID+'/edit?gid='+GID;
-  // Aturan order mengikuti sheet: kolom "Keterangan" = ORDER bila stok akhir <= buffer stok (tab BUFFER).
+  // Aturan order mengikuti sheet: kolom "Status" = ORDER bila stok akhir <= buffer, HABIS bila stok akhir 0, NONAKTIF tidak dihitung.
   var $=function(i){return document.getElementById(i);}, bulan=[], loaded=false, timer=null;
   var esc=function(t){return String(t).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});};
   function csv(t){var r=[],row=[],c='',q=false,i,ch;
@@ -2824,34 +2824,34 @@ var PANDUAN = [
     if(c||row.length){row.push(c);r.push(row);} return r;}
   function num(v){var x=String(v==null?'':v).replace(/[^\d-]/g,''); if(!x||x==='-')return null; return parseInt(x,10);}
   var BLN=['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'];
-  // Google (gviz) mengosongkan teks di kolom yang mayoritas angka, jadi baris "PERIODE"/"No" bisa hilang.
-  // Karena itu blok bulan dikenali dari judul "Nama Reagen" (kolom teks), bukan dari kata PERIODE.
+  // Tab "STOK OPNAME": satu tabel datar untuk SATU bulan. Bulan & tahun dibaca dari sel "Periode" (mis. "Oktober 2026").
+  // Kolom: No, Kode, Nama reagen, Kategori, Sumber, Satuan, Lot terakhir, Expired terakhir, Stok awal, Masuk, Keluar,
+  // Stok akhir, Buffer, Cukup (hari), Status, Peringatan expired. Baris berstatus NONAKTIF tidak ditampilkan.
+  // Google (gviz) bisa mengosongkan judul di kolom yang mayoritas angka, jadi kolom dicari dari judulnya bila terbaca,
+  // dan bila tidak memakai posisi relatif terhadap kolom "Nama reagen".
   function parse(rows){
-    var out=[],cur=null,col=null,sumber='',nb=0;
-    rows.forEach(function(r,ri){
-      var n=-1,k; for(k=0;k<r.length;k++){if(/nama\s*reagen/i.test(r[k]||'')){n=k;break;}}
-      if(n>=0){
-        var bln='',bRow=null; for(var b=ri-1;b>=Math.max(0,ri-3)&&!bln;b--){rows[b].forEach(function(x){if(!bln&&BLN.indexOf((x||'').trim().toUpperCase())>=0){bln=x.trim();bRow=rows[b];}});}
-        var yr=null; if(bRow)bRow.forEach(function(x){var mm=/(^|\D)(20\d{2})(\D|$)/.exec(String(x||'')); if(yr===null&&mm)yr=+mm[2];});
-        cur={name:bln||BLN[nb%12],yr:yr,items:[]};nb++;out.push(cur);sumber='';
-        col={n:n,s:n-1,a:n+4,i:n+67,o:n+68,e:n+69,b:n+70,k:n+71};
-        r.forEach(function(x,k){var h=(x||'').trim().toLowerCase();
-          if(h==='sumber')col.s=k;else if(h==='stok awal')col.a=k;else if(h==='jumlah penerimaan')col.i=k;
-          else if(h==='jumlah pengeluaran')col.o=k;else if(h==='stok akhir')col.e=k;
-          else if(h==='buffer stok')col.b=k;else if(/^keterangan/.test(h))col.k=k;});
-        return;}
-      if(!col)return;
-      var nm=(r[col.n]||'').trim(); if(!nm)return;
-      if((r[col.s]||'').trim())sumber=r[col.s].trim();
+    var h=-1,n=-1,i,k;
+    for(i=0;i<rows.length&&h<0;i++){for(k=0;k<rows[i].length;k++){if(/^nama\s*reagen$/i.test((rows[i][k]||'').trim())){h=i;n=k;break;}}}
+    for(i=0;i<rows.length&&h<0;i++){for(k=0;k<rows[i].length;k++){if(/nama\s*reagen/i.test(rows[i][k]||'')){h=i;n=k;break;}}}
+    if(h<0)return [];
+    var col={kd:n-1,n:n,kt:n+1,s:n+2,sa:n+3,lt:n+4,ex:n+5,a:n+6,i:n+7,o:n+8,e:n+9,b:n+10,hr:n+11,k:n+12,w:n+13};
+    var hd={'kode':'kd','kategori':'kt','sumber':'s','satuan':'sa','lot terakhir':'lt','expired terakhir':'ex','stok awal':'a','masuk':'i','keluar':'o','stok akhir':'e','buffer':'b','cukup (hari)':'hr','status':'k','peringatan expired':'w'};
+    rows[h].forEach(function(x,j){var t=(x||'').trim().toLowerCase(); if(hd[t])col[hd[t]]=j;});
+    var mn=-1,yr=null;
+    for(i=0;i<=h&&mn<0;i++){rows[i].forEach(function(x){var m=/^(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)\s+(20\d{2})$/i.exec((x||'').trim()); if(m&&mn<0){mn=BLN.indexOf(m[1].toUpperCase());yr=+m[2];}});}
+    if(mn<0){var now=new Date(); mn=now.getMonth(); yr=now.getFullYear();}
+    var items=[],g=function(r,c){return String(r[c]==null?'':r[c]).trim();};
+    for(i=h+1;i<rows.length;i++){
+      var r=rows[i], nm=g(r,col.n); if(!nm)continue;
+      var st=g(r,col.k).toUpperCase(); if(st==='NONAKTIF')continue;
       var aw=num(r[col.a]),mi=num(r[col.i]),ke=num(r[col.o]),ak=num(r[col.e]);
-      if(aw==null&&mi==null&&ke==null&&ak==null)return; // belum ada data
-      var bf=num(r[col.b]),kt=(r[col.k]||'').trim().toUpperCase();
-      cur.items.push({n:nm,s:sumber,a:aw||0,i:mi||0,o:ke||0,e:ak==null?0:ak,b:bf,k:kt});
-    });
-    return out.filter(function(m){return m.items.length;});
+      if(aw==null&&mi==null&&ke==null&&ak==null)continue; // belum ada data
+      items.push({n:nm,s:g(r,col.s),a:aw||0,i:mi||0,o:ke||0,e:ak==null?0:ak,b:num(r[col.b]),k:st,kd:g(r,col.kd),kt:g(r,col.kt),sa:g(r,col.sa),ex:g(r,col.ex),w:g(r,col.w)});
+    }
+    return items.length?[{name:BLN[mn].charAt(0)+BLN[mn].slice(1).toLowerCase(),yr:yr,items:items}]:[];
   }
   function status(x){
-    if(x.e<=0)return 'Habis';
+    if(x.e<=0||x.k==='HABIS')return 'Habis';
     if(x.k==='ORDER'||(!x.k&&x.b!=null&&x.e<=x.b))return 'Order';
     if(x.k==='AMAN'||x.b!=null)return 'Aman';
     return 'Tanpa buffer';
@@ -3020,7 +3020,7 @@ var PANDUAN = [
 
   /* ===== Tampilan gelap (sesuai mockup): kartu ringkasan, daftar stok, grafik kategori & status ===== */
   var DK={p:1,ok:0,it:[]}, DKCOL=['#1d6fe0','#12a36c','#f5a800','#8b4ee0','#10b8d6','#8a96b0'], DKCAT=['Kimia Klinik','Imunologi','Mikrobiologi','Hematologi','Urinalisa','Lain-lain'], DKL={ok:'Aman',warn:'Perlu Order',bad:'Habis'};
-  // Sheet stok belum punya kolom kategori / satuan / expired: kategori ditebak dari nama reagen (ubah pola di sini bila perlu)
+  // Kategori diambil dari kolom Kategori di sheet (dkKat). Tebakan dari nama reagen (dkCat) hanya dipakai bila kolom itu kosong.
   function dkCat(n){n=n.toLowerCase();
     // Urutan pengecekan penting: bahan habis pakai dulu, lalu Urinalisa, Hematologi, Kimia Klinik, Imunologi, Mikrobiologi.
     // 0 Kimia Klinik, 1 Imunologi, 2 Mikrobiologi, 3 Hematologi, 4 Urinalisa, 5 Lain-lain (bahan habis pakai / penunjang)
@@ -3031,6 +3031,8 @@ var PANDUAN = [
     if(/hiv|hbs\s*ag|hbsag|hcv|widal|salmonella|typhy|typhoid|tifoid|tpha|vdrl|rapid|dengue|ns\s*1|\bigg\b|\bigm\b|crp|\brf\b|anti|hcg|kehamilan|pp\s*test|plano|sifilis|syphilis|malaria|napza|narkoba|\bfob\b|tubex|troponin|\btsh\b|\bft4\b|\bhir\b/.test(n))return 1;
     if(/tcm|cartridge|catridge|xpert|agar|gram|ziehl|giemsa|\bbta\b|kultur|pewarna|lugol|methyl|carbol|oil|imersi|parasit|mikro/.test(n))return 2;
     return 5;}
+  function dkKat(x){var t=(x.kt||'').toLowerCase(); if(!t)return dkCat(x.n);
+    if(/kimia/.test(t))return 0; if(/imun|serolog/.test(t))return 1; if(/molekul|mikrob/.test(t))return 2; if(/hemato/.test(t))return 3; if(/urin/.test(t))return 4; if(/tabung|wadah|lain/.test(t))return 5; return dkCat(x.n);}
   function dkSt(x){var s=status(x);return s==='Habis'?'bad':s==='Order'?'warn':'ok';}
   function dkSvg(p){return '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';}
   var DKFL='<path d="M9 3h6M10 3v6L5 19a1.6 1.6 0 0 0 1.4 2.3h11.2A1.6 1.6 0 0 0 19 19l-5-10V3M7.5 15h9"/>';
@@ -3063,7 +3065,7 @@ var PANDUAN = [
     var f=DK.it.filter(function(r){return (!q||r.x.n.toLowerCase().indexOf(q)>=0)&&(c===''||r.c==+c)&&(!sv||(r.x.s||'').trim()===sv)&&(!s||r.st===s);});
     var pg=Math.max(1,Math.ceil(f.length/6)); DK.p=Math.min(DK.p,pg);
     var a=(DK.p-1)*6, rows=f.slice(a,a+6).map(function(r,i){var x=r.x;
-      return '<tr><td>'+(a+i+1)+'</td><td>'+esc(x.n)+'</td><td>'+DKCAT[r.c]+'</td><td>'+esc(x.s||'–')+'</td><td'+(r.st!=='ok'?' class="'+r.st+'"':'')+'>'+x.e+'</td><td>–</td><td><span class="dk-pill '+r.st+'">'+DKL[r.st]+'</span></td><td>–</td><td><button type="button" class="dk-lihat">Lihat</button></td></tr>'+
+      return '<tr><td>'+(a+i+1)+'</td><td>'+esc(x.n)+'</td><td>'+DKCAT[r.c]+'</td><td>'+esc(x.s||'–')+'</td><td'+(r.st!=='ok'?' class="'+r.st+'"':'')+'>'+x.e+'</td><td>'+esc(x.sa||'–')+'</td><td><span class="dk-pill '+r.st+'">'+DKL[r.st]+'</span></td><td>'+(x.ex?esc(x.ex)+(x.w?' <small>('+esc(x.w.toLowerCase())+')</small>':''):'–')+'</td><td><button type="button" class="dk-lihat">Lihat</button></td></tr>'+
         '<tr class="dk-det" hidden><td colspan="9">Sumber: <b>'+esc(x.s||'–')+'</b> · Stok awal: <b>'+x.a+'</b> · Masuk: <b>'+x.i+'</b> · Keluar: <b>'+x.o+'</b> · Stok akhir: <b>'+x.e+'</b> · Buffer: <b>'+(x.b==null?'–':x.b)+'</b></td></tr>';}).join('');
     $('dkT').tBodies[0].innerHTML=rows||'<tr><td colspan="9">Tidak ada reagensia yang cocok.</td></tr>';
     $('dkI').textContent='Menampilkan '+(f.length?a+1:0)+' - '+Math.min(a+6,f.length)+' dari '+f.length+' data';
@@ -3088,7 +3090,7 @@ var PANDUAN = [
   }
   function dkS(m){
     if(!$('dkRootS'))return; if(!DK.ok)dkInit();
-    var it=m.items.map(function(x){return {x:x,st:dkSt(x),c:dkCat(x.n)};}), n=it.length, cn={ok:0,warn:0,bad:0}, cc=[0,0,0,0,0,0];
+    var it=m.items.map(function(x){return {x:x,st:dkSt(x),c:dkKat(x)};}), n=it.length, cn={ok:0,warn:0,bad:0}, cc=[0,0,0,0,0,0];
     it.forEach(function(r){cn[r.st]++;cc[r.c]++;}); DK.it=it;
     $('dkBln').innerHTML=bulan.map(function(b,i){return '<option value="'+i+'">'+esc(b.name+(b.yr?' '+b.yr:''))+'</option>';}).join(''); $('dkBln').value=$('stokBulan').selectedIndex;
     function kp(c,col,ic,t,v,tc){return '<div class="dk-k '+c+'"><span class="ik" style="background:'+col+'">'+dkSvg(ic)+'</span><div><small class="t" style="color:'+tc+'">'+t+'</small><b>'+v+'</b><small>jenis reagensia</small></div></div>';}
