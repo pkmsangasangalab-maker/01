@@ -1772,7 +1772,7 @@ html body.locked #loginOverlay #loginError:not(:empty){background:#ffe6e2;border
       <i class="fa-solid fa-boxes-stacked"></i> STOK, PERALATAN & KONTROL MUTU
     </div>
     <div class="horizontal-grid" data-group="stok">
-      <a rel="noopener noreferrer" data-internal href="https://docs.google.com/spreadsheets/d/1cwQoPEtHT33xWXUfFA05P14LKhrZje438RFLBFmNRts/edit?gid=1152592586#gid=1152592586" target="_blank" class="card">
+      <a rel="noopener noreferrer" data-internal href="https://docs.google.com/spreadsheets/d/1axwil6eYFLv8OPg44DwEL0SHawrB5r_tdzWnhR78clg/edit?gid=131724345#gid=131724345" target="_blank" class="card">
         <div class="icon">📦</div>
         <div>
           <h3>REKAP STOK, PENERIMAAN DAN PEMERIKSAAN LAB</h3>
@@ -2809,7 +2809,7 @@ var PANDUAN = [
 <script>
 // Stok reagensia: dibaca langsung dari Google Sheets REKAP_LAB_DAN_STOK_OPNAME_2026, tab "STOK OPNAME" (sheet harus bisa dilihat siapa pun yang punya link)
 (function(){
-  var SID='1axwil6eYFLv8OPg44DwEL0SHawrB5r_tdzWnhR78clg', GID='131724345';
+  var SID='1axwil6eYFLv8OPg44DwEL0SHawrB5r_tdzWnhR78clg', GID='131724345', GID_MASTER='967284261', GID_LOG='512586976';
   var URL_CSV='https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&gid='+GID;
   var URL_SHEET='https://docs.google.com/spreadsheets/d/'+SID+'/edit?gid='+GID;
   // Aturan order mengikuti sheet: kolom "Status" = ORDER bila stok akhir <= buffer, HABIS bila stok akhir 0, NONAKTIF tidak dihitung.
@@ -2850,6 +2850,50 @@ var PANDUAN = [
     }
     return items.length?[{name:BLN[mn].charAt(0)+BLN[mn].slice(1).toLowerCase(),yr:yr,items:items}]:[];
   }
+  // ===== Riwayat bulanan: dihitung dari MASTER REAGEN (stok awal 1 Jan, buffer, aktif) + LOG TRANSAKSI (masuk/keluar) =====
+  // Stok awal bulan = stok awal 1 Jan + (masuk - keluar) semua bulan sebelumnya. Hasil Oktober 2026 sama persis dengan tab STOK OPNAME.
+  function tglParse(t){t=String(t||'').trim(); var m=/^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(t);
+    if(m)return {y:+m[1],m:+m[2]-1};
+    m=/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/.exec(t); if(!m)return null;
+    var a=+m[1],b=+m[2]; // hari/bulan (Indonesia); bila bagian kedua > 12 berarti format bulan/hari
+    return {y:+m[3],m:(b>12&&a<=12)?a-1:b-1};}
+  function cariHeader(rows,re){var i,k; for(i=0;i<rows.length;i++){for(k=0;k<rows[i].length;k++){if(re.test((rows[i][k]||'').trim()))return {h:i,n:k};}} return null;}
+  function parseMaster(rows){
+    var f=cariHeader(rows,/^nama\s*reagen$/i); if(!f)return [];
+    var n=f.n, col={kd:n-1,n:n,kt:n+1,s:n+2,sa:n+3,a:n+4,b:n+5,ak:n+6};
+    var hd={'kode':'kd','kategori':'kt','sumber':'s','satuan':'sa','buffer':'b','aktif':'ak'};
+    rows[f.h].forEach(function(x,j){var t=(x||'').trim().toLowerCase(); if(hd[t])col[hd[t]]=j; else if(/^stok\s*awal/.test(t))col.a=j;});
+    var out=[],g=function(r,c){return String(r[c]==null?'':r[c]).trim();};
+    for(var i=f.h+1;i<rows.length;i++){var r=rows[i],nm=g(r,col.n); if(!nm)continue;
+      out.push({kd:g(r,col.kd)||nm,n:nm,kt:g(r,col.kt),s:g(r,col.s),sa:g(r,col.sa),a:num(r[col.a])||0,b:num(r[col.b]),aktif:!/^(tidak|nonaktif|no|n|false|0)$/i.test(g(r,col.ak))});}
+    return out;}
+  function parseLog(rows){
+    var f=cariHeader(rows,/^nama\s*reagen/i); if(!f)return [];
+    var n=f.n, col={t:n-2,kd:n-1,n:n,j:n+1,q:n+2};
+    rows[f.h].forEach(function(x,j){var t=(x||'').trim().toLowerCase(); if(/^tanggal/.test(t))col.t=j; else if(/^kode/.test(t))col.kd=j; else if(t==='jenis')col.j=j; else if(t==='jumlah')col.q=j;});
+    var out=[];
+    for(var i=f.h+1;i<rows.length;i++){var r=rows[i], d=tglParse(r[col.t]); if(!d)continue;
+      var jn=String(r[col.j]||'').trim().toLowerCase(), q=num(r[col.q]); if(q==null||!q)continue;
+      var kd=String(r[col.kd]||'').trim()||String(r[col.n]||'').trim(); if(!kd)continue;
+      out.push({kd:kd,nm:String(r[col.n]||'').trim(),y:d.y,m:d.m,j:/^masuk/.test(jn)?'i':(/^keluar/.test(jn)?'o':''),q:q});}
+    return out.filter(function(x){return x.j;});}
+  function bangun(ms,lg,cur){
+    var yr=cur.yr, ci=BLN.indexOf(cur.name.toUpperCase()), last=ci>=0?ci:0, idx={};
+    lg.forEach(function(t){if(t.y===yr&&t.m>last)last=t.m;});
+    ms.forEach(function(r){idx[r.kd]=r; idx[r.n]=r;});
+    var run={}, io={}, out=[], m;
+    ms.forEach(function(r){run[r.kd]=r.a;});
+    lg.forEach(function(t){if(t.y!==yr)return; var r=idx[t.kd]||idx[t.nm]; if(!r)return; var k=r.kd+'|'+t.m; (io[k]||(io[k]={i:0,o:0}))[t.j]+=t.q;});
+    for(m=0;m<=last;m++){
+      var name=BLN[m].charAt(0)+BLN[m].slice(1).toLowerCase(), items=[];
+      if(m===ci){out.push(cur);
+        ms.forEach(function(r){var x=io[r.kd+'|'+m]||{i:0,o:0}; run[r.kd]+=x.i-x.o;});
+        continue;}
+      ms.forEach(function(r){var x=io[r.kd+'|'+m]||{i:0,o:0}, aw=run[r.kd], ak=aw+x.i-x.o; run[r.kd]=ak;
+        if(!r.aktif)return;
+        items.push({n:r.n,s:r.s,a:aw,i:x.i,o:x.o,e:ak,b:r.b,k:'',kd:r.kd,kt:r.kt,sa:r.sa,ex:'',w:''});});
+      out.push({name:name,yr:yr,items:items});}
+    return out;}
   function status(x){
     if(x.e<=0||x.k==='HABIS')return 'Habis';
     if(x.k==='ORDER'||(!x.k&&x.b!=null&&x.e<=x.b))return 'Order';
@@ -3110,16 +3154,25 @@ var PANDUAN = [
       options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}},
       plugins:[{id:'dkc',afterDraw:function(ch){var a=ch.chartArea,c=ch.ctx,x=(a.left+a.right)/2,y=(a.top+a.bottom)/2;c.save();c.textAlign='center';c.fillStyle='#fff';c.font='700 26px Poppins,sans-serif';c.fillText(n,x,y+6);c.fillStyle='#b9c9ee';c.font='10px Poppins,sans-serif';c.fillText('Total Reagensia',x,y+22);c.restore();}}]});
   }
+  function ambil(gid){
+    return fetch('https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&gid='+gid+'&_='+Date.now()).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}).then(function(t){
+      if(/^\s*</.test(t))throw new Error('Google meminta login, sheet belum publik'); return csv(t);});
+  }
   function load(){
     $('stokNote').textContent='Memuat data…';
-    fetch(URL_CSV+'&_='+Date.now()).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}).then(function(t){
-      if(/^\s*</.test(t))throw new Error('Google meminta login, sheet belum publik');
-      var d=parse(csv(t)); if(!d.length)throw new Error('judul "Nama Reagen" tidak ditemukan, '+t.length+' karakter diterima, baris pertama: '+csv(t.slice(0,1500))[0].slice(0,5).join(' | '));
+    var pCur=ambil(GID).then(function(rows){
+      var d=parse(rows); if(!d.length)throw new Error('judul "Nama reagen" tidak ditemukan, '+rows.length+' baris diterima, baris pertama: '+(rows[0]||[]).slice(0,5).join(' | '));
+      return d;});
+    var pHist=Promise.all([ambil(GID_MASTER),ambil(GID_LOG)]).then(function(r){return {m:parseMaster(r[0]),l:parseLog(r[1])};}).catch(function(e){console.warn('Riwayat stok tidak dimuat:',e);return null;});
+    Promise.all([pCur,pHist]).then(function(res){
+      var d=res[0], h=res[1], ket='';
+      if(h&&h.m.length&&h.l.length){var b=bangun(h.m,h.l,d[0]); if(b.length){d=b; ket=' Riwayat '+b[0].name+'–'+b[b.length-1].name+' dihitung dari LOG TRANSAKSI.';}}
+      else ket=' Riwayat bulan sebelumnya belum terbaca, hanya bulan di tab STOK OPNAME yang tampil.';
       var keep=bulan.length?$('stokBulan').selectedIndex:-1; bulan=d; fillReagen(); skReagenFill(); fillTahun();
       $('stokBulan').innerHTML=d.map(function(x,i){return '<option>'+esc(x.name)+'</option>';}).join('');
       var def=d.length-1; for(var i=d.length-1;i>=0;i--){if(d[i].items.some(function(x){return x.o>0||x.i>0;})){def=i;break;}}
       $('stokBulan').selectedIndex=keep>=0&&keep<d.length?keep:def; applyTahun(true); render();
-      $('stokNote').innerHTML='Diperbarui '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+' dari Google Sheets. <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
+      $('stokNote').innerHTML='Diperbarui '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+' dari Google Sheets.'+esc(ket)+' <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
       loaded=true;
     }).catch(function(e){
       $('stokNote').innerHTML='Data stok gagal dimuat ['+esc(e&&e.message?e.message:'gagal terhubung')+']. Pastikan sheet bisa dilihat siapa pun yang punya link. <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
