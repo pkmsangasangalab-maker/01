@@ -4060,14 +4060,18 @@ var PANDUAN = [
         PARS.forEach(function(p,k){var v=nv(r[c+1+k]); if(v!=null){(o[p][tw]=o[p][tw]||[]).push(v);any=true;}});});
     });
     return any?out:null;}
+  function isDate(t){return /^\d{1,4}[\/.-]\d{1,2}[\/.-]\d{1,4}/.test(t)||/^\d{1,2}\s+[A-Za-z]{3,}/.test(t)||/^[A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4}/.test(t);}
+  // Nilai kontrol kimia klinik selalu kecil (< 1000). Angka >= 1000, teks, atau angka berformat ribuan di kolom nilai = nomor lot.
+  function lotVal(b){var raw=String(b).trim(); if(!raw)return false; var t=raw.replace(/\s/g,'');
+    if(/^\d{1,3}([.,]\d{3})+$/.test(t))return true; var n=nv(t); return n==null||n>=1000;}
   function parseKim(rows){
     var out={}, any=false;
     KIM.forEach(function(k){var c=k[1], lots=[], cur=null;
       rows.forEach(function(r){var a=String(r[c]==null?'':r[c]).trim(), b=String(r[c+1]==null?'':r[c+1]).trim();
-        if(!a&&!b)return; if(/^nilai/i.test(b)||/^tanggal/i.test(a)||/^qc\s/i.test(a))return;
-        var bn=nv(b);
-        if(/no\.?\s*lot/i.test(a)||(!a&&b&&(bn==null||bn>=10000))){cur={lot:b||'-',pts:[]};lots.push(cur);return;}
-        if(bn==null)return;
+        if(!a&&!b)return; if(/^nilai/i.test(b)||/^tanggal/i.test(a)||/^qc\s/i.test(a)||/diacon|assay/i.test(a))return;
+        var label=/lot/i.test(a);
+        if(label||(!isDate(a)&&lotVal(b))){var id=b.replace(/\s+/g,' ')||(label?a.replace(/no\.?\s*lot\s*:?/i,'').trim():'')||'-'; cur={lot:id,pts:[]};lots.push(cur);return;}
+        var bn=nv(b); if(bn==null)return;
         if(!cur){cur={lot:'(tanpa nomor lot)',pts:[]};lots.push(cur);}
         cur.pts.push({l:a||('#'+(cur.pts.length+1)),v:bn});});
       out[k[0]]=lots.filter(function(l){return l.pts.length>0;}); if(out[k[0]].length)any=true;});
@@ -4080,7 +4084,7 @@ var PANDUAN = [
       live=!!(a[0]||a[1]);
       D={hem:a[0]||fbHem(),kim:a[1]||{}};
       var msg=[]; if(!a[0])msg.push('hematologi memakai data cadangan (sheet tidak terbaca)'); if(!a[1])msg.push('kimia klinik tidak terbaca — pastikan sheet dibagikan “Siapa saja yang memiliki link: Viewer”');
-      $('sdNote').innerHTML='Sumber: <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">PROJECT STANDAR DEVIATION LAB 2025</a>. '+(msg.length?'<b>Catatan:</b> '+msg.join('; ')+'.':'Data langsung dari Google Sheets.');
+      $('sdNote').innerHTML='Sumber: <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">PROJECT STANDAR DEVIATION LAB 2025</a>. '+(msg.length?'<b>Catatan:</b> '+msg.join('; ')+'.':'Data langsung dari Google Sheets. Terbaca: '+KIM.map(function(x){return x[0]+' '+((D.kim[x[0]]||[]).length)+' lot';}).join(' · ')+'.');
       fillKat();
     });}
   function fillKat(){
