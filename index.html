@@ -1486,35 +1486,21 @@ html body.locked #loginOverlay #loginError:not(:empty){background:#ffe6e2;border
 .site-tape.show{animation:tapeShow 2.3s ease both}
 @keyframes tapeShow{0%{opacity:0;transform:rotate(-6deg) scale(.6)}12%{opacity:1;transform:rotate(-6deg) scale(1.06)}20%{transform:rotate(-6deg) scale(1)}80%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.site-rig,.site-cable,.cloud,.slab,.login-box::before,.login-box::after,.login-box.denied{animation:none!important}.slab{opacity:1}}
-/* ===== Dashboard Peringatan Expired & Standar Deviasi ===== */
-.ex-card,.sd-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin:18px 0;box-shadow:var(--lift);color:var(--ink);font-family:'Poppins','Segoe UI',Tahoma,sans-serif}
-.ex-card h3,.sd-card h3{margin:0 0 4px;font-size:1rem;color:var(--ink)}
-.ex-sub{margin:0 0 12px;font-size:.8rem;color:var(--ink-2)}
-.ex-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
-.ex-kpi{border-radius:12px;padding:10px 12px;background:#f6f4ef;border-left:5px solid #8f98a3}
-.ex-kpi b{display:block;font-size:1.6rem;line-height:1.1}.ex-kpi span{font-size:.74rem;color:var(--ink-2)}
-.ex-kpi.bad{border-color:#c9615a;background:#fbeceb}.ex-kpi.warn{border-color:#d08a2e;background:#fdf3e1}.ex-kpi.mid{border-color:#c9b552;background:#fbf8e3}.ex-kpi.ok{border-color:#5f9f7f;background:#e8f4ee}
-.ex-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;font-size:.82rem}
-.ex-tools select,.ex-tools input[type=search],.sd-tools select,.sd-tools input{border:1px solid #c6daf2;border-radius:10px;background:#fff;color:var(--ink);padding:7px 10px;font-size:.82rem;min-width:0}
-.ex-tools input[type=search]{flex:1;min-width:150px}
-.ex-scroll,.sd-scroll{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:12px}
-.ex-card table,.sd-card table{width:100%;border-collapse:collapse;font-size:.82rem}
-.ex-card th,.sd-card th{position:sticky;top:0;background:#e8e5df;color:var(--ink-2);text-align:left;padding:8px;font-weight:600;white-space:nowrap;z-index:1}
-html[data-theme="biru"] .ex-card th,html[data-theme="biru"] .sd-card th{background:#eaf3fe;color:#35517d}
-.ex-card td,.sd-card td{padding:7px 8px;border-top:1px solid var(--line)}
-.ex-card .num,.sd-card .num{text-align:right;font-variant-numeric:tabular-nums}
-.ex-b{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.7rem;font-weight:700;color:#fff;white-space:nowrap}
-.ex-b.bad{background:#c9615a}.ex-b.warn{background:#d08a2e}.ex-b.mid{background:#a99a2c}.ex-b.ok{background:#5f9f7f}.ex-b.na{background:#8f98a3}
-tr.ex-hot td{background:#fdeeee}
-.ex-empty{padding:14px;text-align:center;color:var(--ink-2)}
-.sd-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;font-size:.82rem}
-.sd-tools input[type=number]{width:120px}
-.sd-tools label{display:flex;gap:6px;align-items:center;color:var(--ink-2)}
-.sd-tools input[type=number]{width:120px}
-.sd-chart{height:340px;position:relative}
-.sd-grid{display:grid;grid-template-columns:1fr;gap:16px}
-#sdTbl tbody tr{cursor:pointer}#sdTbl tbody tr:hover td{background:#f1f6fd}#sdTbl tbody tr.sel td{background:#e3effd}
-.sd-note{font-size:.76rem;color:var(--ink-2);margin:8px 0 0}
+/* ===== Dashboard Peringatan Expired & Standar Deviasi (tema sama dengan Stok Reagensia) ===== */
+.dk-kpis.auto{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.dk-k.na{border-color:rgba(143,152,163,.5)}
+.dk-k.mid{border-color:rgba(216,192,48,.55);background:rgba(80,72,10,.4)}
+.dk-pill.na{background:#64748b;color:#fff}.dk-pill.mid{background:#d8c030;color:#3b2a00}
+.dk-scroll{max-height:420px;overflow:auto;border-radius:8px}
+.dk-t th{position:sticky;top:0;z-index:1;background:#14398a}
+.dk-t .num{text-align:right;font-variant-numeric:tabular-nums}
+tr.ex-hot td{background:rgba(229,56,59,.2)!important}
+#sdTbl tbody tr{cursor:pointer}#sdTbl tbody tr:hover td{background:rgba(29,111,224,.2)}#sdTbl tbody tr.sel td{background:rgba(29,111,224,.38)}
+.dk-note{font-size:.76rem;color:#b9c9ee;margin:10px 0 0}.dk-note a{color:#7cc4ff}
+.dk-empty{padding:16px;text-align:center;color:#b9c9ee}
+.dk-lbl{display:flex;align-items:center;gap:6px;font-size:.78rem;color:#c9d7f7}
+.dk .dk-filter input[type=number]{width:120px;flex:none}
+.dk-chbig{position:relative;height:340px}
 </style>
 </head>
 <body class="locked" data-view="home">
@@ -2046,18 +2032,19 @@ tr.ex-hot td{background:#fdeeee}
         </div>
         <p id="stokNote">Memuat data…</p>
       </div>
-      <div class="ex-card" id="exCard">
-          <h3>⏳ Peringatan Expired Reagensia</h3>
-          <p class="ex-sub" id="exSub">Memuat data…</p>
-          <div class="ex-kpis" id="exKpis"></div>
-          <div class="ex-tools">
+      <div class="dk" id="exCard">
+        <div class="dk-head"><span class="dk-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 3h6"/></svg></span><div><h2>Peringatan Expired Reagensia</h2><p id="exSub">Memuat data…</p></div></div>
+        <div class="dk-kpis auto" id="exKpis"></div>
+        <div class="dk-p">
+          <div class="dk-filter">
             <input type="search" id="exCari" autocomplete="off" placeholder="Cari reagen / lot…" aria-label="Cari reagen">
             <select id="exFilter" aria-label="Filter peringatan"><option value="all">Semua yang punya tanggal expired</option><option value="alert" selected>Perlu perhatian (≤ 90 hari)</option><option value="expired">Sudah kedaluwarsa</option><option value="30">≤ 30 hari</option><option value="90">31–90 hari</option><option value="180">91–180 hari</option></select>
-            <label><input type="checkbox" id="exStok"> Hanya yang masih ada stok</label>
+            <label class="dk-lbl"><input type="checkbox" id="exStok"> Hanya yang masih ada stok</label>
           </div>
-          <div class="ex-scroll"><table id="exTbl"><thead><tr><th>Reagen</th><th>Kategori</th><th>Lot</th><th>Expired</th><th class="num">Sisa hari</th><th class="num">Stok akhir</th><th>Peringatan</th></tr></thead><tbody></tbody></table></div>
-          <p class="sd-note">Sisa hari dihitung dari tanggal hari ini terhadap kolom “Expired terakhir” pada tab STOK OPNAME. Baris merah muda = sudah kedaluwarsa tetapi stok masih tercatat.</p>
+          <div class="dk-scroll"><table class="dk-t" id="exTbl"><thead><tr><th>Reagen</th><th>Kategori</th><th>Lot</th><th>Expired</th><th class="num">Sisa hari</th><th class="num">Stok akhir</th><th>Peringatan</th></tr></thead><tbody></tbody></table></div>
+          <p class="dk-note">Sisa hari dihitung dari tanggal hari ini terhadap kolom “Expired terakhir” pada tab STOK OPNAME. Baris merah = sudah kedaluwarsa tetapi stok masih tercatat.</p>
         </div>
+      </div>
     </section>
 
 
@@ -2080,28 +2067,33 @@ tr.ex-hot td{background:#fdeeee}
     </section>
 
   <section id="sdLive" data-view="sd">
-    <div class="section-title"><i class="fa-solid fa-chart-line"></i> DASHBOARD STANDAR DEVIASI (KONTROL MUTU)</div>
-    <div class="sd-card">
-      <div class="sd-tools">
-        <select id="sdKat" aria-label="Kategori"></select>
-        <select id="sdTahun" aria-label="Tahun"></select>
-        <select id="sdPar" aria-label="Parameter / lot"></select>
-        <select id="sdTw" aria-label="Triwulan"></select>
-        <label>Batas CV % <input type="number" id="sdCvMax" value="6" min="0" step="0.5"></label>
-        <label>Mean tetapan <input type="number" id="sdMeanT" step="any" placeholder="opsional"></label>
-        <label>SD tetapan <input type="number" id="sdSdT" step="any" placeholder="opsional"></label>
-        <button class="btn-action" id="sdMuat" type="button">🔄 Muat ulang</button>
+    <div class="dk" id="sdRoot">
+      <div class="dk-head"><span class="dk-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4"/><path d="M4 12h16" stroke-dasharray="2 2"/><path d="m6 15 3-3 3 4 3-7 3 3"/></svg></span><div><h2>Standar Deviasi QC</h2><p>Kontrol mutu hematologi &amp; kimia klinik (Levey-Jennings, mean, SD, CV, aturan Westgard)</p></div>
+        <div class="dk-ctl">
+          <div class="dk-f"><small>Kategori</small><select id="sdKat" aria-label="Kategori"></select></div>
+          <div class="dk-f" id="fTahun"><small>Tahun</small><select id="sdTahun" aria-label="Tahun"></select></div>
+          <div class="dk-f"><small id="sdParLbl">Parameter</small><select id="sdPar" aria-label="Parameter / lot"></select></div>
+          <div class="dk-f" id="fTw"><small>Triwulan</small><select id="sdTw" aria-label="Triwulan"></select></div>
+          <button class="dk-btn b" id="sdMuat" type="button">🔄 Muat ulang</button>
+        </div>
       </div>
-      <div class="ex-kpis" id="sdKpis"></div>
-      <h3>Grafik Levey-Jennings</h3>
-      <div class="sd-chart"><canvas id="chSd"></canvas></div>
-      <p class="sd-note" id="sdFlags"></p>
-    </div>
-    <div class="sd-card">
-      <h3>Ringkasan semua parameter</h3>
-      <p class="ex-sub">Klik baris untuk menampilkan grafiknya. Mean & SD dihitung dari data pada rentang yang dipilih (SD sampel, n−1) kecuali diisi nilai tetapan.</p>
-      <div class="sd-scroll"><table id="sdTbl"><thead><tr><th>Parameter / lot</th><th class="num">n</th><th class="num">Mean</th><th class="num">SD</th><th class="num">CV %</th><th class="num">Di luar ±2SD</th><th class="num">Di luar ±3SD</th><th>Status</th></tr></thead><tbody></tbody></table></div>
-      <p class="sd-note" id="sdNote">Memuat data…</p>
+      <div class="dk-kpis auto" id="sdKpis"></div>
+      <div class="dk-p">
+        <h3>Grafik Levey-Jennings</h3>
+        <div class="dk-filter">
+          <label class="dk-lbl">Batas CV % <input type="number" id="sdCvMax" value="6" min="0" step="0.5"></label>
+          <label class="dk-lbl">Mean tetapan <input type="number" id="sdMeanT" step="any" placeholder="opsional"></label>
+          <label class="dk-lbl">SD tetapan <input type="number" id="sdSdT" step="any" placeholder="opsional"></label>
+        </div>
+        <div class="dk-chbig"><canvas id="chSd"></canvas></div>
+        <p class="dk-note" id="sdFlags"></p>
+      </div>
+      <div class="dk-p">
+        <h3>Ringkasan semua parameter / lot</h3>
+        <div class="dk-scroll"><table class="dk-t" id="sdTbl"><thead><tr><th>Parameter / lot</th><th class="num">n</th><th class="num">Mean</th><th class="num">SD</th><th class="num">CV %</th><th class="num">Di luar ±2SD</th><th class="num">Di luar ±3SD</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+        <p class="dk-note">Klik baris untuk menampilkan grafiknya. Mean &amp; SD dihitung dari data pada rentang yang dipilih (SD sampel, n−1) kecuali diisi nilai tetapan. “Data belum cukup” berarti data kurang dari 2 titik sehingga SD belum bisa dihitung.</p>
+        <p class="dk-note" id="sdNote">Memuat data…</p>
+      </div>
     </div>
   </section>
 
@@ -3000,8 +2992,8 @@ var PANDUAN = [
     var n={expired:0,'30':0,'90':0,'180':0,ok:0}, ns=0;
     exItems.forEach(function(r){n[r.c.g]++; if(r.c.g==='expired'&&r.x.e>0)ns++;});
     var noDate=0; var all=bulan.length?bulan[bulan.length-1].items:[]; all.forEach(function(x){if(!exDate(x.ex))noDate++;});
-    function k(cls,v,l){return '<div class="ex-kpi '+cls+'"><b>'+v+'</b><span>'+l+'</span></div>';}
-    $('exKpis').innerHTML=k('bad',n.expired,'Sudah kedaluwarsa')+k('bad',ns,'Kedaluwarsa & masih ada stok')+k('warn',n['30'],'Expired ≤ 30 hari')+k('mid',n['90'],'31–90 hari')+k('ok',n['180']+n.ok,'> 90 hari (aman)')+k('',noDate,'Tanpa tanggal expired');
+    function k(cls,v,l){return '<div class="dk-k '+cls+'"><div><b>'+v+'</b><small>'+l+'</small></div></div>';}
+    $('exKpis').innerHTML=k('bad',n.expired,'Sudah kedaluwarsa')+k('bad',ns,'Kedaluwarsa & masih ada stok')+k('warn',n['30'],'Expired ≤ 30 hari')+k('mid',n['90'],'31–90 hari')+k('ok',n['180']+n.ok,'> 90 hari (aman)')+k('na',noDate,'Tanpa tanggal expired');
     $('exSub').textContent=n.expired||n['30']?('Perlu tindakan: '+n.expired+' reagen sudah kedaluwarsa dan '+n['30']+' akan kedaluwarsa dalam 30 hari.'):'Tidak ada reagen kedaluwarsa atau yang mendekati expired dalam 30 hari.';
     var q=($('exCari').value||'').toLowerCase().trim(), f=$('exFilter').value, so=$('exStok').checked, rows='';
     exItems.forEach(function(r){
@@ -3009,8 +3001,8 @@ var PANDUAN = [
       if(f==='alert'&&r.s>90)return; if(f!=='all'&&f!=='alert'&&r.c.g!==f)return;
       if(q&&(r.x.n+' '+r.x.kd+' '+(r.x.kt||'')).toLowerCase().indexOf(q)<0)return;
       var dd=('0'+r.d.getDate()).slice(-2)+'/'+('0'+(r.d.getMonth()+1)).slice(-2)+'/'+r.d.getFullYear();
-      rows+='<tr'+(r.s<0&&r.x.e>0?' class="ex-hot"':'')+'><td>'+esc(r.x.n)+'</td><td>'+esc(r.x.kt||'')+'</td><td>'+esc(r.x.lt||'–')+'</td><td>'+dd+'</td><td class="num">'+(r.s<0?'−'+(-r.s):r.s)+'</td><td class="num"><b>'+r.x.e+'</b></td><td><span class="ex-b '+r.c.c+'">'+r.c.l+'</span></td></tr>';});
-    $('exTbl').tBodies[0].innerHTML=rows||'<tr><td colspan="7" class="ex-empty">Tidak ada reagen pada filter ini.</td></tr>';
+      rows+='<tr'+(r.s<0&&r.x.e>0?' class="ex-hot"':'')+'><td>'+esc(r.x.n)+'</td><td>'+esc(r.x.kt||'')+'</td><td>'+esc(r.x.lt||'–')+'</td><td>'+dd+'</td><td class="num">'+(r.s<0?'−'+(-r.s):r.s)+'</td><td class="num"><b>'+r.x.e+'</b></td><td><span class="dk-pill '+r.c.c+'">'+r.c.l+'</span></td></tr>';});
+    $('exTbl').tBodies[0].innerHTML=rows||'<tr><td colspan="7" class="dk-empty">Tidak ada reagen pada filter ini.</td></tr>';
   }
   function expRender(m){
     if(!$('exCard'))return;
@@ -4049,24 +4041,37 @@ var PANDUAN = [
     if(c||row.length){row.push(c);r.push(row);} return r;}
   function nv(v){var s=String(v==null?'':v).trim().replace(/\s/g,'').replace(',','.'); return /^-?\d+(\.\d+)?$/.test(s)?parseFloat(s):null;}
   // D = {hem:{tahun:{param:{tw:[nilai...]}}}, kim:{nama:[{lot,pts:[{l,v}]}]}}
+  // Catatan: Google (gviz) membuang sel teks pada kolom yang mayoritas angka/tanggal (mis. "TW 1", "TAHUN 2026", "No Lot"),
+  // jadi batas triwulan dikenali dari nomor urut yang kembali ke 1, dan nomor lot dari nilai kontrol yang tidak masuk akal (>= 10000) atau bukan angka.
   function parseHem(rows){
-    var out={}, hdr=rows[0]||[], starts=[];
-    hdr.forEach(function(x,j){var m=/TAHUN\s+(\d{4})/i.exec(x||''); if(m)starts.push([j,m[1]]);});
-    starts.forEach(function(s){var c=s[0], y=s[1], tw=0; out[y]={};
-      PARS.forEach(function(p){out[y][p]={};});
-      for(var i=1;i<rows.length;i++){var r=rows[i], a=String(r[c]||'').trim(), m=/^TW\s*(\d)/i.exec(a);
-        if(m){tw=+m[1];continue;} if(!tw||/^no$/i.test(a))continue;
-        PARS.forEach(function(p,k){var v=nv(r[c+1+k]); if(v!=null)(out[y][p][tw]=out[y][p][tw]||[]).push(v);});}
+    var out={}, cols=[], any=false;
+    rows.forEach(function(r){r.forEach(function(x,j){if(/^\s*LEUKOSIT\s*$/i.test(x||'')&&cols.indexOf(j-1)<0&&j>0)cols.push(j-1);});});
+    if(!cols.length)cols=[0,7]; cols.sort(function(a,b){return a-b;});
+    cols.forEach(function(c,idx){
+      var y=null; rows.forEach(function(r){for(var j=c;j<=c+5&&j<r.length;j++){var m=/TAHUN\s*(\d{4})/i.exec(r[j]||''); if(m&&!y)y=m[1];}});
+      if(!y)y=String(new Date().getFullYear()-idx);
+      var o=out[y]={}; PARS.forEach(function(p){o[p]={};});
+      var tw=0, marker=false;
+      rows.forEach(function(r){var a=String(r[c]==null?'':r[c]).trim(), m=/^TW\s*(\d)/i.exec(a);
+        if(m){tw=+m[1];marker=true;return;}
+        var no=nv(a); if(no==null||no<1)return;
+        if(no===1){if(!marker)tw++; marker=false;}
+        if(!tw)tw=1;
+        PARS.forEach(function(p,k){var v=nv(r[c+1+k]); if(v!=null){(o[p][tw]=o[p][tw]||[]).push(v);any=true;}});});
     });
-    return out;}
+    return any?out:null;}
   function parseKim(rows){
-    var out={};
+    var out={}, any=false;
     KIM.forEach(function(k){var c=k[1], lots=[], cur=null;
-      rows.forEach(function(r,i){if(i<3)return; var a=String(r[c]||'').trim(), b=String(r[c+1]||'').trim();
-        if(/^no\.?\s*lot$/i.test(a)){cur={lot:b,pts:[]};lots.push(cur);return;}
-        var v=nv(b); if(v==null||!cur)return; cur.pts.push({l:a,v:v});});
-      out[k[0]]=lots.filter(function(l){return l.pts.length>0;});});
-    return out;}
+      rows.forEach(function(r){var a=String(r[c]==null?'':r[c]).trim(), b=String(r[c+1]==null?'':r[c+1]).trim();
+        if(!a&&!b)return; if(/^nilai/i.test(b)||/^tanggal/i.test(a)||/^qc\s/i.test(a))return;
+        var bn=nv(b);
+        if(/no\.?\s*lot/i.test(a)||(!a&&b&&(bn==null||bn>=10000))){cur={lot:b||'-',pts:[]};lots.push(cur);return;}
+        if(bn==null)return;
+        if(!cur){cur={lot:'(tanpa nomor lot)',pts:[]};lots.push(cur);}
+        cur.pts.push({l:a||('#'+(cur.pts.length+1)),v:bn});});
+      out[k[0]]=lots.filter(function(l){return l.pts.length>0;}); if(out[k[0]].length)any=true;});
+    return any?out:null;}
   function getCsv(gid){return fetch('https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&gid='+gid+'&_='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}).then(function(t){if(/^\s*</.test(t))throw new Error('login');return csv(t);});}
   function fbHem(){var o={}; Object.keys(FB).forEach(function(y){o[y]={}; PARS.forEach(function(p,k){o[y][p]={}; Object.keys(FB[y]).forEach(function(tw){o[y][p][tw]=FB[y][tw][k].slice();});});}); return o;}
   function load(){
@@ -4074,23 +4079,23 @@ var PANDUAN = [
     return Promise.all([getCsv(GH).then(parseHem).catch(function(){return null;}),getCsv(GK).then(parseKim).catch(function(){return null;})]).then(function(a){
       live=!!(a[0]||a[1]);
       D={hem:a[0]||fbHem(),kim:a[1]||{}};
-      var msg=[]; if(!a[0])msg.push('hematologi memakai data cadangan (sheet tidak terbaca)'); if(!a[1])msg.push('kimia klinik tidak terbaca — bagikan sheet dengan “Siapa saja yang memiliki link: Pelanggan/Viewer”');
+      var msg=[]; if(!a[0])msg.push('hematologi memakai data cadangan (sheet tidak terbaca)'); if(!a[1])msg.push('kimia klinik tidak terbaca — pastikan sheet dibagikan “Siapa saja yang memiliki link: Viewer”');
       $('sdNote').innerHTML='Sumber: <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">PROJECT STANDAR DEVIATION LAB 2025</a>. '+(msg.length?'<b>Catatan:</b> '+msg.join('; ')+'.':'Data langsung dari Google Sheets.');
       fillKat();
     });}
   function fillKat(){
-    var ks=['Hematologi']; Object.keys(D.kim).forEach(function(k){if(D.kim[k].length)ks.push(k);});
+    var ks=['Hematologi'].concat(KIM.map(function(x){return x[0];}));
     var cur=$('sdKat').value; $('sdKat').innerHTML=ks.map(function(k){return '<option>'+esc(k)+'</option>';}).join(''); if(cur&&ks.indexOf(cur)>=0)$('sdKat').value=cur;
     fillSub();}
   function opt(sel,list,keep){var c=sel.value; sel.innerHTML=list.map(function(x){return '<option value="'+esc(x[0])+'">'+esc(x[1])+'</option>';}).join(''); if(keep&&list.some(function(x){return x[0]===c;}))sel.value=c;}
   function isHem(){return $('sdKat').value==='Hematologi';}
   function fillSub(){
     var h=isHem();
-    $('sdTahun').style.display=h?'':'none'; $('sdTw').style.display=h?'':'none';
+    $('fTahun').style.display=h?'':'none'; $('fTw').style.display=h?'':'none'; $('sdParLbl').textContent=h?'Parameter':'Nomor lot';
     if(h){opt($('sdTahun'),Object.keys(D.hem).sort().reverse().map(function(y){return [y,'Tahun '+y];}),true);
       opt($('sdPar'),PARS.map(function(p){return [p,p];}),true);
       opt($('sdTw'),[['all','Semua triwulan'],['1','TW 1'],['2','TW 2'],['3','TW 3'],['4','TW 4']],true);}
-    else{var lots=D.kim[$('sdKat').value]||[]; opt($('sdPar'),lots.map(function(l,i){return [String(i),'Lot '+l.lot+' ('+l.pts.length+' data)'];}),true); if(!$('sdPar').value&&lots.length)$('sdPar').value=String(lots.length-1);}
+    else{var lots=D.kim[$('sdKat').value]||[]; opt($('sdPar'),lots.map(function(l,i){return [String(i),'Lot '+l.lot+' ('+l.pts.length+' data)'];}),true); if(lots.length)$('sdPar').value=String(lots.length-1);}
     draw();}
   function series(kind,y,p,tw,lotIdx){
     if(kind==='hem'){var o=[], t=D.hem[y]&&D.hem[y][p]||{};
@@ -4106,7 +4111,7 @@ var PANDUAN = [
       var sg=q>0?1:q<0?-1:0; if(sg!==0&&sg===last)run++; else run=sg===0?0:1; last=sg; if(run===10)r10++;});
     return {n:n,mean:mean,sd:s,cv:mean?s/mean*100:0,z:z,vs:vs,o2:o2,o3:o3,r22:r22,r10:r10,calcMean:m,calcSd:sd};}
   function stat(S,cvMax){
-    if(S.n<2)return {c:'na',l:'Data kurang'};
+    if(S.n<2)return {c:'na',l:'Data belum cukup'};
     if(S.o3||S.r22||S.r10||S.cv>cvMax)return {c:'bad',l:'Perlu tindakan'};
     if(S.o2)return {c:'warn',l:'Peringatan 1-2s'};
     return {c:'ok',l:'Terkendali'};}
@@ -4115,22 +4120,22 @@ var PANDUAN = [
   function getSel(){var c=cur(), mT=nv($('sdMeanT').value), sT=nv($('sdSdT').value);
     if(c.kat==='Hematologi'){var pts=series('hem',c.y,c.p,c.tw); return {name:c.p+' · '+c.y+(c.tw==='all'?'':' TW'+c.tw),pts:pts,S:stats(pts,mT,sT)};}
     var pts2=series(c.kat,null,null,null,+c.p), lot=(D.kim[c.kat]||[])[+c.p]; return {name:c.kat+' · Lot '+(lot?lot.lot:'–'),pts:pts2,S:stats(pts2,mT,sT)};}
-  function k(cls,v,l){return '<div class="ex-kpi '+cls+'"><b>'+v+'</b><span>'+l+'</span></div>';}
+  function k(cls,v,l){return '<div class="dk-k '+cls+'"><div><b>'+v+'</b><small>'+l+'</small></div></div>';}
   function draw(){
     if(!D)return;
     var s=getSel(), S=s.S, cvMax=+$('sdCvMax').value||6, st=stat(S,cvMax);
     $('sdKpis').innerHTML=k('',S.n,'Jumlah data (n)')+k('',fx(S.mean),'Mean')+k('',fx(S.sd),'Standar deviasi (SD)')+k(S.cv>cvMax?'bad':'ok',fx(S.cv,2)+'%','CV (batas '+cvMax+'%)')+k(S.o2?'warn':'ok',S.o2,'Di luar ±2SD')+k(S.o3?'bad':'ok',S.o3,'Di luar ±3SD')+k(st.c==='bad'?'bad':st.c==='warn'?'warn':st.c==='ok'?'ok':'',st.l,'Status kontrol');
-    var f=[]; if(S.o3)f.push('Aturan 1-3s dilanggar ('+S.o3+' titik) – tolak run.'); if(S.r22)f.push('Aturan 2-2s dilanggar ('+S.r22+' kali).'); if(S.r10)f.push('Aturan 10x (10 titik berturut-turut di satu sisi mean) terdeteksi.');
+    var f=[]; if(S.n<2)f.push(isHem()?'Belum ada data pada pilihan ini.':'Belum ada data kimia klinik yang terbaca. Pastikan spreadsheet dibagikan dengan akses “Siapa saja yang memiliki link”, lalu klik Muat ulang.'); if(S.o3)f.push('Aturan 1-3s dilanggar ('+S.o3+' titik) – tolak run.'); if(S.r22)f.push('Aturan 2-2s dilanggar ('+S.r22+' kali).'); if(S.r10)f.push('Aturan 10x (10 titik berturut-turut di satu sisi mean) terdeteksi.');
     if(S.o2&&!S.o3)f.push(S.o2+' titik melewati ±2SD (peringatan 1-2s).'); if($('sdMeanT').value||$('sdSdT').value)f.push('Memakai Mean/SD tetapan (mean hitung: '+fx(S.calcMean)+', SD hitung: '+fx(S.calcSd)+').');
     $('sdFlags').textContent=f.length?f.join(' '):'Tidak ada pelanggaran aturan Westgard (1-3s, 2-2s, 10x) pada data ini.';
-    if(typeof Chart!=='undefined'){
+    if(ch){ch.destroy();ch=null;}
+    if(typeof Chart!=='undefined'&&S.n>=2){
       var lab=s.pts.map(function(x,i){return x.l||String(i+1);}), line=function(m,name,col,dash){return {label:name,data:lab.map(function(){return S.mean+m*S.sd;}),borderColor:col,borderDash:dash||[],borderWidth:m===0?2:1.2,pointRadius:0,fill:false};};
-      if(ch)ch.destroy();
       ch=new Chart($('chSd'),{type:'line',data:{labels:lab,datasets:[
-        {label:'Nilai kontrol',data:S.vs,borderColor:'#1668e3',backgroundColor:'#1668e3',borderWidth:1.6,tension:0,pointRadius:4,pointBackgroundColor:S.z.map(function(q){var a=Math.abs(q);return a>3?'#c9615a':a>2?'#d08a2e':'#1668e3';}),order:1},
-        line(0,'Mean','#22a06b'),line(1,'+1SD','#9bb4d6',[2,3]),line(-1,'-1SD','#9bb4d6',[2,3]),line(2,'+2SD','#d08a2e',[6,4]),line(-2,'-2SD','#d08a2e',[6,4]),line(3,'+3SD','#c9615a',[3,3]),line(-3,'-3SD','#c9615a',[3,3])]},
-        options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:14,autoSkip:true}},y:{min:S.mean-3.6*S.sd,max:S.mean+3.6*S.sd,grid:{color:'rgba(70,62,52,.08)'}}},
-          plugins:{legend:{position:'bottom',labels:{boxWidth:14}},title:{display:true,text:s.name},tooltip:{callbacks:{label:function(c){if(c.datasetIndex)return null;return 'Nilai '+fx(c.parsed.y)+' (Z = '+fx(S.z[c.dataIndex],2)+' SD)';}}}}}});
+        {label:'Nilai kontrol',data:S.vs,borderColor:'#4da3ff',backgroundColor:'#4da3ff',borderWidth:1.8,tension:0,pointRadius:4,pointBackgroundColor:S.z.map(function(q){var a=Math.abs(q);return a>3?'#ff5a5f':a>2?'#f5b301':'#4da3ff';}),order:1},
+        line(0,'Mean','#2ee6a6'),line(1,'+1SD','#8aa4d6',[2,3]),line(-1,'-1SD','#8aa4d6',[2,3]),line(2,'+2SD','#f5b301',[6,4]),line(-2,'-2SD','#f5b301',[6,4]),line(3,'+3SD','#ff5a5f',[3,3]),line(-3,'-3SD','#ff5a5f',[3,3])]},
+        options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:14,autoSkip:true,color:'#b9c9ee'}},y:{min:S.mean-3.6*S.sd,max:S.mean+3.6*S.sd,grid:{color:'rgba(255,255,255,.09)'},ticks:{color:'#b9c9ee'}}},
+          plugins:{legend:{position:'bottom',labels:{boxWidth:14,color:'#dbe7ff'}},title:{display:true,text:s.name,color:'#fff'},tooltip:{callbacks:{label:function(c){if(c.datasetIndex)return null;return 'Nilai '+fx(c.parsed.y)+' (Z = '+fx(S.z[c.dataIndex],2)+' SD)';}}}}}});
     }
     table(s.name);}
   function table(selName){
@@ -4138,8 +4143,8 @@ var PANDUAN = [
     if(c.kat==='Hematologi')PARS.forEach(function(p){items.push({id:p,name:p+' · '+c.y+(c.tw==='all'?'':' TW'+c.tw),pts:series('hem',c.y,p,c.tw)});});
     else((D.kim[c.kat])||[]).forEach(function(l,i){items.push({id:String(i),name:c.kat+' · Lot '+l.lot,pts:l.pts});});
     items.forEach(function(it){var S=stats(it.pts,items.length&&it.id===c.p?mT:null,items.length&&it.id===c.p?sT:null), st=stat(S,cvMax);
-      rows+='<tr data-id="'+esc(it.id)+'"'+(it.id===c.p?' class="sel"':'')+'><td>'+esc(it.name)+'</td><td class="num">'+S.n+'</td><td class="num">'+fx(S.mean)+'</td><td class="num">'+fx(S.sd)+'</td><td class="num">'+fx(S.cv,2)+'</td><td class="num">'+S.o2+'</td><td class="num">'+S.o3+'</td><td><span class="ex-b '+st.c+'">'+st.l+'</span></td></tr>';});
-    $('sdTbl').tBodies[0].innerHTML=rows||'<tr><td colspan="8" class="ex-empty">Belum ada data.</td></tr>';}
+      rows+='<tr data-id="'+esc(it.id)+'"'+(it.id===c.p?' class="sel"':'')+'><td>'+esc(it.name)+'</td><td class="num">'+S.n+'</td><td class="num">'+fx(S.mean)+'</td><td class="num">'+fx(S.sd)+'</td><td class="num">'+fx(S.cv,2)+'</td><td class="num">'+S.o2+'</td><td class="num">'+S.o3+'</td><td><span class="dk-pill '+st.c+'">'+st.l+'</span></td></tr>';});
+    $('sdTbl').tBodies[0].innerHTML=rows||'<tr><td colspan="8" class="dk-empty">Belum ada data.</td></tr>';}
   function init(){
     if(started)return; started=true;
     ['sdTahun','sdTw','sdPar'].forEach(function(i){$(i).addEventListener('change',draw);});
