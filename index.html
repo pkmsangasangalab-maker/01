@@ -711,6 +711,7 @@ body.locked .app-sidebar{display:none}
 body:not([data-view="home"]) [data-view="home"],
 body:not([data-view="tasks"]) [data-view="tasks"],
 body:not([data-view="stok"]) [data-view="stok"],
+body:not([data-view="sd"]) [data-view="sd"],
 body:not([data-view="ringkasan"]) [data-view="ringkasan"],
 body:not([data-view="backup"]) [data-view="backup"],
 body:not([data-view="panduan"]) [data-view="panduan"],
@@ -1375,6 +1376,61 @@ html[data-theme="biru"] .side-link{font-size:.9rem;letter-spacing:0;line-height:
 @media(max-width:1100px){.dk-grid,.dk-gr2,.dk-bot{grid-template-columns:1fr}.dk-kpis{grid-template-columns:repeat(2,1fr)}.dk-ctl{margin-left:0}}
 @media(max-width:560px){.dk-kpis{grid-template-columns:1fr}.dk-don{flex-direction:column}}
 </style>
+<style id="pm-exsd">
+/* ===== Dashboard Peringatan Expired (Stok Reagensia) & Dashboard Standar Deviasi (Kendali Mutu) ===== */
+.ex-kpis,.sd-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.ex-kpis .dk-k,.sd-kpis .dk-k{padding:12px 14px;gap:12px}
+.ex-kpis .dk-k .ik,.sd-kpis .dk-k .ik{width:46px;height:46px}
+.ex-kpis .dk-k b,.sd-kpis .dk-k b{font-size:1.45rem}
+.ex-kpis .dk-k small.s,.sd-kpis .dk-k small.s{font-size:.7rem;color:#9fb6e6}
+.ex-alert{display:flex;gap:12px;align-items:flex-start;border-radius:12px;padding:12px 16px;margin-bottom:14px;font-size:.84rem;line-height:1.55;border:1px solid}
+.ex-alert[hidden]{display:none}
+.ex-alert i{font-style:normal;font-size:1.3rem;line-height:1.2;flex:none}
+.ex-alert b{color:#fff}
+.ex-alert.bad{background:rgba(229,56,59,.16);border-color:rgba(229,56,59,.6);color:#ffd9da}
+.ex-alert.warn{background:rgba(245,168,0,.14);border-color:rgba(245,168,0,.55);color:#ffe6a8}
+.ex-alert.ok{background:rgba(18,163,108,.16);border-color:rgba(18,163,108,.55);color:#c4f3df}
+.ex-scroll{max-height:420px;overflow:auto;border-radius:8px}
+.ex-scroll thead th{position:sticky;top:0;z-index:1;background:#133a85}
+.dk-t td.num,.dk-t th.num{text-align:right;white-space:nowrap}
+.ex-zero td{opacity:.55}
+.ex-pill{display:inline-block;min-width:92px;text-align:center;padding:2px 10px;border-radius:6px;font-size:.72rem;font-weight:700;color:#fff;white-space:nowrap}
+.ex-pill.exp,.ex-pill.bad{background:#e5383b}
+.ex-pill.c30{background:#ff7a3d}
+.ex-pill.c60,.ex-pill.warn{background:#f5b301;color:#3b2a00}
+.ex-pill.c180{background:#2f8fe8}
+.ex-pill.ok{background:#12a36c}
+.ex-pill.none,.ex-pill.na{background:#6b7a99}
+.ex-note{font-size:.72rem;color:#9fb6e6;margin-top:6px;line-height:1.55}
+.ex-note a{color:#7cc4ff}
+.sd-sel{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:14px}
+.sd-sel .dk-f{min-width:0}
+.sd-kpis{grid-template-columns:repeat(3,1fr)}
+.sd-kpis .dk-k .ik{width:40px;height:40px}
+.sd-kpis .dk-k b.m{font-size:1.2rem}
+.sd-grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:14px;align-items:stretch;margin-bottom:14px}
+.sd-grid .dk-p{margin-bottom:0}
+.sd-main{display:flex;flex-direction:column}
+.sd-side{display:grid;gap:14px;align-content:start}
+.sd-lj{position:relative;flex:1;min-height:340px}
+.sd-hist{height:200px}
+.sd-wg{max-height:230px}
+@media(min-width:1500px){.sd-kpis{grid-template-columns:repeat(6,1fr)}}
+@media(max-width:1100px){.sd-grid{grid-template-columns:1fr}}
+.sd-wg{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:.78rem;max-height:260px;overflow:auto}
+.sd-wg li{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:8px;background:rgba(29,111,224,.14);line-height:1.45;color:#e8efff}
+.sd-wg li.bad{background:rgba(229,56,59,.16)}
+.sd-wg li.warn{background:rgba(245,168,0,.14)}
+.sd-wg li.ok{background:rgba(18,163,108,.16)}
+.sd-tag{flex:none;min-width:48px;text-align:center;border-radius:5px;padding:1px 6px;font-weight:700;font-size:.72rem;background:#e5383b;color:#fff}
+.sd-tag.warn{background:#f5b301;color:#3b2a00}
+.sd-tag.ok{background:#12a36c}
+.sd-wg small{display:block;color:#9fb6e6;font-size:.7rem}
+.sd-row{cursor:pointer}
+.sd-row:hover td{background:rgba(29,111,224,.22)}
+.sd-row.sd-on td{background:rgba(29,111,224,.42);font-weight:600}
+@media(max-width:560px){.ex-kpis,.sd-kpis{grid-template-columns:repeat(2,1fr)}.sd-lj{min-height:280px}}
+</style>
 <style id="pm-tasks-compact">
 #tasksDashboard .tasks-dashboard-head{margin-bottom:8px}
 #tasksDashboard .section-title{padding:8px 14px!important;font-size:.95rem!important;margin-bottom:2px!important}
@@ -1560,6 +1616,7 @@ html body.locked #loginOverlay #loginError:not(:empty){background:#ffe6e2;border
       <button class="side-link active" data-nav="home" onclick="setView('home', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-6h4v6"/></svg><span class="lbl">Beranda</span></button>
       <button class="side-link staff-only" data-nav="tasks" onclick="setView('tasks', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg><span class="lbl">Dashboard Tasks</span></button>
       <button class="side-link" data-nav="stok" onclick="setView('stok', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6L5 19a1.6 1.6 0 0 0 1.4 2.3h11.2A1.6 1.6 0 0 0 19 19l-5-10V3"/><path d="M7.5 15h9"/></svg><span class="lbl">Stok Reagensia</span></button>
+      <button class="side-link" data-nav="sd" onclick="setView('sd', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19h18"/><path d="M3 19c3.2 0 3.6-13 9-13s5.8 13 9 13"/><path d="M12 6v13"/></svg><span class="lbl">Standar Deviasi<br>Kendali Mutu</span></button>
       <button class="side-link" data-nav="ringkasan" onclick="setView('ringkasan', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="m5 15 4-4 3 3 6-7"/><path d="M15 7h3v3"/></svg><span class="lbl">Ringkasan Laporan<br>Tahunan Lab</span></button>
       <button class="side-link" data-nav="kelurahan" onclick="setView('kelurahan', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg><span class="lbl">Tren per Kelurahan</span></button>
       <div class="side-label staff-only">MENU PETUGAS</div>
@@ -1965,6 +2022,7 @@ html body.locked #loginOverlay #loginError:not(:empty){background:#ffe6e2;border
     <!-- Stok reagensia (dashboard, tampil di tampilan awal) -->
     <section id="stokLive" data-view="stok">
       <div class="dk" id="dkRootS"></div>
+      <div class="dk" id="dkExp"></div>
       <div class="section-title"><i class="fa-solid fa-boxes-stacked"></i> STOK REAGENSIA (DATA LANGSUNG)</div>
       <div class="chart-card">
         <div class="stok-tools">
@@ -2017,6 +2075,10 @@ html body.locked #loginOverlay #loginError:not(:empty){background:#ffe6e2;border
       </div>
     </section>
 
+    <!-- Standar deviasi kendali mutu (dashboard Levey-Jennings) -->
+    <section id="sdLive" data-view="sd">
+      <div class="dk" id="sdRoot"><p class="ex-note">Memuat data…</p></div>
+    </section>
 
     <section id="mutuLive" data-view="ringkasan">
       <div class="section-title"><i class="fa-solid fa-stopwatch"></i> INDIKATOR MUTU LAB: WAKTU TUNGGU PELAYANAN</div>
@@ -3154,6 +3216,101 @@ var PANDUAN = [
       options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}},
       plugins:[{id:'dkc',afterDraw:function(ch){var a=ch.chartArea,c=ch.ctx,x=(a.left+a.right)/2,y=(a.top+a.bottom)/2;c.save();c.textAlign='center';c.fillStyle='#fff';c.font='700 26px Poppins,sans-serif';c.fillText(n,x,y+6);c.fillStyle='#b9c9ee';c.font='10px Poppins,sans-serif';c.fillText('Total Reagensia',x,y+22);c.restore();}}]});
   }
+  /* ===== Dashboard peringatan expired =====
+     Dibaca dari kolom "Expired terakhir" tab STOK OPNAME (item aktif bulan berjalan) dan dihitung terhadap tanggal hari ini di perangkat.
+     Batas: kedaluwarsa (lewat), kritis <= 30 hari, segera 31-60 hari, waspada 61-180 hari, aman > 180 hari. */
+  var EX={items:[],rows:[],per:'',ok:0};
+  var EXL=[{k:'exp',n:'Kedaluwarsa',c:'#e5383b'},{k:'c30',n:'≤ 30 hari',c:'#ff7a3d'},{k:'c60',n:'31–60 hari',c:'#f5b301'},{k:'c180',n:'61–180 hari',c:'#2f8fe8'},{k:'ok',n:'> 180 hari',c:'#12a36c'},{k:'none',n:'Tanpa tanggal',c:'#6b7a99'}], EXN={};
+  EXL.forEach(function(l){EXN[l.k]=l.n;});
+  var MON3=['jan','feb','mar','apr','mei','jun','jul','agu','sep','okt','nov','des'], MONX={may:4,aug:7,oct:9,dec:11}, MONS=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  // Tanggal expired di sheet bisa berbentuk 20/08/2027, 27/5/31, 11/2027, atau AGUSTUS/2027 (bulan saja = akhir bulan).
+  function exParse(s){
+    s=String(s||'').trim(); if(!s)return null;
+    var m,y,mo,dd,t;
+    if((m=/^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s))){y=+m[1];mo=+m[2];dd=+m[3];}
+    else if((m=/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})$/.exec(s))){dd=+m[1];mo=+m[2];y=+m[3]; if(y<100)y+=2000; if(mo>12&&dd<=12){t=dd;dd=mo;mo=t;}}
+    else if((m=/^(\d{1,2})[\/.\-](\d{4})$/.exec(s))){mo=+m[1];y=+m[2];dd=new Date(y,mo,0).getDate();}
+    else if((m=/^([a-z]{3,})[\s\/.\-]+(\d{4})$/i.exec(s))){t=m[1].toLowerCase().slice(0,3);mo=MON3.indexOf(t); if(mo<0&&MONX[t]!=null)mo=MONX[t]; if(mo<0)return null; mo+=1;y=+m[2];dd=new Date(y,mo,0).getDate();}
+    else return null;
+    var d=new Date(y,mo-1,dd); return (d.getFullYear()===y&&d.getMonth()===mo-1&&d.getDate()===dd)?d:null;
+  }
+  function exLvl(days){return days<0?'exp':days<=30?'c30':days<=60?'c60':days<=180?'c180':'ok';}
+  function exRows(){
+    var n=new Date(), t0=new Date(n.getFullYear(),n.getMonth(),n.getDate());
+    return EX.items.map(function(x){var d=exParse(x.ex), days=d?Math.round((d-t0)/864e5):null; return {x:x,d:d,days:days,l:d?exLvl(days):'none'};})
+      .sort(function(a,b){return (a.days==null?1e9:a.days)-(b.days==null?1e9:b.days);});
+  }
+  function exSisa(r){return r.days==null?'–':(r.days<0?'Lewat '+(-r.days)+' hari':(r.days===0?'Hari ini':r.days+' hari'));}
+  function exInit(){
+    var root=$('dkExp'); if(!root)return; EX.ok=1;
+    root.innerHTML='<div class="dk-head"><span class="dk-ico" style="background:#e5383b">'+dkSvg('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M5 3.5 2.5 6M19 3.5 21.5 6"/>')+'</span><div><h2>Peringatan Expired Reagensia</h2><p id="exSub">Memuat data…</p></div>'+
+      '<div class="dk-ctl"><button type="button" class="dk-btn b staff-only" id="exCopy">📋 Salin daftar expired</button></div></div>'+
+      '<div class="ex-alert" id="exAlert" hidden></div><div class="ex-kpis" id="exKp"></div>'+
+      '<div class="dk-grid"><div class="dk-p"><h3>Daftar Peringatan Expired</h3>'+
+      '<div class="dk-filter"><input id="exQ" type="search" autocomplete="off" placeholder="Cari reagensia..." aria-label="Cari reagensia"><select id="exF" aria-label="Filter status expired"><option value="att">Perlu perhatian (≤ 180 hari)</option><option value="all">Semua reagensia</option>'+EXL.map(function(l){return '<option value="'+l.k+'">'+l.n+'</option>';}).join('')+'</select></div>'+
+      '<div class="ex-scroll"><table class="dk-t" id="exT"><thead><tr><th>No</th><th>Nama Reagensia</th><th>Sumber</th><th class="num">Stok</th><th>Tanggal Expired</th><th class="num">Sisa Waktu</th><th>Status</th></tr></thead><tbody><tr><td colspan="7">Memuat data…</td></tr></tbody></table></div>'+
+      '<div class="dk-pg"><span id="exI"></span></div></div>'+
+      '<div><div class="dk-p"><h3>Komposisi Status Expired</h3><div class="dk-don"><div class="dk-ch s"><canvas id="exDon"></canvas></div><ul id="exLg"></ul></div></div>'+
+      '<div class="dk-p"><h3>Jadwal Expired 12 Bulan ke Depan</h3><div class="dk-ch"><canvas id="exBar"></canvas></div></div></div></div>'+
+      '<p class="ex-note" id="exNote">Memuat data…</p>';
+    $('exQ').addEventListener('input',exTbl); $('exF').addEventListener('change',exTbl); $('exCopy').addEventListener('click',exSalin);
+  }
+  function exTbl(){
+    var q=($('exQ').value||'').toLowerCase().trim(), f=$('exF').value, rows='';
+    var list=EX.rows.filter(function(r){
+      var ok=f==='all'||(f==='att'?(r.l==='exp'||r.l==='c30'||r.l==='c60'||r.l==='c180'):r.l===f);
+      return ok&&(!q||r.x.n.toLowerCase().indexOf(q)>=0);});
+    list.forEach(function(r,i){var x=r.x;
+      rows+='<tr'+(x.e<=0?' class="ex-zero"':'')+'><td>'+(i+1)+'</td><td>'+esc(x.n)+'</td><td>'+esc(x.s||'–')+'</td><td class="num'+(r.l==='exp'&&x.e>0?' bad':'')+'">'+x.e+'</td><td>'+(x.ex?esc(x.ex):'–')+'</td><td class="num">'+exSisa(r)+'</td><td><span class="ex-pill '+r.l+'">'+EXN[r.l]+'</span></td></tr>';});
+    $('exT').tBodies[0].innerHTML=rows||'<tr><td colspan="7">Tidak ada reagensia pada filter ini.</td></tr>';
+    $('exI').textContent='Menampilkan '+list.length+' dari '+EX.rows.length+' reagensia aktif';
+  }
+  function exSalin(ev){
+    var l=EX.rows.filter(function(r){return r.l==='exp'||r.l==='c30'||r.l==='c60'||r.l==='c180';});
+    var t='Daftar reagensia mendekati / melewati expired (per '+new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})+'):\n'+(l.length?l.map(function(r,i){
+      return (i+1)+'. '+r.x.n+' - exp '+r.x.ex+' ('+(r.days<0?'sudah lewat '+(-r.days)+' hari':r.days+' hari lagi')+'), stok '+r.x.e;}).join('\n'):'Tidak ada.');
+    var b=(ev&&ev.currentTarget)||$('exCopy'),o=b.innerHTML,ok=function(){b.textContent='✔ Tersalin';setTimeout(function(){b.innerHTML=o;},1800);};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,function(){prompt('Salin teks ini:',t);});}
+    else prompt('Salin teks ini:',t);
+  }
+  function exRender(){
+    if(!$('dkExp'))return; if(!EX.ok)exInit();
+    var rows=EX.rows=exRows(), cnt={}, stk={}, now=new Date(), i;
+    EXL.forEach(function(l){cnt[l.k]=0;stk[l.k]=0;});
+    rows.forEach(function(r){cnt[r.l]++; if(r.x.e>0)stk[r.l]++;});
+    $('exSub').textContent='Per '+now.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})+' · '+rows.length+' jenis reagensia aktif · stok periode '+EX.per;
+    var bad=rows.filter(function(r){return r.l==='exp'&&r.x.e>0;}), soon=rows.filter(function(r){return r.l==='c30'&&r.x.e>0;}), al=$('exAlert');
+    var nm=function(a){return a.slice(0,5).map(function(r){return esc(r.x.n);}).join(', ')+(a.length>5?' dan '+(a.length-5)+' lainnya':'');};
+    var tot=function(a){return a.reduce(function(s,r){return s+r.x.e;},0);};
+    if(bad.length){al.className='ex-alert bad';
+      al.innerHTML='<i>⚠️</i><div><b>'+bad.length+' reagensia sudah kedaluwarsa tetapi stoknya masih tercatat</b> ('+tot(bad)+' unit): '+nm(bad)+'. Pisahkan dari rak pemakaian dan tangani sesuai SOP.'+(soon.length?'<br>Selain itu <b>'+soon.length+' reagensia berstok</b> akan kedaluwarsa dalam ≤ 30 hari: '+nm(soon)+'.':'')+'</div>';}
+    else if(soon.length){al.className='ex-alert warn';
+      al.innerHTML='<i>⏳</i><div><b>'+soon.length+' reagensia berstok akan kedaluwarsa dalam ≤ 30 hari</b> ('+tot(soon)+' unit): '+nm(soon)+'. Dahulukan pemakaiannya (FEFO).</div>';}
+    else{al.className='ex-alert ok'; al.innerHTML='<i>✅</i><div><b>Tidak ada reagensia berstok yang kedaluwarsa</b> atau akan kedaluwarsa dalam ≤ 30 hari.</div>';}
+    al.hidden=false;
+    function kp(cls,col,ic,t,l){return '<div class="dk-k '+cls+'"><span class="ik" style="background:'+col+'">'+dkSvg(ic)+'</span><div><small class="t">'+t+'</small><b>'+cnt[l]+'</b><small class="s">'+stk[l]+' masih berstok</small></div></div>';}
+    $('exKp').innerHTML=
+      kp('bad','#e5383b','<path d="m6 6 12 12M18 6 6 18"/>','Kedaluwarsa','exp')+
+      kp('bad','#ff7a3d','<path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17.5v.01"/>','≤ 30 hari lagi','c30')+
+      kp('warn','#f5a800','<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>','31–60 hari lagi','c60')+
+      kp('','#2f8fe8','<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/>','61–180 hari lagi','c180')+
+      kp('ok','#12a36c','<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>','Aman (> 180 hari)','ok');
+    exTbl();
+    var n=rows.length, ls=EXL.filter(function(l){return cnt[l.k]>0;});
+    $('exLg').innerHTML=ls.map(function(l){return '<li><i style="background:'+l.c+'"></i><span>'+l.n+'</span><b>'+cnt[l.k]+' ('+(n?Math.round(cnt[l.k]/n*100):0)+'%)</b></li>';}).join('');
+    $('exNote').innerHTML='Status dihitung dari kolom <b>Expired terakhir</b> (tab STOK OPNAME) terhadap tanggal hari ini di perangkat Anda: kritis ≤ 30 hari, segera 31–60 hari, waspada 61–180 hari. Reagen NONAKTIF tidak dihitung. '+(cnt.none?cnt.none+' reagensia belum punya tanggal expired (isi kolom <i>Expired terakhir</i> di spreadsheet). ':'')+'<a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
+    if(typeof Chart==='undefined')return;
+    [$('exDon'),$('exBar')].forEach(function(c){var o=Chart.getChart(c);if(o)o.destroy();});
+    new Chart($('exDon'),{type:'doughnut',data:{labels:ls.map(function(l){return l.n;}),datasets:[{data:ls.map(function(l){return cnt[l.k];}),backgroundColor:ls.map(function(l){return l.c;}),borderColor:'#0a1e50',borderWidth:3}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}},
+      plugins:[{id:'exc',afterDraw:function(ch){var a=ch.chartArea,c=ch.ctx,x=(a.left+a.right)/2,y=(a.top+a.bottom)/2;c.save();c.textAlign='center';c.fillStyle='#fff';c.font='700 26px Poppins,sans-serif';c.fillText(n,x,y+6);c.fillStyle='#b9c9ee';c.font='10px Poppins,sans-serif';c.fillText('Total Reagensia',x,y+22);c.restore();}}]});
+    var lab=['Lewat'], val=[0], col=['#e5383b'], b0=new Date(now.getFullYear(),now.getMonth(),1);
+    for(i=0;i<12;i++){var d=new Date(b0.getFullYear(),b0.getMonth()+i,1); lab.push(MONS[d.getMonth()]+' '+String(d.getFullYear()).slice(2)); val.push(0); col.push(i<2?'#f5a800':'#2f8fe8');}
+    rows.forEach(function(r){if(!r.d)return; if(r.days<0){val[0]++;return;} var k=(r.d.getFullYear()-b0.getFullYear())*12+r.d.getMonth()-b0.getMonth(); if(k>=0&&k<12)val[k+1]++;});
+    new Chart($('exBar'),{type:'bar',data:{labels:lab,datasets:[{data:val,backgroundColor:col,borderRadius:4,maxBarThickness:30}]},
+      options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},scales:{x:{grid:{display:false},ticks:{color:'#b9c9ee',font:{size:10}}},y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.08)'},border:{display:false},ticks:{color:'#b9c9ee',precision:0}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.parsed.y+' reagensia';}}}}},
+      plugins:[{id:'exv',afterDatasetsDraw:function(ch){var c=ch.ctx;c.save();c.fillStyle='#fff';c.font='600 11px Poppins,sans-serif';c.textAlign='center';ch.getDatasetMeta(0).data.forEach(function(b,j){var v=ch.data.datasets[0].data[j]; if(v)c.fillText(v,b.x,b.y-4);});c.restore();}}]});
+  }
   function ambil(gid){
     return fetch('https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&gid='+gid+'&_='+Date.now()).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}).then(function(t){
       if(/^\s*</.test(t))throw new Error('Google meminta login, sheet belum publik'); return csv(t);});
@@ -3166,15 +3323,17 @@ var PANDUAN = [
     var pHist=Promise.all([ambil(GID_MASTER),ambil(GID_LOG)]).then(function(r){return {m:parseMaster(r[0]),l:parseLog(r[1])};}).catch(function(e){console.warn('Riwayat stok tidak dimuat:',e);return null;});
     Promise.all([pCur,pHist]).then(function(res){
       var d=res[0], h=res[1], ket='';
+      EX.items=d[0].items; EX.per=d[0].name+(d[0].yr?' '+d[0].yr:'');
       if(h&&h.m.length&&h.l.length){var b=bangun(h.m,h.l,d[0]); if(b.length){d=b; ket=' Riwayat '+b[0].name+'–'+b[b.length-1].name+' dihitung dari LOG TRANSAKSI.';}}
       else ket=' Riwayat bulan sebelumnya belum terbaca, hanya bulan di tab STOK OPNAME yang tampil.';
       var keep=bulan.length?$('stokBulan').selectedIndex:-1; bulan=d; fillReagen(); skReagenFill(); fillTahun();
       $('stokBulan').innerHTML=d.map(function(x,i){return '<option>'+esc(x.name)+'</option>';}).join('');
       var def=d.length-1; for(var i=d.length-1;i>=0;i--){if(d[i].items.some(function(x){return x.o>0||x.i>0;})){def=i;break;}}
-      $('stokBulan').selectedIndex=keep>=0&&keep<d.length?keep:def; applyTahun(true); render();
+      $('stokBulan').selectedIndex=keep>=0&&keep<d.length?keep:def; applyTahun(true); render(); exRender();
       $('stokNote').innerHTML='Diperbarui '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+' dari Google Sheets.'+esc(ket)+' <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
       loaded=true;
     }).catch(function(e){
+      if($('exNote'))$('exNote').textContent='Data expired belum bisa dimuat ('+(e&&e.message?e.message:'gagal terhubung')+'). Pastikan sheet bisa dilihat siapa pun yang punya link.';
       $('stokNote').innerHTML='Data stok gagal dimuat ['+esc(e&&e.message?e.message:'gagal terhubung')+']. Pastikan sheet bisa dilihat siapa pun yang punya link. <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
     });
   }
@@ -3191,9 +3350,229 @@ var PANDUAN = [
    $('stokReagen').addEventListener('change',usage); $('skReagen').addEventListener('change',skUsage); $('stokTahun').addEventListener('change',function(){applyTahun(false);render();}); $('stokMuat').addEventListener('click',load); $('stokSalin').addEventListener('click',salin);
   var _t=window.toggleStaff; window.toggleStaff=function(){_t.apply(this,arguments);sync();};
   window.__stokParse=parse; window.__stokCsv=csv;
+  exInit();
   sync();
 })();
 </script>
+<script>
+// ===== Dashboard Standar Deviasi kendali mutu (Levey-Jennings + aturan Westgard) =====
+// Dibaca langsung dari Google Sheets "PROJECT STANDAR DEVIATION LAB" (sheet harus bisa dilihat siapa pun yang punya link):
+//  - tab "kontrol by lot"  : QC Gula, Kolesterol, Asam Urat per nomor lot (kolom tanggal + nilai; baris "NO LOT" = pergantian lot)
+//  - tab "DATA KONTROL HA" : QC Hematologi per triwulan (blok tahun paling atas; 5 parameter x TW 1-4)
+// Mean & SD dihitung dari data (SD sampel, n-1) sehingga selalu mengikuti isi spreadsheet.
+(function(){
+  var SID='1EjhqFF-AkdaHBIsNeOaozPOoH-36YYgIY3zCEk5oxm4', GID_LOT='1252703038', GID_HA='18484466';
+  var URL_SHEET='https://docs.google.com/spreadsheets/d/'+SID+'/edit?gid='+GID_HA;
+  var $=function(i){return document.getElementById(i);};
+  var esc=function(t){return String(t).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});};
+  var UNIT={'gula':'mg/dL','kolesterol':'mg/dL','asam urat':'mg/dL','leukosit':'10³/µL','eritrosit':'10⁶/µL','hemoglobin':'g/dL','hematokrit':'%','trombosit':'10³/µL'};
+  var STL={ok:'Terkendali',warn:'Waspada',bad:'Perlu evaluasi',na:'Data kurang'};
+  var D=[], S={g:0,a:0,s:0,base:'all'}, ERR=[], loading=false, first=true, built=false;
+  function csv(t){var r=[],row=[],c='',q=false,i,ch;
+    for(i=0;i<t.length;i++){ch=t[i];
+      if(q){if(ch=='"'){if(t[i+1]=='"'){c+='"';i++;}else q=false;}else c+=ch;}
+      else if(ch=='"')q=true; else if(ch==','){row.push(c);c='';}
+      else if(ch=='\n'||ch=='\r'){if(ch=='\r'&&t[i+1]=='\n')i++;row.push(c);r.push(row);row=[];c='';}
+      else c+=ch;}
+    if(c||row.length){row.push(c);r.push(row);} return r;}
+  function toNum(v){var s=String(v==null?'':v).replace(/\s+/g,'').replace(',','.'); if(!/^-?\d+(\.\d+)?$/.test(s))return null; return parseFloat(s);}
+  function title(s){return String(s).trim().toLowerCase().replace(/\b[a-z]/g,function(c){return c.toUpperCase();});}
+  function lotName(v){var s=String(v==null?'':v).trim().replace(/\.0+$/,''); return s||'–';}
+  var cell=function(row,j){return String((row&&row[j])==null?'':row[j]).trim();};
+
+  // ----- Tab "kontrol by lot": blok per analit; baris "NO LOT" memulai lot baru; urutan baris = urutan waktu -----
+  function parseLot(rows){
+    var blocks=[], i, lim=Math.min(rows.length,12), out=[];
+    for(i=0;i<lim;i++){rows[i].forEach(function(c,j){
+      var m=/^QC\s+(?!BERDASARKAN)(\S.*)$/i.exec(String(c||'').trim());
+      if(m&&!blocks.some(function(b){return b.col===j;}))blocks.push({name:title(m[1]),col:j,row:i});});}
+    blocks.forEach(function(b){
+      var lot0='', start=b.row+3, r, v, dc;
+      for(r=b.row+1;r<Math.min(rows.length,b.row+8);r++){
+        var h=cell(rows[r],b.col);
+        if(/^no\.?\s*lot$/i.test(h)&&!lot0)lot0=lotName(rows[r][b.col+1]);
+        if(/^tanggal$/i.test(h)){start=r+1;break;}}
+      var sets=[{lot:lot0||'–',pts:[]}], cur=sets[0];
+      for(r=start;r<rows.length;r++){
+        dc=cell(rows[r],b.col);
+        if(/^no\.?\s*lot$/i.test(dc)){cur={lot:lotName(rows[r][b.col+1]),pts:[]};sets.push(cur);continue;}
+        v=toNum(rows[r][b.col+1]); if(v==null)continue;
+        cur.pts.push({d:dc,v:v});}
+      sets=sets.filter(function(s){return s.pts.length;});
+      if(sets.length)out.push({name:b.name,unit:UNIT[b.name.toLowerCase()]||'',sets:sets});});
+    return out;}
+
+  // ----- Tab "DATA KONTROL HA": baris judul berisi LEUKOSIT di tiap triwulan; data berhenti di baris tahun berikutnya (mis. "2025") -----
+  function parseHA(rows){
+    var hp=-1,i,j,p;
+    for(i=0;i<rows.length&&hp<0;i++){var c=0; rows[i].forEach(function(x){if(/^(?:.*\s)?leukosit$/i.test(String(x||'').trim()))c++;}); if(c>=2)hp=i;}
+    if(hp<0)return [];
+    var groups=[], g;
+    rows[hp].forEach(function(x,j){var m=/^(?:(.*?)\s+)?leukosit$/i.exec(String(x||'').trim());
+      if(m){var lb=(m[1]||'').trim()||(hp>0?cell(rows[hp-1],j):''); groups.push({col:j,label:lb||('Triwulan '+(groups.length+1)),names:[],pts:[]});}});
+    groups.forEach(function(gp,k){
+      var end=k+1<groups.length?groups[k+1].col:gp.col+8;
+      for(j=gp.col;j<end;j++){var t=cell(rows[hp],j).replace(/^.*\s(?=\S+$)/,''); if(!t)break; gp.names.push(t);}
+      gp.pts=gp.names.map(function(){return [];});});
+    for(i=hp+1;i<rows.length;i++){
+      var fc=cell(rows[i],0); if(/^(tahun|20\d\d)\b/i.test(fc)||/^no$/i.test(fc))break;
+      groups.forEach(function(gp){gp.names.forEach(function(nm,p){var v=toNum(rows[i][gp.col+p]); if(v!=null)gp.pts[p].push({d:'Data ke-'+(fc||(i-hp)),v:v});});});}
+    var names=groups.length?groups[0].names:[];
+    return names.map(function(nm,p){
+      var sets=[]; groups.forEach(function(gp){if(gp.pts[p]&&gp.pts[p].length)sets.push({lot:gp.label,pts:gp.pts[p]});});
+      return {name:title(nm),unit:UNIT[nm.toLowerCase()]||'',sets:sets};}).filter(function(a){return a.sets.length;});}
+
+  // ----- Aturan Westgard (dihitung terhadap z-score = (nilai - mean) / SD) -----
+  function westgard(z){
+    var out=[], i, u2=0,d2=0,u1=0,d1=0,u0=0,d0=0;
+    for(i=0;i<z.length;i++){var x=z[i];
+      u2=x>2?u2+1:0; d2=x<-2?d2+1:0; u1=x>1?u1+1:0; d1=x<-1?d1+1:0; u0=x>0?u0+1:0; d0=x<0?d0+1:0;
+      if(Math.abs(x)>3)out.push({r:'1-3s',i:i,s:'bad'}); else if(Math.abs(x)>2)out.push({r:'1-2s',i:i,s:'warn'});
+      if(u2===2||d2===2)out.push({r:'2-2s',i:i,s:'bad'});
+      if(i>0&&((x>2&&z[i-1]<-2)||(x<-2&&z[i-1]>2)))out.push({r:'R-4s',i:i,s:'bad'});
+      if(u1===4||d1===4)out.push({r:'4-1s',i:i,s:'bad'});
+      if(u0===10||d0===10)out.push({r:'10x',i:i,s:'bad'});}
+    return out;}
+  function calc(pts,base){
+    var vals=pts.map(function(p){return p.v;}), n=vals.length, ref=(base==='20'&&n>20)?vals.slice(0,20):vals;
+    var sum=function(a){return a.reduce(function(s,x){return s+x;},0);};
+    var m=sum(ref)/ref.length, sd=ref.length>1?Math.sqrt(sum(ref.map(function(x){return (x-m)*(x-m);}))/(ref.length-1)):0;
+    var z=vals.map(function(x){return sd>0?(x-m)/sd:0;}), wg=westgard(z), st=n<2?'na':'ok';
+    if(n>=2)wg.forEach(function(w){if(w.s==='bad')st='bad'; else if(st==='ok')st='warn';});
+    return {n:n,nref:ref.length,mean:m,sd:sd,cv:m?sd/Math.abs(m)*100:0,min:Math.min.apply(null,vals),max:Math.max.apply(null,vals),vals:vals,z:z,wg:wg,st:st,
+      o2:z.filter(function(q){return Math.abs(q)>2;}).length,o3:z.filter(function(q){return Math.abs(q)>3;}).length};}
+  var dp=function(m){return Math.abs(m)>=100?1:2;};
+  var f=function(v,d){return (v==null||isNaN(v))?'–':Number(v).toFixed(d).replace('.',',');};
+  var zf=function(v){return (v>0?'+':'')+f(v,2);};
+  var zc=function(z){var a=Math.abs(z);return a>3?'#e5383b':a>2?'#f5b301':'#12a36c';};
+  function svg(p){return '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';}
+
+  function build(){
+    built=true;
+    $('sdRoot').innerHTML=
+      '<div class="dk-head"><span class="dk-ico">'+svg('<path d="M3 19h18"/><path d="M3 19c3.2 0 3.6-13 9-13s5.8 13 9 13"/><path d="M12 6v13"/>')+'</span><div><h2>Standar Deviasi Kendali Mutu</h2><p>Mean, SD, CV%, grafik Levey-Jennings dan aturan Westgard dari data kontrol harian</p></div>'+
+      '<div class="dk-ctl"><button type="button" class="dk-btn b" id="sdMuat">🔄 Muat ulang</button><a class="dk-btn o" target="_blank" rel="noopener noreferrer" href="'+URL_SHEET+'">Buka spreadsheet</a></div></div>'+
+      '<div class="sd-sel"><label class="dk-f"><small>Kelompok</small><select id="sdG"></select></label><label class="dk-f"><small>Parameter</small><select id="sdA"></select></label>'+
+      '<label class="dk-f"><small id="sdSL">Nomor lot</small><select id="sdS"></select></label>'+
+      '<label class="dk-f"><small>Dasar mean &amp; SD</small><select id="sdB"><option value="all">Semua data</option><option value="20">20 data pertama</option></select></label></div>'+
+      '<div class="sd-kpis" id="sdKp"></div>'+
+      '<div class="sd-grid"><div class="dk-p sd-main"><h3 id="sdTitle">Grafik Levey-Jennings</h3><div class="sd-lj"><canvas id="sdLJ"></canvas></div><p class="ex-note" id="sdCap"></p></div>'+
+      '<div class="sd-side"><div class="dk-p"><h3>Evaluasi Aturan Westgard</h3><div id="sdWg"></div></div>'+
+      '<div class="dk-p"><h3>Sebaran Nilai (z-score)</h3><div class="dk-ch sd-hist"><canvas id="sdHist"></canvas></div><p class="ex-note">Batang = jumlah data; garis putus = harapan bila sebaran normal.</p></div></div></div>'+
+      '<div class="dk-p"><h3>Ringkasan Standar Deviasi Semua Kontrol <small style="font-weight:400;color:#9fb6e6">(klik baris untuk melihat grafiknya)</small></h3>'+
+      '<div class="ex-scroll"><table class="dk-t" id="sdT"><thead><tr><th>Kelompok</th><th>Parameter</th><th>Lot / Periode</th><th class="num">n</th><th class="num">Mean</th><th class="num">SD</th><th class="num">CV</th><th class="num">Di luar ±2SD</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>'+
+      '<p class="ex-note" id="sdNote">Memuat data…</p>';
+    $('sdMuat').addEventListener('click',load);
+    $('sdG').addEventListener('change',function(){S.g=+this.value;S.a=0;S.s=lastSet();fillSel();draw();});
+    $('sdA').addEventListener('change',function(){S.a=+this.value;S.s=lastSet();fillSel();draw();});
+    $('sdS').addEventListener('change',function(){S.s=+this.value;draw();});
+    $('sdB').addEventListener('change',function(){S.base=this.value;draw();});
+    $('sdT').addEventListener('click',function(e){var tr=e.target.closest&&e.target.closest('tr.sd-row'); if(!tr)return;
+      S.g=+tr.dataset.g;S.a=+tr.dataset.a;S.s=+tr.dataset.s;fillSel();draw();$('sdRoot').scrollIntoView({behavior:'smooth',block:'start'});});
+  }
+  function lastSet(){var g=D[S.g],a=g&&g.analytes[S.a]; return a?a.sets.length-1:0;}
+  function pick(){var g=D[S.g],a=g&&g.analytes[S.a],s=a&&a.sets[S.s]; return s?{g:g,a:a,s:s}:null;}
+  function fillSel(){
+    if(!D.length){['sdG','sdA','sdS'].forEach(function(i){$(i).innerHTML='';});return;}
+    var g=D[S.g], a=g.analytes[S.a];
+    $('sdG').innerHTML=D.map(function(x,i){return '<option value="'+i+'">'+esc(x.title)+'</option>';}).join(''); $('sdG').value=S.g;
+    $('sdA').innerHTML=g.analytes.map(function(x,i){return '<option value="'+i+'">'+esc(x.name)+'</option>';}).join(''); $('sdA').value=S.a;
+    $('sdS').innerHTML=a.sets.map(function(x,i){return '<option value="'+i+'">'+esc(x.lot)+' ('+x.pts.length+' data)</option>';}).join(''); $('sdS').value=S.s;
+    $('sdSL').textContent=g.label;
+  }
+  function kp(cls,col,ic,t,v,s){return '<div class="dk-k '+cls+'"><span class="ik" style="background:'+col+'">'+svg(ic)+'</span><div><small class="t">'+t+'</small><b>'+v+'</b><small class="s">'+s+'</small></div></div>';}
+  function draw(){
+    if(!built)return;
+    var P=pick(), kpEl=$('sdKp');
+    if(!P){kpEl.innerHTML='';$('sdWg').innerHTML='';$('sdT').tBodies[0].innerHTML='<tr><td colspan="9">Belum ada data kontrol yang terbaca.</td></tr>';$('sdCap').textContent='';
+      ['sdLJ','sdHist'].forEach(function(i){var o=typeof Chart!=='undefined'&&Chart.getChart($(i));if(o)o.destroy();}); return;}
+    var c=calc(P.s.pts,S.base), d=dp(c.mean), u=P.a.unit||'';
+    $('sdTitle').textContent='Grafik Levey-Jennings · '+P.a.name+' · '+P.g.label+' '+P.s.lot;
+    kpEl.innerHTML=
+      kp('','#1d6fe0','<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>','Jumlah data',c.n,c.nref<c.n?'mean &amp; SD dari '+c.nref+' data pertama':'titik kontrol')+
+      kp('','#2f8fe8','<path d="M3 12h18M12 5v14"/>','Rata-rata (mean)',f(c.mean,d),esc(u))+
+      kp('ok','#12a36c','<path d="M3 19h18"/><path d="M3 19c3.2 0 3.6-13 9-13s5.8 13 9 13"/>','Standar deviasi (SD)',f(c.sd,d+(c.sd<1&&d<2?1:0)),esc(u))+
+      kp(c.cv>10?'warn':'','#8b4ee0','<path d="M5 19 19 5M7 8a1.5 1.5 0 1 0 0-.01M17 18a1.5 1.5 0 1 0 0-.01"/>','Koefisien variasi (CV)',f(c.cv,1)+'%','SD ÷ mean × 100')+
+      kp('','#10b8d6','<path d="M4 8h16M4 16h16"/>','Rentang ±2 SD','<span style="font-size:1.2rem">'+f(c.mean-2*c.sd,d)+' – '+f(c.mean+2*c.sd,d)+'</span>',esc(u))+
+      kp(c.o3?'bad':(c.o2?'warn':'ok'),c.o3?'#e5383b':(c.o2?'#f5a800':'#12a36c'),c.o2?'<path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17.5v.01"/>':'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>','Di luar ±2 SD',c.o2+(c.n?' ('+Math.round(c.o2/c.n*100)+'%)':''),c.o3+' di luar ±3 SD');
+    $('sdCap').innerHTML='Mean &amp; SD dari '+(c.nref<c.n?c.nref+' data pertama (total '+c.n+' data)':'semua '+c.n+' data')+' (SD sampel, n−1). Titik hijau = dalam ±2 SD, kuning = 2–3 SD, merah = di luar 3 SD.'+(c.nref<20?' <b>Data kurang dari 20, SD masih indikatif.</b>':'')+' Urutan titik mengikuti urutan baris di spreadsheet.';
+    $('sdWg').innerHTML=wgHtml(c,P.s);
+    tbl();
+    if(typeof Chart==='undefined')return;
+    drawLJ(c,P);drawHist(c);
+  }
+  function wgHtml(c,set){
+    if(c.n<2)return '<ul class="sd-wg"><li class="warn"><span class="sd-tag warn">n&lt;2</span><span>Data belum cukup untuk dievaluasi.</span></li></ul>';
+    if(!c.wg.length)return '<ul class="sd-wg"><li class="ok"><span class="sd-tag ok">OK</span><span>Tidak ada pelanggaran aturan Westgard (1-2s, 1-3s, 2-2s, R-4s, 4-1s, 10x).</span></li></ul>';
+    var RN={'1-3s':'1 titik melewati ±3 SD','2-2s':'2 titik berurutan melewati ±2 SD di sisi yang sama','R-4s':'2 titik berurutan berselisih lebih dari 4 SD','4-1s':'4 titik berurutan melewati ±1 SD di sisi yang sama','10x':'10 titik berurutan berada di satu sisi mean','1-2s':'1 titik melewati ±2 SD (peringatan)'}, html='';
+    ['1-3s','2-2s','R-4s','4-1s','10x','1-2s'].forEach(function(r){
+      var l=c.wg.filter(function(w){return w.r===r;}); if(!l.length)return;
+      var cls=r==='1-2s'?'warn':'bad';
+      var ex=l.slice(0,4).map(function(w){var p=set.pts[w.i]; return '#'+(w.i+1)+(p.d?' ('+esc(p.d)+')':'')+' = '+f(p.v,dp(c.mean))+', z '+zf(c.z[w.i]);}).join('; ')+(l.length>4?'; +'+(l.length-4)+' lagi':'');
+      html+='<li class="'+cls+'"><span class="sd-tag'+(cls==='warn'?' warn':'')+'">'+r+'</span><span><b>'+l.length+'×</b> '+RN[r]+'<small>'+ex+'</small></span></li>';});
+    return '<ul class="sd-wg">'+html+'</ul>';}
+  function tbl(){
+    var rows='';
+    D.forEach(function(g,gi){g.analytes.forEach(function(a,ai){a.sets.forEach(function(s,si){
+      var c=calc(s.pts,S.base), d=dp(c.mean), on=(gi===S.g&&ai===S.a&&si===S.s);
+      rows+='<tr class="sd-row'+(on?' sd-on':'')+'" data-g="'+gi+'" data-a="'+ai+'" data-s="'+si+'"><td>'+esc(g.title)+'</td><td>'+esc(a.name)+'</td><td>'+esc(s.lot)+'</td><td class="num">'+c.n+'</td><td class="num">'+f(c.mean,d)+'</td><td class="num"><b>'+f(c.sd,d+(c.sd<1&&d<2?1:0))+'</b></td><td class="num">'+f(c.cv,1)+'%</td><td class="num">'+c.o2+'</td><td><span class="ex-pill '+c.st+'">'+STL[c.st]+'</span></td></tr>';});});});
+    $('sdT').tBodies[0].innerHTML=rows||'<tr><td colspan="9">Belum ada data kontrol yang terbaca.</td></tr>';}
+  function drawLJ(c,P){
+    var cv=$('sdLJ'), o=Chart.getChart(cv); if(o)o.destroy();
+    var m=c.mean, sd=c.sd, labels=P.s.pts.map(function(p,i){return i+1;}), rad=c.n>200?1.5:c.n>80?2.5:4;
+    function ln(k,label,color,dash,w){return {label:label,data:labels.map(function(){return m+k*sd;}),borderColor:color,borderWidth:w||1,borderDash:dash||[],pointRadius:0,pointHoverRadius:0,fill:false,order:5};}
+    var ds=[{label:'Nilai kontrol',data:c.vals,borderColor:'rgba(124,196,255,.75)',backgroundColor:'#7cc4ff',borderWidth:1.5,pointRadius:rad,pointHoverRadius:rad+2,pointBackgroundColor:c.z.map(zc),pointBorderColor:c.z.map(zc),order:1},
+      ln(0,'Mean','#ffffff',[],1.6),ln(1,'±1 SD','#9fb6e6',[3,4]),ln(-1,'-1 SD','#9fb6e6',[3,4]),ln(2,'±2 SD','#f5b301',[6,4]),ln(-2,'-2 SD','#f5b301',[6,4]),ln(3,'±3 SD','#e5383b',[8,4]),ln(-3,'-3 SD','#e5383b',[8,4])];
+    var sc={x:{grid:{display:false},ticks:{color:'#b9c9ee',maxTicksLimit:14,font:{size:10}},title:{display:true,text:'Urutan data',color:'#9fb6e6',font:{size:10}}},
+      y:{grid:{color:'rgba(255,255,255,.08)'},border:{display:false},ticks:{color:'#b9c9ee'},title:{display:!!P.a.unit,text:P.a.unit,color:'#9fb6e6',font:{size:10}}}};
+    if(sd>0){sc.y.min=Math.min(m-3.4*sd,c.min-.2*sd); sc.y.max=Math.max(m+3.4*sd,c.max+.2*sd);}
+    new Chart(cv,{type:'line',data:{labels:labels,datasets:ds},
+      options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},interaction:{mode:'nearest',axis:'x',intersect:false},scales:sc,
+        plugins:{legend:{position:'bottom',labels:{color:'#cfe0ff',usePointStyle:true,boxWidth:8,filter:function(it){return it.text.charAt(0)!=='-';}}},
+          tooltip:{filter:function(it){return it.datasetIndex===0;},callbacks:{title:function(it){var p=P.s.pts[it[0].dataIndex];return '#'+(it[0].dataIndex+1)+(p&&p.d?' · '+p.d:'');},
+            label:function(it){return 'Nilai '+f(it.parsed.y,dp(m))+' '+(P.a.unit||'')+' (z '+zf(c.z[it.dataIndex])+')';}}}}}});
+  }
+  function drawHist(c){
+    var cv=$('sdHist'), o=Chart.getChart(cv); if(o)o.destroy();
+    var edges=[-3,-2,-1,0,1,2,3], cnt=[0,0,0,0,0,0,0,0], P=[.00135,.0214,.13591,.34134,.34134,.13591,.0214,.00135];
+    c.z.forEach(function(z){var k=0; while(k<edges.length&&z>=edges[k])k++; cnt[k]++;});
+    new Chart(cv,{data:{labels:['< −3','−3…−2','−2…−1','−1…0','0…1','1…2','2…3','≥ 3'],datasets:[
+      {type:'bar',label:'Jumlah data',data:cnt,backgroundColor:['#e5383b','#f5b301','#2f8fe8','#12a36c','#12a36c','#2f8fe8','#f5b301','#e5383b'],borderRadius:4,order:2},
+      {type:'line',label:'Harapan (normal)',data:P.map(function(p){return Math.round(p*c.n*10)/10;}),borderColor:'#ffffff',borderDash:[5,4],borderWidth:1.5,pointRadius:2,pointBackgroundColor:'#fff',tension:.3,order:1}]},
+      options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false},ticks:{color:'#b9c9ee',font:{size:10}},title:{display:true,text:'z-score (SD dari mean)',color:'#9fb6e6',font:{size:10}}},y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.08)'},border:{display:false},ticks:{color:'#b9c9ee',precision:0}}},
+        plugins:{legend:{position:'bottom',labels:{color:'#cfe0ff',usePointStyle:true,boxWidth:8}}}}});
+  }
+  function ambil(gid){
+    return fetch('https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&headers=0&gid='+gid+'&_='+Date.now(),{cache:'no-store'})
+      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+      .then(function(t){if(/^\s*</.test(t))throw new Error('Google meminta login, sheet belum publik');return csv(t);});}
+  function load(){
+    if(loading)return; loading=true; ERR=[];
+    var b=$('sdMuat'); b.disabled=true; $('sdNote').textContent='Memuat data…';
+    Promise.all([
+      ambil(GID_LOT).then(function(r){var x=parseLot(r); if(!x.length)throw new Error('tab "kontrol by lot": judul "QC …" tidak terbaca ('+r.length+' baris diterima)'); return x;}).catch(function(e){ERR.push(e&&e.message?e.message:'gagal terhubung');return [];}),
+      ambil(GID_HA).then(function(r){var x=parseHA(r); if(!x.length)throw new Error('tab "DATA KONTROL HA": kolom LEUKOSIT tidak terbaca ('+r.length+' baris diterima)'); return x;}).catch(function(e){ERR.push(e&&e.message?e.message:'gagal terhubung');return [];})
+    ]).then(function(res){
+      var nd=[]; if(res[0].length)nd.push({key:'kimia',title:'Kimia Klinik',label:'Nomor lot',analytes:res[0]});
+      if(res[1].length)nd.push({key:'hema',title:'Hematologi',label:'Periode (triwulan)',analytes:res[1]});
+      D=nd;
+      if(S.g>=D.length)S.g=0;
+      if(D.length){var g=D[S.g]; if(S.a>=g.analytes.length)S.a=0; var a=g.analytes[S.a]; if(first||S.s>=a.sets.length||S.s<0)S.s=a.sets.length-1;}
+      first=false; fillSel(); draw();
+      $('sdNote').innerHTML=(D.length?'Diperbarui '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+' dari Google Sheets. ':'')+
+        'SD = standar deviasi sampel (n−1); CV = SD ÷ mean × 100; aturan Westgard: 1-3s, 2-2s, R-4s, 4-1s, 10x = tolak, 1-2s = peringatan. '+
+        (ERR.length?'<b>Sebagian data gagal dimuat:</b> '+esc(ERR.join(' | '))+'. Pastikan sheet bisa dilihat siapa pun yang punya link. ':'')+
+        '<a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
+    }).catch(function(e){
+      $('sdNote').textContent='Dashboard standar deviasi gagal ditampilkan ('+(e&&e.message?e.message:'kesalahan tak dikenal')+').';
+    }).then(function(){loading=false;b.disabled=false;});
+  }
+  window.__sdParse={lot:parseLot,ha:parseHA,csv:csv,calc:calc,westgard:westgard};
+  if($('sdRoot')){build(); load();
+    var nav=document.querySelector('[data-nav="sd"]'); if(nav)nav.addEventListener('click',function(){setTimeout(draw,150);});}
+})();
+</script>
+
 <script>
 // ===== Indikator Mutu Lab: Waktu Tunggu (1 Google Sheet, tahun dinamis) =====
 (function(){
