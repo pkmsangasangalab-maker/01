@@ -2093,6 +2093,8 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
         <div class="dk-scroll"><table class="dk-t" id="sdTbl"><thead><tr><th>Parameter / lot</th><th class="num">n</th><th class="num">Mean</th><th class="num">SD</th><th class="num">CV %</th><th class="num">Di luar ±2SD</th><th class="num">Di luar ±3SD</th><th>Status</th></tr></thead><tbody></tbody></table></div>
         <p class="dk-note">Klik baris untuk menampilkan grafiknya. Mean &amp; SD dihitung dari data pada rentang yang dipilih (SD sampel, n−1) kecuali diisi nilai tetapan. “Data belum cukup” berarti data kurang dari 2 titik sehingga SD belum bisa dihitung.</p>
         <p class="dk-note" id="sdNote">Memuat data…</p>
+        <p class="dk-note"><button class="dk-btn o" id="sdDiag" type="button">🩺 Salin data mentah (diagnosa)</button></p>
+        <textarea id="sdDiagOut" class="dk-filter" style="display:none;width:100%;height:220px;background:rgba(6,20,60,.85);color:#e8efff;border:1px solid rgba(80,140,255,.4);border-radius:8px;padding:8px;font:12px monospace" readonly></textarea>
       </div>
     </div>
   </section>
@@ -4022,7 +4024,7 @@ var PANDUAN = [
   var $=function(i){return document.getElementById(i);};
   var esc=function(t){return String(t).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});};
   var PARS=['LEUKOSIT','ERITROSIT','HEMOGLOBIN','HEMATOKRIT','TROMBOSIT'], KIM=[['Gula darah',0],['Kolesterol',4],['Asam urat',7]];
-  var D=null, ch=null, started=false, live=false;
+  var D=null, ch=null, started=false, live=false, RAW={hem:null,kim:null};
   // cadangan hematologi (dipakai bila Google Sheets tidak bisa dibaca dari browser)
   var FB={2026:{1:[[7.44,7.81,7.75,8.08,8.18,7.20,7.64],[4.62,4.80,4.82,4.92,4.81,4.63,4.84],[13.4,13.4,13.6,13.9,14.0,12.7,13.2],[38.8,40.1,40.6,41.4,40.5,39.2,40.7],[227,239,234,249,221,226,231]],
     2:[[7.16,7.72,7.48,7.69,7.29,7.46,6.99],[4.70,4.92,4.82,4.71,4.79,4.84,4.76],[14.2,14.6,14.1,13.7,13.8,14.1,14.2],[43.4,44.4,44.6,43.9,43.5,44.4,44.3],[254,250,245,244,253,252,256]],
@@ -4080,7 +4082,7 @@ var PANDUAN = [
   function fbHem(){var o={}; Object.keys(FB).forEach(function(y){o[y]={}; PARS.forEach(function(p,k){o[y][p]={}; Object.keys(FB[y]).forEach(function(tw){o[y][p][tw]=FB[y][tw][k].slice();});});}); return o;}
   function load(){
     $('sdNote').textContent='Memuat data…';
-    return Promise.all([getCsv(GH).then(parseHem).catch(function(){return null;}),getCsv(GK).then(parseKim).catch(function(){return null;})]).then(function(a){
+    return Promise.all([getCsv(GH).then(function(r){RAW.hem=r;return parseHem(r);}).catch(function(){return null;}),getCsv(GK).then(function(r){RAW.kim=r;return parseKim(r);}).catch(function(){return null;})]).then(function(a){
       live=!!(a[0]||a[1]);
       D={hem:a[0]||fbHem(),kim:a[1]||{}};
       var msg=[]; if(!a[0])msg.push('hematologi memakai data cadangan (sheet tidak terbaca)'); if(!a[1])msg.push('kimia klinik tidak terbaca — pastikan sheet dibagikan “Siapa saja yang memiliki link: Viewer”');
@@ -4149,8 +4151,23 @@ var PANDUAN = [
     items.forEach(function(it){var S=stats(it.pts,items.length&&it.id===c.p?mT:null,items.length&&it.id===c.p?sT:null), st=stat(S,cvMax);
       rows+='<tr data-id="'+esc(it.id)+'"'+(it.id===c.p?' class="sel"':'')+'><td>'+esc(it.name)+'</td><td class="num">'+S.n+'</td><td class="num">'+fx(S.mean)+'</td><td class="num">'+fx(S.sd)+'</td><td class="num">'+fx(S.cv,2)+'</td><td class="num">'+S.o2+'</td><td class="num">'+S.o3+'</td><td><span class="dk-pill '+st.c+'">'+st.l+'</span></td></tr>';});
     $('sdTbl').tBodies[0].innerHTML=rows||'<tr><td colspan="8" class="dk-empty">Belum ada data.</td></tr>';}
+  function diag(){
+    var k=KIM.filter(function(x){return x[0]===$('sdKat').value;})[0]||KIM[1], c=k[1], rows=RAW.kim, out=[];
+    if(!rows){out.push('CSV kimia klinik tidak terbaca (fetch gagal / sheet belum dibagikan).');}
+    else{
+      var tot=rows.length, dt=0, ed=0, odd=[];
+      rows.forEach(function(r,i){var a=String(r[c]==null?'':r[c]).trim(), b=String(r[c+1]==null?'':r[c+1]).trim();
+        if(!a&&!b)return; if(isDate(a))dt++; if(!a)ed++;
+        var bn=nv(b); if((a&&!isDate(a))||(!a&&b)||(b&&(bn==null||bn>=1000))||(a&&!b))odd.push((i+1)+' | '+JSON.stringify(a)+' | '+JSON.stringify(b));});
+      out.push('Kategori: '+k[0]+' (kolom '+c+'-'+(c+1)+'), total baris CSV: '+tot+', baris bertanggal: '+dt+', tanggal kosong tapi ada nilai: '+ed);
+      out.push('Lot terbaca: '+((D&&D.kim[k[0]])||[]).map(function(l){return l.lot+'='+l.pts.length;}).join(', '));
+      out.push('Baris tidak biasa (no | kolom tanggal | kolom nilai):'); out=out.concat(odd.slice(0,120));
+      out.push('Baris 1-6 mentah:'); for(var i=0;i<6&&i<rows.length;i++)out.push((i+1)+' | '+JSON.stringify(rows[i].slice(0,10)));}
+    var t=out.join('\n'), ta=$('sdDiagOut'); ta.style.display='block'; ta.value=t; ta.focus(); ta.select();
+    try{navigator.clipboard.writeText(t).catch(function(){});}catch(e){}}
   function init(){
     if(started)return; started=true;
+    $('sdDiag').addEventListener('click',diag);
     ['sdTahun','sdTw','sdPar'].forEach(function(i){$(i).addEventListener('change',draw);});
     $('sdKat').addEventListener('change',fillSub);
     ['sdCvMax','sdMeanT','sdSdT'].forEach(function(i){$(i).addEventListener('input',draw);});
