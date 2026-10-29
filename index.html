@@ -3870,16 +3870,17 @@ var PANDUAN = [
 })();
 </script>
 <script>
-// ===== Dashboard pemeriksaan berdasarkan hari (Google Sheets, tab "REKAP PEMERIKSAAN LAB 2026") =====
+// ===== Dashboard pemeriksaan berdasarkan hari (Google Sheets REKAP_LAB_DAN_STOK_OPNAME_2026, tab LAB JAN … LAB DES) =====
 (function(){
-  var SID='1cwQoPEtHT33xWXUfFA05P14LKhrZje438RFLBFmNRts', GID='1655090146';
-  var URL_CSV='https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&gid='+GID;
-  var URL_SHEET='https://docs.google.com/spreadsheets/d/'+SID+'/edit?gid='+GID;
+  var SID='1axwil6eYFLv8OPg44DwEL0SHawrB5r_tdzWnhR78clg';
+  // gid tab LAB JAN … LAB DES (urut bulan 1–12)
+  var GIDS=['482305516','618777133','1272825076','275543783','1840821210','991798025','73921279','578483524','2026233475','161621160','993635097','22302672'];
+  var URL_CSV='https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&gid=';
+  var URL_SHEET='https://docs.google.com/spreadsheets/d/'+SID+'/edit?gid='+GIDS[new Date().getMonth()];
   var BLN=['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'];
   var BNM=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   var HARI=['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
   // Baris yang BUKAN jenis pemeriksaan (rekap pasien per wilayah & total); sisanya dihitung sebagai pemeriksaan
-  var NON=/^(ssd|jawa|sarijaya|pendingin|ss muara|luar wilayah|dalam wilayah|total pasien|total|jumlah)$/i;
   var TK='#cfe0ff', GR='rgba(160,190,255,.14)', BAR='#2f8cff', HI='#ffa726', LN='#3ccf7e';
   var M=[], C={}, timer=null;
   function $(i){return document.getElementById(i);}
@@ -3896,32 +3897,32 @@ var PANDUAN = [
     if(f!==''||row.length){row.push(f);r.push(row);} return r;}
   function num(v){var x=String(v==null?'':v).replace(/[^\d]/g,''); return x===''?null:parseInt(x,10);}
 
-  // Tata letak sheet: kolom A = bulan (hanya di baris pertama blok), B = nama pemeriksaan, C..AG = tanggal 1..31, AH = total.
-  // Sel kosong = tidak ada layanan (Minggu/libur). Baris "Total Pasien" = jumlah pasien per hari.
-  function parse(rows){
-    var hi=-1,i,d,col={};
-    for(i=0;i<rows.length;i++){if(/^tanggal$/i.test(String(rows[i][1]||'').trim())){hi=i;break;}}
+  // Tata letak tiap tab LAB <bulan>: B2 = bulan (1-12), B3 = tahun; baris header "Kategori | Jenis pemeriksaan | 1..31 | Total | %";
+  // baris "Total harian" = jumlah pemeriksaan per tanggal; baris "Total pasien" (di bagian ASAL PASIEN) = jumlah pasien per tanggal.
+  // Sel kosong / 0 = tidak ada layanan (Minggu/libur). Google (gviz) dapat membuang sel teks di kolom angka, jadi kolom tanggal dicari
+  // dari baris header bila terbaca dan bila tidak memakai posisi tetap (kolom C = tanggal 1).
+  function parse(rows,mi){
+    var hi=-1,i,d,col={},yr=null;
+    for(i=0;i<rows.length;i++){var b0=String(rows[i][1]||'').trim(), a0=String(rows[i][0]||'').trim();
+      if(/^tahun$/i.test(a0)&&yr==null){var y=num(rows[i][1]); if(y&&y>2000)yr=y;}
+      if(hi<0&&/^jenis pemeriksaan$/i.test(b0))hi=i;}
     if(hi>=0)rows[hi].forEach(function(x,k){var t=String(x==null?'':x).trim(); if(k>=2&&/^\d{1,2}$/.test(t)){var n=+t; if(n>=1&&n<=31&&col[n]==null)col[n]=k;}});
     for(d=1;d<=31;d++){if(col[d]==null)col[d]=d+1;}
-    var out=[],cur=null,yd=new Date().getFullYear();
-    for(i=hi+1;i<rows.length;i++){
-      var r=rows[i], a=String(r[0]||'').trim(), b=String(r[1]||'').trim();
-      var mm=/^(JANUARI|FEBRUARI|MARET|APRIL|MEI|JUNI|JULI|AGUSTUS|SEPTEMBER|OKTOBER|NOVEMBER|DESEMBER)\s*(\d{4})?/i.exec(a);
-      if(mm){cur={mi:BLN.indexOf(mm[1].toUpperCase()),yr:+mm[2]||yd,pas:null,ex:[]};out.push(cur);}
-      if(!cur||!b)continue;
+    if(yr==null)yr=new Date().getFullYear();
+    var tot=null,pas=null,sum=[];
+    for(i=Math.max(hi+1,0);i<rows.length;i++){
+      var r=rows[i], a=String(r[0]||'').trim(), b=String(r[1]||'').trim(), key=(a||b).toLowerCase();
       var v=[]; for(d=1;d<=31;d++)v[d]=num(r[col[d]]);
-      var key=b.toLowerCase();
-      if(key==='total pasien')cur.pas=v; else if(!NON.test(key))cur.ex.push(v);
+      if(/^total harian$/.test(key))tot=v;
+      else if(/^total pasien$/.test(key))pas=v;
+      else if(a&&b&&!tot){for(d=1;d<=31;d++){if(v[d]!=null)sum[d]=(sum[d]||0)+v[d];}}
     }
-    return out.map(function(m){
-      var n=new Date(m.yr,m.mi+1,0).getDate(), days=[];
-      for(d=1;d<=n;d++){
-        var pem=0; m.ex.forEach(function(v){if(v[d]!=null)pem+=v[d];});
-        var pas=(m.pas&&m.pas[d]!=null)?m.pas[d]:0;
-        days.push({d:d,dow:(new Date(m.yr,m.mi,d).getDay()+6)%7,pas:pas,pem:pem,buka:pas>0||pem>0});
-      }
-      return {mi:m.mi,yr:m.yr,name:BNM[m.mi]+' '+m.yr,days:days};
-    }).filter(function(m){return m.days.some(function(x){return x.buka;});});
+    var n=new Date(yr,mi+1,0).getDate(), days=[];
+    for(d=1;d<=n;d++){
+      var pem=tot&&tot[d]!=null?tot[d]:(sum[d]||0), ps=(pas&&pas[d]!=null)?pas[d]:0;
+      days.push({d:d,dow:(new Date(yr,mi,d).getDay()+6)%7,pas:ps,pem:pem,buka:ps>0||pem>0});
+    }
+    return days.some(function(x){return x.buka;})?{mi:mi,yr:yr,name:BNM[mi]+' '+yr,days:days}:null;
   }
   function agg(list){
     var o={pas:0,pem:0,buka:0,dp:[0,0,0,0,0,0,0],dm:[0,0,0,0,0,0,0],dn:[0,0,0,0,0,0,0],all:[]};
@@ -3987,11 +3988,16 @@ var PANDUAN = [
   }
   function load(){
     $('rsHrNote').textContent='Memuat data harian…';
-    fetch(URL_CSV+'&_='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}).then(function(t){
-      if(/^\s*</.test(t))throw new Error('Google meminta login, sheet belum publik');
-      var d=parse(csv(t)); if(!d.length)throw new Error('blok bulan tidak ditemukan');
+    var fail=0, last='';
+    Promise.all(GIDS.map(function(g,mi){
+      return fetch(URL_CSV+g+'&_='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}).then(function(t){
+        if(/^\s*</.test(t))throw new Error('Google meminta login, sheet belum publik');
+        return parse(csv(t),mi);
+      }).catch(function(e){fail++;last=e&&e.message?e.message:'gagal terhubung';return null;});
+    })).then(function(res){
+      var d=res.filter(Boolean); if(!d.length)throw new Error(fail?last:'belum ada data pada tab LAB');
       M=d; fillSel(); render();
-      $('rsHrNote').innerHTML='Data langsung dari Google Sheets "REKAP PEMERIKSAAN LAB". Rata-rata dihitung per hari layanan (hari tanpa pasien seperti Minggu/libur tidak dihitung). Diperbarui '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'. <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
+      $('rsHrNote').innerHTML='Data langsung dari Google Sheets "REKAP_LAB_DAN_STOK_OPNAME_2026" (tab LAB JAN–DES). Rata-rata dihitung per hari layanan (hari tanpa pasien seperti Minggu/libur tidak dihitung). Diperbarui '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'. <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
     }).catch(function(e){
       $('rsHrNote').innerHTML='Data harian gagal dimuat ['+esc(e&&e.message?e.message:'gagal terhubung')+']. Pastikan sheet bisa dilihat siapa pun yang punya link. <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
       if(!M.length)$('rsHrTop').innerHTML='<tr><td colspan="4">Data belum tersedia.</td></tr>';
