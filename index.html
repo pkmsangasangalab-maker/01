@@ -4091,16 +4091,16 @@ var PANDUAN = [
   function isHem(){return $('sdKat').value==='Hematologi';}
   function fillSub(){
     var h=isHem();
-    $('fTahun').style.display=h?'':'none'; $('fTw').style.display=h?'':'none'; $('sdParLbl').textContent=h?'Parameter':'Nomor lot';
+    $('fTahun').style.display=h?'':'none'; $('fTw').style.display=h?'':'none'; $('sdParLbl').textContent=h?'Parameter':'No Lot';
     if(h){opt($('sdTahun'),Object.keys(D.hem).sort().reverse().map(function(y){return [y,'Tahun '+y];}),true);
       opt($('sdPar'),PARS.map(function(p){return [p,p];}),true);
       opt($('sdTw'),[['all','Semua triwulan'],['1','TW 1'],['2','TW 2'],['3','TW 3'],['4','TW 4']],true);}
-    else{var lots=D.kim[$('sdKat').value]||[]; opt($('sdPar'),lots.map(function(l,i){return [String(i),'Lot '+l.lot+' ('+l.pts.length+' data)'];}),true); if(lots.length)$('sdPar').value=String(lots.length-1);}
+    else{var lots=D.kim[$('sdKat').value]||[]; opt($('sdPar'),(lots.length>1?[['all','Semua lot (gabungan)']]:[]).concat(lots.map(function(l,i){return [String(i),'No Lot '+l.lot+' · '+l.pts.length+' data'];})),false); if(lots.length)$('sdPar').value=String(lots.length-1);}
     draw();}
   function series(kind,y,p,tw,lotIdx){
     if(kind==='hem'){var o=[], t=D.hem[y]&&D.hem[y][p]||{};
       Object.keys(t).sort().forEach(function(k){if(tw!=='all'&&k!==tw)return; t[k].forEach(function(v,i){o.push({l:'TW'+k+'-'+(i+1),v:v});});}); return o;}
-    var lots=D.kim[kind]||[]; return (lots[lotIdx]||{pts:[]}).pts;}
+    var lots=D.kim[kind]||[]; if(lotIdx==='all'){var all=[]; lots.forEach(function(l){all=all.concat(l.pts);}); return all;} return (lots[+lotIdx]||{pts:[]}).pts;}
   function stats(pts,mT,sT){
     var n=pts.length, vs=pts.map(function(x){return x.v;}), m=n?vs.reduce(function(a,b){return a+b;},0)/n:0;
     var sd=n>1?Math.sqrt(vs.reduce(function(a,b){return a+(b-m)*(b-m);},0)/(n-1)):0;
@@ -4119,12 +4119,12 @@ var PANDUAN = [
   function cur(){return {kat:$('sdKat').value,y:$('sdTahun').value,p:$('sdPar').value,tw:$('sdTw').value};}
   function getSel(){var c=cur(), mT=nv($('sdMeanT').value), sT=nv($('sdSdT').value);
     if(c.kat==='Hematologi'){var pts=series('hem',c.y,c.p,c.tw); return {name:c.p+' · '+c.y+(c.tw==='all'?'':' TW'+c.tw),pts:pts,S:stats(pts,mT,sT)};}
-    var pts2=series(c.kat,null,null,null,+c.p), lot=(D.kim[c.kat]||[])[+c.p]; return {name:c.kat+' · Lot '+(lot?lot.lot:'–'),pts:pts2,S:stats(pts2,mT,sT)};}
+    var pts2=series(c.kat,null,null,null,c.p), lot=(D.kim[c.kat]||[])[+c.p]; return {name:c.kat+' · '+(c.p==='all'?'Semua lot (gabungan)':'No Lot '+(lot?lot.lot:'–')),pts:pts2,S:stats(pts2,mT,sT)};}
   function k(cls,v,l){return '<div class="dk-k '+cls+'"><div><b>'+v+'</b><small>'+l+'</small></div></div>';}
   function draw(){
     if(!D)return;
     var s=getSel(), S=s.S, cvMax=+$('sdCvMax').value||6, st=stat(S,cvMax);
-    $('sdKpis').innerHTML=k('',S.n,'Jumlah data (n)')+k('',fx(S.mean),'Mean')+k('',fx(S.sd),'Standar deviasi (SD)')+k(S.cv>cvMax?'bad':'ok',fx(S.cv,2)+'%','CV (batas '+cvMax+'%)')+k(S.o2?'warn':'ok',S.o2,'Di luar ±2SD')+k(S.o3?'bad':'ok',S.o3,'Di luar ±3SD')+k(st.c==='bad'?'bad':st.c==='warn'?'warn':st.c==='ok'?'ok':'',st.l,'Status kontrol');
+    $('sdKpis').innerHTML=k('',S.n,'Jumlah data (n)')+k('',fx(S.mean),'Mean')+k('',fx(S.sd),'Standar deviasi (SD)')+k(S.cv>cvMax?'bad':'ok',fx(S.cv,2)+'%','CV (batas '+cvMax+'%)')+k(S.o2?'warn':'ok',S.o2,'Di luar ±2SD')+k(S.o3?'bad':'ok',S.o3,'Di luar ±3SD')+k(st.c==='bad'?'bad':st.c==='warn'?'warn':st.c==='ok'?'ok':'',st.l,'Status kontrol')+(!isHem()&&s.pts.length?'<div class="dk-k"><div><b class="m">'+esc(s.pts[0].l)+' – '+esc(s.pts[s.pts.length-1].l)+'</b><small>Rentang tanggal data</small></div></div>':'');
     var f=[]; if(S.n<2)f.push(isHem()?'Belum ada data pada pilihan ini.':'Belum ada data kimia klinik yang terbaca. Pastikan spreadsheet dibagikan dengan akses “Siapa saja yang memiliki link”, lalu klik Muat ulang.'); if(S.o3)f.push('Aturan 1-3s dilanggar ('+S.o3+' titik) – tolak run.'); if(S.r22)f.push('Aturan 2-2s dilanggar ('+S.r22+' kali).'); if(S.r10)f.push('Aturan 10x (10 titik berturut-turut di satu sisi mean) terdeteksi.');
     if(S.o2&&!S.o3)f.push(S.o2+' titik melewati ±2SD (peringatan 1-2s).'); if($('sdMeanT').value||$('sdSdT').value)f.push('Memakai Mean/SD tetapan (mean hitung: '+fx(S.calcMean)+', SD hitung: '+fx(S.calcSd)+').');
     $('sdFlags').textContent=f.length?f.join(' '):'Tidak ada pelanggaran aturan Westgard (1-3s, 2-2s, 10x) pada data ini.';
@@ -4141,7 +4141,7 @@ var PANDUAN = [
   function table(selName){
     var c=cur(), cvMax=+$('sdCvMax').value||6, mT=nv($('sdMeanT').value), sT=nv($('sdSdT').value), rows='', items=[];
     if(c.kat==='Hematologi')PARS.forEach(function(p){items.push({id:p,name:p+' · '+c.y+(c.tw==='all'?'':' TW'+c.tw),pts:series('hem',c.y,p,c.tw)});});
-    else((D.kim[c.kat])||[]).forEach(function(l,i){items.push({id:String(i),name:c.kat+' · Lot '+l.lot,pts:l.pts});});
+    else{var ll=(D.kim[c.kat])||[]; ll.forEach(function(l,i){items.push({id:String(i),name:c.kat+' · No Lot '+l.lot,pts:l.pts});}); if(ll.length>1)items.unshift({id:'all',name:c.kat+' · Semua lot (gabungan)',pts:series(c.kat,null,null,null,'all')});}
     items.forEach(function(it){var S=stats(it.pts,items.length&&it.id===c.p?mT:null,items.length&&it.id===c.p?sT:null), st=stat(S,cvMax);
       rows+='<tr data-id="'+esc(it.id)+'"'+(it.id===c.p?' class="sel"':'')+'><td>'+esc(it.name)+'</td><td class="num">'+S.n+'</td><td class="num">'+fx(S.mean)+'</td><td class="num">'+fx(S.sd)+'</td><td class="num">'+fx(S.cv,2)+'</td><td class="num">'+S.o2+'</td><td class="num">'+S.o3+'</td><td><span class="dk-pill '+st.c+'">'+st.l+'</span></td></tr>';});
     $('sdTbl').tBodies[0].innerHTML=rows||'<tr><td colspan="8" class="dk-empty">Belum ada data.</td></tr>';}
