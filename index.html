@@ -4066,16 +4066,23 @@ var PANDUAN = [
   // Nilai kontrol kimia klinik selalu kecil (< 1000). Angka >= 1000, teks, atau angka berformat ribuan di kolom nilai = nomor lot.
   function lotVal(b){var raw=String(b).trim(); if(!raw)return false; var t=raw.replace(/\s/g,'');
     if(/^\d{1,3}([.,]\d{3})+$/.test(t))return true; var n=nv(t); return n==null||n>=1000;}
+  function mkey(t){var m=/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/.exec(t); return m?(+m[3])*12+(+m[2]):null;}
+  // Bila nomor lot tersimpan sebagai TEKS di kolom angka, Google membuangnya sehingga baris lot tampak kosong.
+  // Baris kosong di antara dua tanggal berbeda bulan dianggap pergantian lot (nomor lot ditandai "tidak terbaca").
   function parseKim(rows){
     var out={}, any=false;
-    KIM.forEach(function(k){var c=k[1], lots=[], cur=null;
+    KIM.forEach(function(k){var c=k[1], lots=[], cur=null, blank=0, lastKey=null;
       rows.forEach(function(r){var a=String(r[c]==null?'':r[c]).trim(), b=String(r[c+1]==null?'':r[c+1]).trim();
-        if(!a&&!b)return; if(/^nilai/i.test(b)||/^tanggal/i.test(a)||/^qc\s/i.test(a)||/diacon|assay/i.test(a))return;
+        if(!a&&!b){blank++;return;}
+        if(/^nilai/i.test(b)||/^tanggal/i.test(a)||/^qc\s/i.test(a)||/diacon|assay/i.test(a)){blank=0;return;}
         var label=/lot/i.test(a);
-        if(label||(!isDate(a)&&lotVal(b))){var id=b.replace(/\s+/g,' ')||(label?a.replace(/no\.?\s*lot\s*:?/i,'').trim():'')||'-'; cur={lot:id,pts:[]};lots.push(cur);return;}
-        var bn=nv(b); if(bn==null)return;
+        if(label||(!isDate(a)&&lotVal(b))){var id=b.replace(/\s+/g,' ')||(label?a.replace(/no\.?\s*lot\s*:?/i,'').trim():'')||'-'; cur={lot:id,pts:[]};lots.push(cur);blank=0;lastKey=null;return;}
+        var bn=nv(b); if(bn==null){blank=0;return;}
+        var key=mkey(a);
+        if(cur&&blank>=1&&key!=null&&lastKey!=null&&key!==lastKey&&cur.pts.length>=3){cur={lot:'(tidak terbaca, mulai '+a+')',pts:[]};lots.push(cur);}
+        blank=0;
         if(!cur){cur={lot:'(tanpa nomor lot)',pts:[]};lots.push(cur);}
-        cur.pts.push({l:a||('#'+(cur.pts.length+1)),v:bn});});
+        cur.pts.push({l:a||('#'+(cur.pts.length+1)),v:bn}); if(key!=null)lastKey=key;});
       out[k[0]]=lots.filter(function(l){return l.pts.length>0;}); if(out[k[0]].length)any=true;});
     return any?out:null;}
   function getCsv(gid){return fetch('https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&gid='+gid+'&_='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}).then(function(t){if(/^\s*</.test(t))throw new Error('login');return csv(t);});}
