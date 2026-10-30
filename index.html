@@ -1500,6 +1500,9 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
 .dk-empty{padding:16px;text-align:center;color:#b9c9ee}
 .dk-lbl{display:flex;align-items:center;gap:6px;font-size:.78rem;color:#c9d7f7}
 .dk .dk-filter input[type=number]{width:120px;flex:none}
+.dk-lbl select{background:rgba(6,20,60,.85);color:#e8efff;border:1px solid rgba(80,140,255,.4);border-radius:8px;padding:7px 8px;font:inherit}
+.dk-btn:disabled{opacity:.4;cursor:not-allowed}
+#sdDet .dk-pill{white-space:nowrap}
 .dk-chbig{position:relative;height:340px}
 </style>
 </head>
@@ -2087,6 +2090,16 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
         </div>
         <div class="dk-chbig"><canvas id="chSd"></canvas></div>
         <p class="dk-note" id="sdFlags"></p>
+      </div>
+      <div class="dk-p" id="sdDetP">
+        <h3>Rincian hasil pemeriksaan</h3>
+        <div class="dk-filter">
+          <label class="dk-lbl">Tampilkan <select id="sdDetF"><option value="all">Semua data</option><option value="in">Di dalam ±2SD</option><option value="out">Di luar ±2SD</option><option value="out3">Di luar ±3SD</option></select></label>
+          <label class="dk-lbl">Baris per halaman <select id="sdDetN"><option>10</option><option selected>25</option><option>50</option><option>100</option><option value="0">Semua</option></select></label>
+        </div>
+        <div class="dk-scroll"><table class="dk-t" id="sdDet"><thead><tr><th class="num">No</th><th>Tanggal / titik</th><th class="num">Hasil</th><th class="num">Selisih dari mean</th><th class="num">Z (SD)</th><th>Zona</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+        <div class="dk-filter" style="justify-content:space-between;margin-top:8px"><span class="dk-note" id="sdDetInfo"></span><span><button class="dk-btn o" id="sdDetPrev" type="button">‹ Sebelumnya</button> <span id="sdDetPg" class="dk-note"></span> <button class="dk-btn o" id="sdDetNext" type="button">Berikutnya ›</button></span></div>
+        <p class="dk-note">Di dalam SD = hasil berada dalam ±2SD dari mean (sesuai pilihan di atas, memakai mean &amp; SD yang sama dengan grafik). Zona: ≤1SD, 1–2SD, 2–3SD (peringatan), &gt;3SD (tolak).</p>
       </div>
       <div class="dk-p">
         <h3>Ringkasan semua parameter / lot</h3>
@@ -4157,7 +4170,19 @@ var PANDUAN = [
         options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:14,autoSkip:true,color:'#b9c9ee'}},y:{min:S.mean-3.6*S.sd,max:S.mean+3.6*S.sd,grid:{color:'rgba(255,255,255,.09)'},ticks:{color:'#b9c9ee'}}},
           plugins:{legend:{position:'bottom',labels:{boxWidth:14,color:'#dbe7ff'}},title:{display:true,text:s.name,color:'#fff'},tooltip:{callbacks:{label:function(c){if(c.datasetIndex)return null;return 'Nilai '+fx(c.parsed.y)+' (Z = '+fx(S.z[c.dataIndex],2)+' SD)';}}}}}});
     }
-    table(s.name);}
+    detail(s); table(s.name);}
+  var detPg=1, detKey='', detCur=null;
+  function detail(s){
+    var S=s.S, key=s.name+'|'+$('sdDetF').value; if(key!==detKey){detKey=key;detPg=1;} detCur=s;
+    var f=$('sdDetF').value, n=+$('sdDetN').value, rows=[];
+    s.pts.forEach(function(pt,i){var z=S.z[i], a=Math.abs(z), zone=a<=1?'≤ 1SD':a<=2?'1–2SD':a<=3?'2–3SD':'> 3SD', cls=a>3?'bad':a>2?'warn':'ok';
+      var inn=a<=2; if(f==='in'&&!inn)return; if(f==='out'&&inn)return; if(f==='out3'&&a<=3)return;
+      rows.push('<tr><td class="num">'+(i+1)+'</td><td>'+esc(pt.l)+'</td><td class="num">'+fx(pt.v)+'</td><td class="num">'+(z>=0?'+':'')+fx(pt.v-S.mean)+'</td><td class="num">'+(z>=0?'+':'')+fx(z,2)+'</td><td>'+zone+'</td><td><span class="dk-pill '+cls+'">'+(a>3?'Di luar ±3SD':a>2?'Di luar ±2SD':'Di dalam SD')+'</span></td></tr>');});
+    var tot=rows.length, pages=n?Math.max(1,Math.ceil(tot/n)):1; if(detPg>pages)detPg=pages; if(detPg<1)detPg=1;
+    var from=n?(detPg-1)*n:0, to=n?Math.min(tot,from+n):tot;
+    $('sdDet').tBodies[0].innerHTML=tot?rows.slice(from,to).join(''):'<tr><td colspan="7" class="dk-empty">Tidak ada data pada pilihan ini.</td></tr>';
+    $('sdDetInfo').textContent=tot?('Menampilkan '+(from+1)+'–'+to+' dari '+tot+' data (total '+s.pts.length+')'):'0 data';
+    $('sdDetPg').textContent='Halaman '+detPg+' / '+pages; $('sdDetPrev').disabled=detPg<=1; $('sdDetNext').disabled=detPg>=pages;}
   function table(selName){
     var c=cur(), cvMax=+$('sdCvMax').value||6, mT=nv($('sdMeanT').value), sT=nv($('sdSdT').value), rows='', items=[];
     if(c.kat==='Hematologi')PARS.forEach(function(p){items.push({id:p,name:p+' · '+c.y+(c.tw==='all'?'':' TW'+c.tw),pts:series('hem',c.y,p,c.tw)});});
@@ -4182,6 +4207,8 @@ var PANDUAN = [
   function init(){
     if(started)return; started=true;
     $('sdDiag').addEventListener('click',diag);
+    $('sdDetF').addEventListener('change',function(){detPg=1;if(detCur)detail(detCur);}); $('sdDetN').addEventListener('change',function(){detPg=1;if(detCur)detail(detCur);});
+    $('sdDetPrev').addEventListener('click',function(){detPg--;if(detCur)detail(detCur);}); $('sdDetNext').addEventListener('click',function(){detPg++;if(detCur)detail(detCur);});
     ['sdTw','sdPar'].forEach(function(i){$(i).addEventListener('change',draw);}); $('sdTahun').addEventListener('change',fillSub);
     $('sdKat').addEventListener('change',fillSub);
     ['sdCvMax','sdMeanT','sdSdT'].forEach(function(i){$(i).addEventListener('input',draw);});
