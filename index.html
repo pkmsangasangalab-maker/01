@@ -716,7 +716,6 @@ body:not([data-view="backup"]) [data-view="backup"],
 body:not([data-view="panduan"]) [data-view="panduan"],
 body:not([data-view="kelurahan"]) [data-view="kelurahan"],
 body:not([data-view="sd"]) [data-view="sd"],
-body:not([data-view="wt"]) [data-view="wt"],
 body:not([data-view="tentang"]) [data-view="tentang"]{display:none!important}
 /* tautan layanan hanya di Beranda + Mode Petugas */
 body:not(.staff) .section-title[data-category],body:not(.staff) .horizontal-grid[data-group],body:not(.staff) #favWrap,body:not(.staff) #emptyMsg,body:not(.staff) .control-panel,body:not(.staff) #staffNotice,
@@ -1587,7 +1586,7 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
       <button class="side-link" data-nav="ringkasan" onclick="setView('ringkasan', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="m5 15 4-4 3 3 6-7"/><path d="M15 7h3v3"/></svg><span class="lbl">Ringkasan Laporan<br>Tahunan Lab</span></button>
       <button class="side-link" data-nav="kelurahan" onclick="setView('kelurahan', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg><span class="lbl">Tren per Kelurahan</span></button>
       <button class="side-link" data-nav="sd" onclick="setView('sd', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4"/><path d="M4 12h16" stroke-dasharray="2 2"/><path d="m6 14 3-3 3 4 3-6 3 3"/></svg><span class="lbl">Standar Deviasi QC</span></button>
-      <button class="side-link" data-nav="wt" onclick="setView('wt', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9.5 3h5"/></svg><span class="lbl">Waktu Tunggu per Pemeriksaan</span></button>
+      
       <div class="side-label staff-only">MENU PETUGAS</div>
       <button class="side-link staff-only" data-nav="cat-laporan" onclick="openLinkCat('laporan')"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 17v-3M12 17v-5M15 17v-2"/></svg><span class="lbl">Laporan &amp; Profil</span><span class="chev">›</span></button>
       <button class="side-link staff-only" data-nav="cat-aplikasi" onclick="openLinkCat('aplikasi')"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="12" rx="2"/><path d="M8 20h8M12 16.5V20"/></svg><span class="lbl">Aplikasi &amp; Sistem Pelaporan</span><span class="chev">›</span></button>
@@ -2075,7 +2074,7 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
       </div>
     </section>
 
-  <section id="wtLive" data-view="wt">
+  <section id="wtLive" data-view="ringkasan">
     <div class="dk" id="wtRoot">
       <div class="dk-head"><span class="dk-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9.5 3h5"/></svg></span><div><h2>Waktu Tunggu per Kelompok Pemeriksaan</h2><p>Kelompok pemeriksaan yang sesuai dan tidak sesuai standar waktu tunggu, per bulan (1–12)</p></div>
         <div class="dk-ctl">
@@ -2108,6 +2107,7 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
       </div>
     </div>
   </section>
+
 
   <section id="sdLive" data-view="sd">
     <div class="dk" id="sdRoot">
@@ -4326,7 +4326,8 @@ var PANDUAN = [
     ['wtBulan','wtTarget'].forEach(function(i){$(i).addEventListener('input',function(){draw(false);});}); $('wtTahun').addEventListener('change',function(){draw(true);});
     $('wtMuat').addEventListener('click',load); load();}
   var old=window.setView;
-  window.setView=function(v){var r=old.apply(this,arguments); if(v==='wt'){init(); setTimeout(function(){if(cb)cb.resize();if(ct)ct.resize();},80);} return r;};
+  window.setView=function(v){var r=old.apply(this,arguments); if(v==='ringkasan'){setTimeout(function(){if(cb)cb.resize();if(ct)ct.resize();},80);} return r;};
+  init();
 })();
 </script>
 </body>
