@@ -4135,18 +4135,15 @@ function parseH(rows,src){
   var occ=[];
   cells.forEach(function(v,c){var p=hParam(v);if(p)occ.push({p:p,c:c})});
   if(new Set(occ.map(function(o){return o.p})).size<2)return;
-  var nos=[];
-  cells.forEach(function(v,c){var k=hKey(v);if(k==='NO'||k==='TANGGAL'||k==='TGL'||k==='HARI')nos.push(c)});
-  var bl={};
+  // Blok baru dimulai setiap kali sebuah parameter muncul lagi (judul TAHUN/TW/No bisa menyatu dalam satu sel).
+  // Kolom tanggal/hari = kolom tepat di kiri parameter pertama blok tersebut.
+  var blocks=[],cur=null;
   occ.forEach(function(o){
-   var no=nos.filter(function(x){return x<o.c}).sort(function(a,b){return b-a})[0];
-   if(no===undefined)no=0;
-   if(!bl[no])bl[no]={no:no,cols:{}};
-   if(bl[no].cols[o.p]===undefined)bl[no].cols[o.p]=o.c;
+   if(!cur||cur.cols[o.p]!==undefined){cur={no:Math.max(0,o.c-1),cols:{}};blocks.push(cur)}
+   cur.cols[o.p]=o.c;
   });
-  var blocks=Object.keys(bl).map(function(k){return bl[k]}).sort(function(a,b){return a.no-b.no});
-  blocks.forEach(function(b,i){
-   b.end=i+1<blocks.length?blocks[i+1].no:maxCols;
+  blocks.forEach(function(b,k){
+   b.end=k+1<blocks.length?blocks[k+1].no:maxCols;
    if(!state[b.no])state[b.no]={y:null,t:null};
   });
   layouts.push({row:ri,blocks:blocks});
