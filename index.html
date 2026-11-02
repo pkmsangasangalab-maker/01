@@ -4118,13 +4118,20 @@ var H_ALIAS={LEUKOSIT:['LEUKOSIT','LEUKOSITT','LEUKOCYTE','LEUKOCYTES','WBC','LE
 function hKey(v){return normQC(v).toUpperCase().replace(/[^A-Z0-9]/g,'')}
 function hParam(v){var k=hKey(v);for(var p in H_ALIAS){if(H_ALIAS[p].indexOf(k)>=0)return p}return null}
 function hTW(s){var m=String(s||'').toUpperCase().match(/(?:TW|TRIWULAN|Q)\s*([1-4]|I{1,3}|IV)\b/)||String(s||'').toUpperCase().match(/\b([1-4])\s*TW\b/);if(!m)return null;var t=m[1];var map={I:1,II:2,III:3,IV:4};return map[t]||Number(t)}
+function colL(c){return c<26?String.fromCharCode(65+c):String.fromCharCode(64+Math.floor(c/26))+String.fromCharCode(65+c%26)}
+function hYr(t){var m=String(t||'').match(/\b(20\d\d)\b/);return m?Number(m[1]):null}
+function hTW2(s){
+ var t=String(s||'').replace(/\u00a0/g,' ').toUpperCase();
+ var m=t.match(/\b(?:TW|T\.W\.?|TRIWULAN|TRI\s?WULAN)\s*[-:.]?\s*(IV|III|II|I|[1-4])\b/);
+ if(!m)return null;
+ var rom={I:1,II:2,III:3,IV:4},x=m[1];
+ return rom[x]||Number(x);
+}
 function parseH(rows,src){
- var out=[],state={},groups={},order=[],layouts=[];
+ var out=[],state={},groups={},order=[],layouts=[],diag=[];
  var maxCols=0;rows.forEach(function(r){if(r.length>maxCols)maxCols=r.length});
- // 1) Kumpulkan semua baris judul dan tata letak blok masing-masing.
  rows.forEach(function(r,ri){
   var cells=r.map(function(x){return normQC(x)});
-  // Setiap kemunculan parameter dicatat (satu judul bisa memuat beberapa blok tahun/TW berdampingan).
   var occ=[];
   cells.forEach(function(v,c){var p=hParam(v);if(p)occ.push({p:p,c:c})});
   if(new Set(occ.map(function(o){return o.p})).size<2)return;
@@ -4143,9 +4150,9 @@ function parseH(rows,src){
    if(!state[b.no])state[b.no]={y:null,t:null};
   });
   layouts.push({row:ri,blocks:blocks});
+  diag.push('Judul baris '+(ri+1)+': '+blocks.map(function(b){return 'blok kol '+colL(b.no)+' ('+Object.keys(b.cols).join(', ')+')'}).join(' ; '));
  });
- if(!layouts.length)return out;
- // 2) Setiap baris memakai tata letak judul terakhir di atasnya; baris sebelum judul pertama memakai judul pertama.
+ if(!layouts.length){window.__hDiag='Tidak ada baris judul parameter ditemukan.';return out}
  rows.forEach(function(r,ri){
   var lay=null;
   for(var i=0;i<layouts.length;i++){if(layouts[i].row<=ri)lay=layouts[i]}
@@ -4153,12 +4160,14 @@ function parseH(rows,src){
   var cells=r.map(function(x){return normQC(x)});
   lay.blocks.forEach(function(b){
    var st=state[b.no];
-   for(var c=b.no;c<Math.min(b.end,r.length);c++){
+   for(var c=b.no;c<Math.min(b.end,cells.length);c++){
     var txt=cells[c]||'';
-    var y=(txt.match(/\b(20\d\d)\b/)||[])[1];if(y)st.y=Number(y);
-    var t=hTW(txt);if(t)st.t=t;
+    var y=hYr(txt);
+    if(y){if(st.y!==y)diag.push('Tahun '+y+' di kolom '+colL(c)+' baris '+(ri+1));st.y=y}
+    var t=hTW2(txt);
+    if(t){if(st.t!==t)diag.push('TW '+t+' di kolom '+colL(c)+' baris '+(ri+1));st.t=t}
    }
-   if(ri<=lay.row)return;               // baris judul itu sendiri tidak berisi data
+   if(ri<=lay.row)return;
    var dayTxt=cells[b.no]||'';
    if(!/^\d{1,2}(\.0+)?$/.test(dayTxt))return;
    var day=Number(dayTxt.replace(/\.0+$/,''));
@@ -4173,6 +4182,8 @@ function parseH(rows,src){
   });
  });
  order.forEach(function(k){var g=groups[k];add(out,src.group,src.name,g.param,g.label,'',g.pts)});
+ var preview=rows.slice(0,8).map(function(r,i){return 'Baris '+(i+1)+': '+r.slice(0,14).map(function(x){return normQC(x)}).join(' | ')}).join('\n');
+ window.__hDiag=diag.slice(0,60).join('\n')+'\n\nBaris awal sheet:\n'+preview;
  return out;
 }
 function parse(rows,src){return src.group==='hematologi'?parseH(rows,src):parseK(rows,src)}
@@ -4302,8 +4313,9 @@ function load(){
   }).join(' · ');
   var hLabels=Array.from(new Set(B.filter(function(b){return b.group==='hematologi'}).map(function(b){return b.label}))).sort().map(esc).join(' · ');
   var kLots=B.filter(function(b){return b.group==='kimia'}).map(function(b){return esc(b.param)+' '+esc(b.lot)+' ('+b.pts.length+')'}).join(' · ');
+  var hDiagHtml=window.__hDiag?'<details style="margin-top:8px"><summary>Diagnosa Hematologi (salin isi ini jika masih salah)</summary><pre style="white-space:pre-wrap;font-size:12px;user-select:all">'+esc(window.__hDiag)+'</pre></details>':'';
   $('sdNote').innerHTML=(issues.length?'Sebagian data gagal dimuat: '+esc(issues.map(function(x){return x.name+': '+x.error}).join(' | '))+'<br>':'')+
-   'Data terbaca: '+B.length+' kelompok. '+sourceCounts+'. Hematologi terbaca: '+(hLabels||'–')+'. Lot Kimia terbaca: '+(kLots||'–')+'. Hematologi per tahun/TW; Kimia Klinik per parameter/nomor lot. <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">Buka spreadsheet</a>';
+   'Data terbaca: '+B.length+' kelompok. '+sourceCounts+'. Hematologi terbaca: '+(hLabels||'–')+'. Lot Kimia terbaca: '+(kLots||'–')+'. Hematologi per tahun/TW; Kimia Klinik per parameter/nomor lot. <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">Buka spreadsheet</a>'+hDiagHtml;
  })
  .catch(function(e){$('sdNote').textContent='Data gagal dimuat: '+e.message+'. Pastikan akses spreadsheet disetel “Siapa saja yang memiliki link – Pelihat”, lalu muat ulang.'});
 }
