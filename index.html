@@ -4119,7 +4119,7 @@ function stats(p){var v=p.map(x=>x.v),m=v.reduce((a,b)=>a+b,0)/v.length,sd=v.len
 function add(out,g,src,param,label,lot,pts){if(!pts.length)return;var st=stats(pts);out.push({group:g,source:src,param:param,label:label,lot:lot||'',mean:st.m,sd:st.sd,pts:pts})}
 function parseH(rows,src){
  var out=[],params=['LEUKOSIT','ERITROSIT','HEMOGLOBIN','HEMATOKRIT','TROMBOSIT'];
- [{data:0,head:0},{data:7,head:8}].forEach(function(side){
+ [{data:0,head:0},{data:7,head:7}].forEach(function(side){
   var year='',quarter='',buckets={};
   rows.forEach(function(r){
    var h=String(r[side.head]||'').trim(),low=h.toLowerCase(),ym=h.match(/TAHUN\s*(20\d{2})/i),qm=h.match(/TW\s*(\d+)/i);
