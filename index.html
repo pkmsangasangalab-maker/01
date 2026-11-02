@@ -4123,42 +4123,40 @@ function dt(x){if(x instanceof Date&&!isNaN(x))return x;var s=String(x||'').trim
 function stats(p){var v=p.map(x=>x.v),m=v.reduce((a,b)=>a+b,0)/v.length,sd=v.length>1?Math.sqrt(v.reduce((a,b)=>a+(b-m)*(b-m),0)/(v.length-1)):0;return {m:m,sd:sd}}
 function add(out,g,src,param,label,lot,pts){if(!pts.length)return;var st=stats(pts);out.push({group:g,source:src,param:param,label:label,lot:lot||'',mean:st.m,sd:st.sd,pts:pts})}
 function parseH(rows,src){
- var out=[],params=['LEUKOSIT','ERITROSIT','HEMOGLOBIN','HEMATOKRIT'];
- // Baca dua blok berdampingan. Tahun default mengikuti posisi blok,
- // tetapi label tahun/TW yang tertulis di sheet tetap menjadi acuan.
- [{no:0,vals:1,yearCol:0,year:'2026'},{no:7,vals:8,yearCol:7,year:'2025'}].forEach(function(side){
-  var year=side.year,tw='TW 1',colMap=null;
+ // Struktur sumber tervalidasi: blok 2026 pada kolom A:F dan 2025 pada H:M.
+ // Setiap blok memiliki kolom No, Leukosit, Eritrosit, Hemoglobin,
+ // Hematokrit, Trombosit. Trombosit sengaja tidak dimasukkan ke filter.
+ var out=[],defs=[
+  {no:0,start:1,year:2026},
+  {no:7,start:8,year:2025}
+ ];
+ defs.forEach(function(side){
+  var year=side.year,tw=1,groups={};
   rows.forEach(function(r,ri){
-   var cells=r.map(function(x){return String(x==null?'':x).trim();});
-   var blockCells=cells.slice(side.no,side.vals+5);
-   var joined=blockCells.join(' ');
-   var ym=joined.match(/(?:TAHUN\\s*)?(20(?:25|26))/i);
-   if(ym)year=ym[1];
-   var tm=joined.match(/(?:^|\\b)(?:TW|TRIWULAN|KUARTAL|Q)\\s*([1-4])\\b/i);
-   if(tm){tw='TW '+tm[1];return;}
-   // Jika baris berisi nama parameter, petakan berdasarkan judul sebenarnya.
-   var detected={};
-   blockCells.forEach(function(v,j){
-    var u=v.toUpperCase().replace(/[^A-Z]/g,'');
-    if(u.includes('LEUKOSIT')||u.includes('WBC'))detected.LEUKOSIT=side.no+j;
-    else if(u.includes('ERITROSIT')||u.includes('RBC'))detected.ERITROSIT=side.no+j;
-    else if(u.includes('HEMOGLOBIN')||u==='HB')detected.HEMOGLOBIN=side.no+j;
-    else if(u.includes('HEMATOKRIT')||u==='HCT')detected.HEMATOKRIT=side.no+j;
-   });
-   if(Object.keys(detected).length){colMap=detected;return;}
-   var rawDay=cells[side.no],no=n(rawDay);
-   if(no==null||!Number.isInteger(no)||no<1||no>31)return;
-   var indexes=colMap||{LEUKOSIT:side.vals,ERITROSIT:side.vals+1,HEMOGLOBIN:side.vals+2,HEMATOKRIT:side.vals+3};
-   Object.keys(indexes).forEach(function(p){
-    var v=n(cells[indexes[p]]);
-    if(v==null)return;
-    var key=year+'|'+tw+'|'+p,b=out.find(function(x){return x._key===key});
-    if(!b){b={_key:key,group:src.group,source:src.name,param:p,label:year+' · '+tw,lot:'',pts:[]};out.push(b);}
-    b.pts.push({d:'Hari '+no+' (baris '+(ri+1)+')',v:v});
+   var marker=String(r[side.no]==null?'':r[side.no]).trim();
+   var ym=marker.match(/20(?:25|26)/i);
+   if(ym&&/TAHUN/i.test(marker)){year=Number(ym[0]);return;}
+   var tm=marker.match(/\bTW\s*([1-4])\b/i);
+   if(tm){tw=Number(tm[1]);return;}
+   var day=n(marker);
+   if(day==null||!Number.isInteger(day)||day<1||day>31)return;
+   [
+    {p:'LEUKOSIT',col:side.start},
+    {p:'ERITROSIT',col:side.start+1},
+    {p:'HEMOGLOBIN',col:side.start+2},
+    {p:'HEMATOKRIT',col:side.start+3}
+   ].forEach(function(def){
+    var value=n(r[def.col]);
+    if(value==null)return;
+    var key=year+'|'+tw+'|'+def.p;
+    if(!groups[key])groups[key]={param:def.p,label:year+' · TW '+tw,pts:[]};
+    groups[key].pts.push({d:'Hari '+day+' (baris '+(ri+1)+')',v:value});
    });
   });
+  Object.keys(groups).forEach(function(key){
+   var g=groups[key];add(out,src.group,src.name,g.param,g.label,'',g.pts);
+  });
  });
- out.forEach(function(x){var st=stats(x.pts);x.mean=st.m;x.sd=st.sd;delete x._key});
  return out;
 }
 function parse(rows,src){return src.group==='hematologi'?parseH(rows,src):parseK(rows,src)}
