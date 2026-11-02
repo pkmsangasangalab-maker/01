@@ -4119,7 +4119,7 @@ var SID='1EjhqFF-AkdaHBIsNeOaozPOoH-36YYgIY3zCEk5oxm4',SRC=[{gid:'1252703038',gr
 var $=function(x){return document.getElementById(x)},esc=function(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})},f2=function(x){return x==null||!isFinite(x)?'–':Number(x).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})};
 function csv(t){var a=[],r=[],v='',q=false;t=String(t).replace(/^\uFEFF/,'');for(var i=0;i<t.length;i++){var c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){v+='"';i++}else q=false}else v+=c}else if(c==='"')q=true;else if(c===','){r.push(v);v=''}else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;r.push(v);a.push(r);r=[];v=''}else v+=c}if(v!==''||r.length){r.push(v);a.push(r)}return a}
 function n(x){if(x==null)return null;var s=String(x).trim().replace(/\s/g,'');if(!s||!/[0-9]/.test(s))return null;if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else s=s.replace(',','.');var v=parseFloat(s);return isFinite(v)?v:null}
-function dt(x){if(x instanceof Date&&!isNaN(x))return x;var s=String(x||'').trim(),m=s.match(/^Date\\((\\d{4}),(\\d{1,2}),(\\d{1,2})\\)$/);if(m)return new Date(+m[1],+m[2],+m[3]);m=s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);m=s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);var d=new Date(s);return isNaN(d)?null:d}
+function dt(x){if(x instanceof Date&&!isNaN(x))return x;var s=String(x||'').trim(),m=s.match(/^Date\((\d{4}),(\d{1,2}),(\d{1,2})\)$/);if(m)return new Date(+m[1],+m[2],+m[3]);m=s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);m=s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);var d=new Date(s);return isNaN(d)?null:d}
 function stats(p){var v=p.map(x=>x.v),m=v.reduce((a,b)=>a+b,0)/v.length,sd=v.length>1?Math.sqrt(v.reduce((a,b)=>a+(b-m)*(b-m),0)/(v.length-1)):0;return {m:m,sd:sd}}
 function add(out,g,src,param,label,lot,pts){if(!pts.length)return;var st=stats(pts);out.push({group:g,source:src,param:param,label:label,lot:lot||'',mean:st.m,sd:st.sd,pts:pts})}
 function parseH(rows,src){
@@ -4128,7 +4128,7 @@ function parseH(rows,src){
  [{no:0,vals:1,yearCol:0},{no:7,vals:8,yearCol:7}].forEach(function(side){
   var year='',tw='';
   rows.forEach(function(r){
-   var marker=String(r[side.yearCol]||'').trim(),ym=marker.match(/TAHUN\\s*(20\\d{2})/i),tm=marker.match(/^TW\\s*(\\d+)/i);
+   var marker=String(r[side.yearCol]||'').trim(),ym=marker.match(/TAHUN\s*(20\d{2})/i),tm=marker.match(/^TW\s*(\d+)/i);
    if(ym){year=ym[1];return}
    if(tm){tw='TW '+tm[1];return}
    var no=n(r[side.no]);if(no==null||!year||!tw)return;
