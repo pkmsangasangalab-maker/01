@@ -2370,7 +2370,7 @@ html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
     const SEC_ANSWER_HASH = 'b6925d7f31a029a3e90bb78fa58405d935509cf29494d311321ffd512dd634f1'; // sha256("answer:" + jawaban huruf kecil tanpa spasi)
     const normAns = a => a.toLowerCase().replace(/\s+/g, '');
     (function(){
-      const url = 'mailto:' + ADMIN_EMAIL + '?subject=' + encodeURIComponent(MAIL_SUBJECT) + '&body=' + encodeURIComponent(MAIL_TEXT);
+      const url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(ADMIN_EMAIL) + '&su=' + encodeURIComponent(MAIL_SUBJECT) + '&body=' + encodeURIComponent(MAIL_TEXT);
       ['waBtn','waLink'].forEach(id => { const el = document.getElementById(id); if (el) el.href = url; });
       const q = document.getElementById('rcQuestion'); if (q) q.textContent = SEC_QUESTION;
     })();
@@ -2594,12 +2594,12 @@ html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
       const c = CONFIG, e = t => String(t).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
             const kontak = [];
       if (c.penanggungJawab) kontak.push('<li>Dikelola oleh ' + e(c.penanggungJawab) + (c.jabatan ? ', ' + e(c.jabatan) : '') + '</li>');
-      if (c.email) kontak.push('<li><a href="mailto:' + e(c.email) + '">' + e(c.email) + '</a></li>');
+      if (c.email) kontak.push('<li><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=' + encodeURIComponent(c.email) + '" target="_blank" rel="noopener noreferrer">' + e(c.email) + '</a></li>');
       let h = '<div class="info-card"><h3>Untuk siapa</h3><p>Petugas laboratorium dan tenaga kesehatan Puskesmas Sanga-sanga yang memerlukan data dan sistem pelaporan laboratorium.</p></div>' +
         '<div class="info-card"><h3>Keamanan data</h3><ul><li>Halaman ini tidak menyimpan data pasien.</li><li>Menu Internal hanya bisa dibuka dengan akun Google yang diizinkan.</li><li>Catatan harian tersimpan di browser perangkat Anda. Jangan menulis nama atau data pasien.</li></ul></div>';
       if (kontak.length) h += '<div class="info-card"><h3>Kontak</h3><ul>' + kontak.join('') + '</ul></div>';
       document.getElementById('aboutGrid').innerHTML = h;
-      const sosial = [['Facebook','fa-facebook',c.facebook],['Instagram','fa-instagram',c.instagram],['YouTube','fa-youtube',c.youtube],['Email','fa-envelope',c.email ? 'mailto:' + c.email : '']];
+      const sosial = [['Facebook','fa-facebook',c.facebook],['Instagram','fa-instagram',c.instagram],['YouTube','fa-youtube',c.youtube],['Email','fa-envelope',c.email ? 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(c.email) : '']];
       document.getElementById('socialBar').innerHTML = sosial.filter(x => x[2]).map(x =>
         '<a href="' + e(x[2]) + '" target="_blank" rel="noopener noreferrer" class="social-btn' + '' + '"><i class="fa-brands ' + x[1] + '"></i> ' + x[0] + '</a>').join('');
       applyFilters();
