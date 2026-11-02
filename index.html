@@ -2212,9 +2212,11 @@ html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
       <div class="chart-card">
         <div class="stok-tools">
           <select id="sdGroup" aria-label="Pilih kelompok data"><option value="hematologi">Hematologi</option><option value="kimia">Kimia Klinik</option></select>
-          <select id="sdParam" aria-label="Pilih parameter"></select>
-          <select id="sdLot" aria-label="Pilih lot" style="display:none"></select>
-          <select id="sdPeriode" aria-label="Pilih periode"></select>
+          <select id="sdHParam" aria-label="Parameter Hematologi"></select>
+          <select id="sdHYear" aria-label="Tahun Hematologi"></select>
+          <select id="sdHTW" aria-label="Triwulan Hematologi"></select>
+          <select id="sdKParam" aria-label="Parameter Kimia Klinik" style="display:none"></select>
+          <select id="sdKLot" aria-label="Nomor lot Kimia Klinik" style="display:none"></select>
           <button class="btn-action" id="sdMuat" type="button">🔄 Muat ulang</button>
         </div>
         <div class="stok-kpi" id="sdKpi"></div>
@@ -2227,7 +2229,7 @@ html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
       </div>
       <div class="chart-card">
         <div class="chart-head"><h3>Ringkasan semua parameter &amp; periode</h3></div>
-        <div class="stok-wrap"><table id="sdSum"><thead><tr><th>Parameter</th><th>Periode</th><th>Lot</th><th class="num">n</th><th class="num">Jumlah Data</th><th class="num">Mean</th><th class="num">SD</th><th class="num">CV (%)</th><th>Status</th></tr></thead><tbody><tr><td colspan="8">Memuat data…</td></tr></tbody></table></div>
+        <div class="stok-wrap"><table id="sdSum"><thead><tr><th>Parameter</th><th>Periode / Lot</th><th>Lot</th><th class="num">Jumlah Data</th><th class="num">Mean</th><th class="num">SD</th><th class="num">CV (%)</th><th>Status</th></tr></thead><tbody><tr><td colspan="8">Memuat data…</td></tr></tbody></table></div>
       </div>
   </section>
 
@@ -4118,18 +4120,25 @@ function dt(x){if(x instanceof Date&&!isNaN(x))return x;var s=String(x||'').trim
 function stats(p){var v=p.map(x=>x.v),m=v.reduce((a,b)=>a+b,0)/v.length,sd=v.length>1?Math.sqrt(v.reduce((a,b)=>a+(b-m)*(b-m),0)/(v.length-1)):0;return {m:m,sd:sd}}
 function add(out,g,src,param,label,lot,pts){if(!pts.length)return;var st=stats(pts);out.push({group:g,source:src,param:param,label:label,lot:lot||'',mean:st.m,sd:st.sd,pts:pts})}
 function parseH(rows,src){
- var out=[],params=['LEUKOSIT','ERITROSIT','HEMOGLOBIN','HEMATOKRIT','TROMBOSIT'];
- [{data:0,head:0},{data:7,head:7}].forEach(function(side){
-  var year='',quarter='',buckets={};
+ var out=[],params=['LEUKOSIT','ERITROSIT','HEMATOKRIT','HEMOGLOBIN'];
+ // Dua blok berdampingan pada lembar Hematologi: 2026 di kolom A-F dan 2025 di H-M.
+ [{no:0,vals:1,yearCol:0},{no:7,vals:8,yearCol:7}].forEach(function(side){
+  var year='',tw='';
   rows.forEach(function(r){
-   var h=String(r[side.head]||'').trim(),low=h.toLowerCase(),ym=h.match(/TAHUN\s*(20\d{2})/i),qm=h.match(/TW\s*(\d+)/i);
+   var marker=String(r[side.yearCol]||'').trim(),ym=marker.match(/TAHUN\\s*(20\\d{2})/i),tm=marker.match(/^TW\\s*(\\d+)/i);
    if(ym){year=ym[1];return}
-   if(qm){quarter='TW '+qm[1];return}
-   var no=n(r[side.data]);if(no==null||!year||!quarter)return;
-   params.forEach(function(p,j){var v=n(r[side.data+1+j]);if(v==null)return;var key=year+'|'+quarter+'|'+p;if(!buckets[key])buckets[key]={year:year,quarter:quarter,param:p,pts:[]};buckets[key].pts.push({d:'Hari '+String(no),v:v})});
+   if(tm){tw='TW '+tm[1];return}
+   var no=n(r[side.no]);if(no==null||!year||!tw)return;
+   params.forEach(function(p,j){
+    var v=n(r[side.vals+j]);if(v==null)return;
+    var key=year+'|'+tw+'|'+p;
+    var bucket=out.find(function(x){return x._key===key});
+    if(!bucket){bucket={_key:key,group:src.group,source:src.name,param:p,label:year+' · '+tw,lot:'',pts:[]};out.push(bucket)}
+    bucket.pts.push({d:'Hari '+no,v:v});
+   });
   });
-  Object.keys(buckets).forEach(function(k){var x=buckets[k];add(out,src.group,src.name,x.param,x.year+' · '+x.quarter,'',x.pts)});
  });
+ out.forEach(function(x){var st=stats(x.pts);x.mean=st.m;x.sd=st.sd;delete x._key});
  return out;
 }
 function parseK(rows,src){
@@ -4149,14 +4158,30 @@ function parseK(rows,src){
 function calc(b){var m=b.mean,sd=b.sd,pts=b.pts.map(p=>{var z=sd?(p.v-m)/sd:0;return {d:p.d,v:p.v,z:z,st:Math.abs(z)>3?'tolak':Math.abs(z)>2?'peringatan':'ok'}}),n3=pts.filter(p=>p.st==='tolak').length,n2=pts.filter(p=>p.st!=='ok').length;return {m:m,sd:sd,cv:m?sd/m*100:null,pts:pts,n3:n3,n2:n2,status:n3?'Tolak (>3SD)':n2?'Peringatan (>2SD)':'Sesuai'}}
 function byGroup(){return B.filter(b=>b.group===$('sdGroup').value)}
 function fill(){
- var list=byGroup(),sel=$('sdParam'),old=sel.value,pars=Array.from(new Set(list.map(b=>b.param))).sort();
- sel.innerHTML=pars.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');if(pars.includes(old))sel.value=old;
- var lot=$('sdLot'),show=$('sdGroup').value==='kimia';lot.style.display=show?'':'none';
- if(show){var lots=Array.from(new Set(list.filter(b=>b.param===sel.value).map(b=>b.lot))).sort(),lo=lot.value;lot.innerHTML='<option value="all">Semua Lot</option>'+lots.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');if(Array.from(lot.options).some(o=>o.value===lo))lot.value=lo}
- var ps=list.filter(b=>b.param===sel.value&&(!show||lot.value==='all'||b.lot===lot.value)),p=$('sdPeriode'),prev=p.value;
- p.innerHTML=ps.map((b,i)=>'<option value="'+i+'">'+esc(b.label)+'</option>').join('');p.value=prev&&+prev<ps.length?prev:'0';
+ var h=$('sdGroup').value==='hematologi';
+ ['sdHParam','sdHYear','sdHTW'].forEach(id=>$(id).style.display=h?'':'none');
+ ['sdKParam','sdKLot'].forEach(id=>$(id).style.display=h?'none':'');
+ var list=byGroup();
+ if(h){
+  var hp=$('sdHParam'),hy=$('sdHYear'),ht=$('sdHTW'),oldp=hp.value,oldy=hy.value,oldt=ht.value;
+  var pars=['LEUKOSIT','ERITROSIT','HEMATOKRIT','HEMOGLOBIN'].filter(p=>list.some(b=>b.param===p));
+  hp.innerHTML=pars.map(p=>'<option>'+p+'</option>').join('');if(pars.includes(oldp))hp.value=oldp;
+  var years=Array.from(new Set(list.map(b=>b.label.split(' · ')[0]))).sort().reverse();
+  hy.innerHTML=years.map(y=>'<option>'+esc(y)+'</option>').join('');if(years.includes(oldy))hy.value=oldy;
+  var tws=['TW 1','TW 2','TW 3','TW 4'].filter(t=>list.some(b=>b.param===hp.value&&b.label===hy.value+' · '+t));
+  ht.innerHTML=tws.map(t=>'<option>'+t+'</option>').join('');if(tws.includes(oldt))ht.value=oldt;
+ }else{
+  var kp=$('sdKParam'),kl=$('sdKLot'),old=kp.value,pars=['Gula Darah','Asam Urat','Kolesterol'].filter(p=>list.some(b=>b.param===p));
+  kp.innerHTML=pars.map(p=>'<option>'+esc(p)+'</option>').join('');if(pars.includes(old))kp.value=old;
+  var lots=Array.from(new Set(list.filter(b=>b.param===kp.value).map(b=>b.lot))).sort(),prev=kl.value;
+  kl.innerHTML=lots.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');if(lots.includes(prev))kl.value=prev;
+ }
 }
-function selected(){var l=byGroup().filter(b=>b.param===$('sdParam').value&&($('sdGroup').value!=='kimia'||$('sdLot').value==='all'||b.lot===$('sdLot').value));return l[+$('sdPeriode').value]}
+function selected(){
+ var list=byGroup();
+ if($('sdGroup').value==='hematologi')return list.find(b=>b.param===$('sdHParam').value&&b.label===$('sdHYear').value+' · '+$('sdHTW').value);
+ return list.find(b=>b.param===$('sdKParam').value&&b.lot===$('sdKLot').value);
+}
 function render(){
  var b=selected();if(!b){$('sdKpi').textContent='Belum ada data untuk filter ini.';if(ch){ch.destroy();ch=null}$('sdTbl').querySelector('tbody').innerHTML='';return}
  var q=calc(b),tone=q.n3?'st-habis':q.n2?'st-order':'st-aman',lt=b.group==='kimia'?' · Lot '+b.lot:'';
@@ -4172,7 +4197,9 @@ function load(){
  .then(parts=>{B=[].concat.apply([],parts);if(!B.length)throw Error('tidak ditemukan data; periksa gid dan izin akses kedua tab');fill();render();summary();$('sdNote').innerHTML='Data berhasil dibaca. Hematologi dikelompokkan per tahun dan TW; Kimia Klinik dikelompokkan per parameter dan nomor lot. <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">Buka spreadsheet</a>'})
  .catch(e=>{$('sdNote').textContent='Data gagal dimuat: '+e.message+'. Pastikan spreadsheet dapat diakses sebagai CSV.'});
 }
-$('sdGroup').addEventListener('change',()=>{fill();render()});$('sdParam').addEventListener('change',()=>{fill();render()});$('sdLot').addEventListener('change',()=>{fill();render()});$('sdPeriode').addEventListener('change',render);$('sdMuat').addEventListener('click',load);load();setInterval(load,300000);
+$('sdGroup').addEventListener('change',()=>{fill();render()});
+['sdHParam','sdHYear','sdHTW','sdKParam','sdKLot'].forEach(id=>$(id).addEventListener('change',()=>{if(id==='sdKParam')fill();if(id==='sdHParam'||id==='sdHYear')fill();render()}));
+$('sdMuat').addEventListener('click',load);load();setInterval(load,300000);
 })();
 </script>
 </body>
