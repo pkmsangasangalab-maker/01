@@ -4114,7 +4114,7 @@ function dt(x){if(x instanceof Date&&!isNaN(x))return x;var s=String(x||'').trim
 function stats(p){var v=p.map(x=>x.v),m=v.reduce((a,b)=>a+b,0)/v.length,sd=v.length>1?Math.sqrt(v.reduce((a,b)=>a+(b-m)*(b-m),0)/(v.length-1)):0;return {m:m,sd:sd}}
 function add(out,g,src,param,label,lot,pts){if(!pts.length)return;var st=stats(pts);out.push({group:g,source:src,param:param,label:label,lot:lot||'',mean:st.m,sd:st.sd,pts:pts})}
 function normQC(v){return String(v==null?'':v).replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim()}
-var H_ALIAS={LEUKOSIT:['LEUKOSIT','LEUKOSITT','LEUKOCYTE','LEUKOCYTES','WBC','LEU'],ERITROSIT:['ERITROSIT','ERITROSITT','ERYTHROCYTE','ERYTHROCYTES','RBC','ERI'],HEMOGLOBIN:['HEMOGLOBIN','HEMOGLOBINE','HB','HGB'],HEMATOKRIT:['HEMATOKRIT','HEMATOCRIT','HCT']};
+var H_ALIAS={LEUKOSIT:['LEUKOSIT','LEUKOSITT','LEUKOCYTE','LEUKOCYTES','WBC','LEU'],ERITROSIT:['ERITROSIT','ERITROSITT','ERYTHROCYTE','ERYTHROCYTES','RBC','ERI'],HEMOGLOBIN:['HEMOGLOBIN','HEMOGLOBINE','HB','HGB'],HEMATOKRIT:['HEMATOKRIT','HEMATOCRIT','HCT'],TROMBOSIT:['TROMBOSIT','TROMBOSITT','PLT','PLATELET','PLATELETS','TROMBOCYTE']};
 function hKey(v){return normQC(v).toUpperCase().replace(/[^A-Z0-9]/g,'')}
 function hParam(v){var k=hKey(v);for(var p in H_ALIAS){if(H_ALIAS[p].indexOf(k)>=0)return p}return null}
 function hTW(s){var m=String(s||'').toUpperCase().match(/(?:TW|TRIWULAN|Q)\s*([1-4]|I{1,3}|IV)\b/)||String(s||'').toUpperCase().match(/\b([1-4])\s*TW\b/);if(!m)return null;var t=m[1];var map={I:1,II:2,III:3,IV:4};return map[t]||Number(t)}
@@ -4244,7 +4244,7 @@ function fill(){
  var list=byGroup();
  if(h){
   var hp=$('sdHParam'),hy=$('sdHYear'),ht=$('sdHTW'),oldp=hp.value,oldy=hy.value,oldt=ht.value;
-  var pars=['LEUKOSIT','ERITROSIT','HEMATOKRIT','HEMOGLOBIN'].filter(p=>list.some(b=>b.param===p));
+  var pars=['LEUKOSIT','ERITROSIT','HEMOGLOBIN','HEMATOKRIT','TROMBOSIT'].filter(p=>list.some(b=>b.param===p));
   hp.innerHTML=pars.map(p=>'<option>'+p+'</option>').join('');if(pars.includes(oldp))hp.value=oldp;
   var years=Array.from(new Set(list.map(b=>b.label.split(' · ')[0]))).sort().reverse();
   hy.innerHTML=years.map(y=>'<option>'+esc(y)+'</option>').join('');if(years.includes(oldy))hy.value=oldy;
