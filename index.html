@@ -4160,15 +4160,17 @@ function parseH(rows,src){
    for(var c=b.no;c<Math.min(b.end,cells.length);c++){
     var txt=cells[c]||'';
     var y=hYr(txt);
-    if(y){if(st.y!==y)diag.push('Tahun '+y+' di kolom '+colL(c)+' baris '+(ri+1));st.y=y}
+    if(y){if(st.y!==y)diag.push('Tahun '+y+' di kolom '+colL(c)+' baris '+(ri+1));st.y=y;st.last=undefined}
     var t=hTW2(txt);
-    if(t){if(st.t!==t)diag.push('TW '+t+' di kolom '+colL(c)+' baris '+(ri+1));st.t=t}
+    if(t){if(st.t!==t)diag.push('TW '+t+' di kolom '+colL(c)+' baris '+(ri+1));st.t=t;st.mk=true}
    }
    if(ri<=lay.row)return;
    var dayTxt=cells[b.no]||'';
    if(!/^\d{1,2}(\.0+)?$/.test(dayTxt))return;
    var day=Number(dayTxt.replace(/\.0+$/,''));
    if(day<1||day>31)return;
+   if(st.last!==undefined&&day<=st.last&&!st.mk){st.t=(st.t||1)+1;diag.push('TW '+st.t+' (otomatis, hari kembali ke '+day+') di kolom '+colL(b.no)+' baris '+(ri+1))}
+   st.mk=false;st.last=day;
    Object.keys(b.cols).forEach(function(p){
     var val=n(r[b.cols[p]]);if(val==null)return;
     var y=st.y||0,t=st.t||1;
