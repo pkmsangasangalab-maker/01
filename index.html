@@ -1423,152 +1423,93 @@ html[data-theme="biru"] .cal-day.out{color:#8d9db8}
 </style>
 
 <style id="site-login-css">
-/* ===== LOGIN: gaya kartu biru seperti desain referensi (karakter + form) ===== */
-html body.locked #loginOverlay{background:linear-gradient(160deg,#6b8bff 0%,#4a6ce8 100%)!important;padding:20px;align-items:center;justify-content:center;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.bag-stage{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:24px;width:100%;max-width:800px;flex-wrap:wrap}
-.char{width:230px;height:auto;flex:0 0 auto;animation:charIn .8s ease both}
-@keyframes charIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
-html body.locked #loginOverlay .login-box{position:relative;flex:1 1 320px;max-width:340px;width:100%;margin:0;padding:0;background:transparent!important;border:none!important;box-shadow:none!important;color:#fff!important;animation:boxIn .7s ease .4s both;overflow:visible}
-@keyframes boxIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-html body.locked #loginOverlay .login-box h2{color:#fff!important;font-weight:800;font-size:1.6rem;text-align:center;letter-spacing:.04em;margin:0 0 4px}
-html body.locked #loginOverlay .login-box .login-sub{color:rgba(255,255,255,.85)!important;text-align:center;margin:0 0 22px;letter-spacing:.08em;font-size:.72rem;font-weight:500}
-html body.locked #loginOverlay .login-box .login-icon{display:flex;justify-content:center}
-html body.locked #loginOverlay .login-box .login-icon img{width:72px;height:72px;border-radius:50%;object-fit:cover}
-html body.locked #loginOverlay .login-field{margin-bottom:14px}
-html body.locked #loginOverlay .login-field>i.fa-solid:first-child{color:#4a6ce8!important;left:16px}
-html body.locked #loginOverlay .login-field input{background:#fff!important;border:none!important;border-radius:12px!important;color:#1f2a44!important;padding:14px 44px 14px 44px!important;box-shadow:0 8px 18px -10px rgba(0,0,0,.4)}
-html body.locked #loginOverlay .login-field input:focus{outline:none;box-shadow:0 0 0 3px rgba(255,255,255,.45)!important}
-html body.locked #loginOverlay .toggle-pass{color:#4a6ce8!important}
-html body.locked #loginOverlay .login-btn{background:#3fc36b!important;color:#fff!important;border:none!important;border-radius:12px!important;padding:14px!important;font-weight:700;letter-spacing:.04em;box-shadow:0 12px 22px -12px rgba(0,0,0,.45)!important;margin-top:6px}
-html body.locked #loginOverlay .login-btn:hover{filter:brightness(1.05)}
-html body.locked #loginOverlay .forgot-link{color:#fff!important;opacity:.92;font-weight:600}
-html body.locked #loginOverlay #loginError{color:#fff!important;text-align:center}
-html body.locked #loginOverlay #loginError:not(:empty){background:rgba(255,255,255,.2);border-radius:8px;padding:6px 8px}
-html body.locked #loginOverlay .reset-note,html body.locked #loginOverlay .reset-sep{color:rgba(255,255,255,.9)!important}
-html body.locked #loginOverlay .wa-btn{background:#fff!important;color:#2f7a55!important;border-radius:12px!important}
-html body.locked #loginOverlay .reset-ok{color:#fff!important}
+/* ===== LOGIN: PROYEK KONSTRUKSI (crane menurunkan papan akses proyek) ===== */
+html body.locked #loginOverlay{background:#7ec8f0!important;padding:0;align-items:flex-start;justify-content:flex-start;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.site-wrap{position:relative;flex:none;width:100%;min-height:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;padding:0 20px 90px}
+.site-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;background:linear-gradient(180deg,#7ec8f0 0%,#bfe6fa 55%,#ffefc4 100%)}
+.sun{position:absolute;right:9%;top:80px;width:64px;height:64px;border-radius:50%;background:#fff3b0;box-shadow:0 0 60px 30px rgba(255,235,150,.6)}
+.cloud{position:absolute;left:0;width:96px;height:26px;border-radius:30px;background:#fff;opacity:.9;animation:cloudGo 70s linear infinite}
+.cloud::before{content:"";position:absolute;left:16px;top:-14px;width:44px;height:30px;border-radius:50%;background:#fff}
+.cloud.c1{top:150px}.cloud.c2{top:240px;transform:scale(.7);animation-duration:95s;animation-delay:-40s}
+@keyframes cloudGo{from{transform:translateX(-150px)}to{transform:translateX(calc(100vw + 150px))}}
+.site-city{position:absolute;left:0;bottom:70px;width:100%;height:240px;display:block}
+.slab{opacity:0;animation:slabIn .5s ease forwards}
+@keyframes slabIn{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+/* crane (CSS saja) */
+.crane-mast,.crane-jib{background:linear-gradient(#f5b800,#f5b800) left/3px 100% no-repeat,linear-gradient(#f5b800,#f5b800) right/3px 100% no-repeat,repeating-linear-gradient(45deg,transparent 0 9px,#d49a00 9px 11px,transparent 11px 20px),repeating-linear-gradient(-45deg,transparent 0 9px,#d49a00 9px 11px,transparent 11px 20px)}
+.crane-mast{position:absolute;left:calc(50% - 300px);width:26px;top:34px;bottom:70px}
+.crane-jib{position:absolute;left:calc(50% - 330px);width:780px;top:34px;height:22px;background-image:linear-gradient(#f5b800,#f5b800),linear-gradient(#f5b800,#f5b800),repeating-linear-gradient(45deg,transparent 0 9px,#d49a00 9px 11px,transparent 11px 20px),repeating-linear-gradient(-45deg,transparent 0 9px,#d49a00 9px 11px,transparent 11px 20px);background-size:100% 3px,100% 3px,auto,auto;background-position:top,bottom,0 0,0 0}
+.crane-cab{position:absolute;left:calc(50% - 318px);top:16px;width:50px;height:34px;background:#f5b800;border:3px solid #1b1b1b;border-radius:4px}
+.crane-cw{position:absolute;left:calc(50% - 330px);top:56px;width:50px;height:38px;background:#6b7178;border:3px solid #1b1b1b}
+.crane-trolley{position:absolute;left:calc(50% - 18px);top:56px;width:36px;height:12px;background:#1b1b1b;border-radius:0 0 4px 4px}
+.site-fence{position:absolute;left:0;right:0;bottom:70px;height:24px;background:repeating-linear-gradient(90deg,#fff 0 44px,#e03b2f 44px 88px);border-block:4px solid #1b1b1b}
+.site-ground{position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(#c9a064,#a27a45)}
+.cone{position:absolute;bottom:14px;width:36px;height:54px;background:linear-gradient(180deg,#ff7a1a 0 28%,#fff 28% 50%,#ff7a1a 50% 100%);clip-path:polygon(50% 0,100% 100%,0 100%)}
+
+/* rig: kabel + kait + sling + papan */
+.site-rig{position:relative;z-index:1;width:100%;max-width:380px;margin-top:68px;transform-origin:50% 0;animation:rigSwing 2.6s ease-out 1.5s both}
+@keyframes rigSwing{0%{transform:rotate(0)}15%{transform:rotate(2.4deg)}35%{transform:rotate(-1.8deg)}55%{transform:rotate(1deg)}75%{transform:rotate(-.5deg)}100%{transform:rotate(0)}}
+.site-cable{width:3px;height:44px;margin:0 auto;background:#222;animation:cableDown 1.5s cubic-bezier(.25,.9,.3,1) both}
+@keyframes cableDown{from{height:0}}
+.site-hook{width:18px;height:20px;margin:-1px auto 0;border:4px solid #1b1b1b;border-top:0;border-radius:0 0 14px 14px;background:linear-gradient(#f5b800,#f5b800) top/100% 6px no-repeat}
+.site-slings{position:relative;height:40px;margin-bottom:-2px}
+.site-slings svg{display:block;width:100%;height:100%}
+.site-slings line{stroke:#222;stroke-width:2;vector-effect:non-scaling-stroke}
+.site-slings::before,.site-slings::after{content:"";position:absolute;bottom:-5px;width:12px;height:12px;border-radius:50%;background:#f5b800;border:3px solid #1b1b1b;z-index:3}
+.site-slings::before{left:calc(8% - 6px)}.site-slings::after{right:calc(8% - 6px)}
+
+/* papan akses proyek = form login */
+html body.locked #loginOverlay .login-box{position:relative;width:100%;max-width:380px;margin:0;padding:0 22px 40px;border-radius:6px;overflow:hidden;color:#1b1b1b!important;border:3px solid #1b1b1b!important;
+  background:radial-gradient(circle,#b4b4b4 0 2.5px,#444 3px 4.5px,transparent 5px) left 8px top 28px/12px 12px no-repeat,radial-gradient(circle,#b4b4b4 0 2.5px,#444 3px 4.5px,transparent 5px) right 8px top 28px/12px 12px no-repeat,#fffdf4!important;
+  box-shadow:0 0 0 3px #f5b800,0 28px 40px -18px rgba(0,0,0,.55)!important}
+html body.locked #loginOverlay .login-box::before,html body.locked #loginOverlay .login-box::after{content:"";display:block;background:repeating-linear-gradient(-45deg,#f5b800 0 14px,#1b1b1b 14px 28px);animation:hazard 1.6s linear infinite}
+html body.locked #loginOverlay .login-box::before{height:16px;margin:0 -22px 18px}
+html body.locked #loginOverlay .login-box::after{position:absolute;left:0;right:0;bottom:0;height:14px}
+@keyframes hazard{to{background-position:39.6px 0}}
+html body.locked #loginOverlay .login-box h2{color:#1b1b1b;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+html body.locked #loginOverlay .login-box h2::before{content:"\26A0  AREA PROYEK";display:block;width:max-content;margin:0 auto 8px;padding:3px 10px;font-size:.6rem;font-weight:600;letter-spacing:.22em;background:#1b1b1b;color:#f5b800;border-radius:2px}
+html body.locked #loginOverlay .login-box .login-sub{color:#4a4a4a;font-weight:600;letter-spacing:.08em}
+html body.locked #loginOverlay .login-icon img{box-shadow:0 0 0 3px #1b1b1b,0 0 0 6px #f5b800!important}
+html body.locked #loginOverlay .login-field input{background:#fff!important;border:2px solid #1b1b1b!important;border-radius:4px!important;color:#1b1b1b!important;font-weight:500}
+html body.locked #loginOverlay .login-field input:focus{border-color:#f5b800!important;box-shadow:0 0 0 3px rgba(245,184,0,.5)!important}
+html body.locked #loginOverlay .login-field>i.fa-solid:first-child,html body.locked #loginOverlay .toggle-pass{color:#1b1b1b}
+html body.locked #loginOverlay .login-btn{background:#f5b800!important;color:#1b1b1b!important;border:2px solid #1b1b1b!important;border-radius:4px!important;font-weight:800;letter-spacing:.16em;text-transform:uppercase;box-shadow:0 5px 0 #1b1b1b!important;transition:transform .08s,box-shadow .08s}
+html body.locked #loginOverlay .login-btn:hover{filter:none;background:repeating-linear-gradient(-45deg,#f5b800 0 12px,#ffd23f 12px 24px)!important}
+html body.locked #loginOverlay .login-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1b1b1b!important}
+html body.locked #loginOverlay .forgot-link{color:#1b1b1b;font-weight:700}
+html body.locked #loginOverlay #loginError:not(:empty){background:#ffe6e2;border:2px dashed #b3261e;border-radius:4px;padding:6px 8px;color:#b3261e}
 .login-box.denied{animation:denied .5s}
 @keyframes denied{20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
-.site-tape{position:absolute;z-index:6;left:-20px;right:-20px;top:-40px;padding:7px 0;overflow:hidden;white-space:nowrap;text-align:center;pointer-events:none;opacity:0;background:#f5b800;color:#1b1b1b;border-block:3px solid #1b1b1b;font:800 .8rem/1 'Poppins',sans-serif;letter-spacing:.2em;transform:rotate(-6deg)}
+.site-tape{position:absolute;z-index:6;left:-26px;right:-26px;top:215px;padding:7px 0;overflow:hidden;white-space:nowrap;text-align:center;pointer-events:none;opacity:0;
+  background:#f5b800;color:#1b1b1b;border-block:3px solid #1b1b1b;font:800 .8rem/1 'Poppins',sans-serif;letter-spacing:.2em;transform:rotate(-6deg)}
 .site-tape.show{animation:tapeShow 2.3s ease both}
 @keyframes tapeShow{0%{opacity:0;transform:rotate(-6deg) scale(.6)}12%{opacity:1;transform:rotate(-6deg) scale(1.06)}20%{transform:rotate(-6deg) scale(1)}80%{opacity:1}100%{opacity:0}}
-@media (max-width:700px){.char{width:150px}.bag-stage{gap:12px}}
-@media (prefers-reduced-motion:reduce){.char,.login-box,.login-box.denied{animation:none!important}}
-
-/* ===== URUTAN: orang berjalan dari samping -> tas terbuka -> form keluar -> orang bersandar ===== */
-html body.locked #loginOverlay{overflow-x:hidden}
-html body.locked #loginOverlay .bag-stage{min-height:380px;overflow:visible}
-html body.locked #loginOverlay .bag-stage .char{animation:walkIn 2s cubic-bezier(.3,.6,.4,1) both;transform-origin:50% 100%}
-@keyframes walkIn{from{transform:translateX(-520px)}to{transform:translateX(0)}}
-html body.locked #loginOverlay .char .lean{transform-box:view-box;transform-origin:110px 345px;animation:leanIn .9s ease 3.4s both}
-@keyframes leanIn{from{transform:rotate(0)}to{transform:rotate(9deg)}}
-html body.locked #loginOverlay .char .leg{transform-box:view-box;transform-origin:center top;animation:legSwing .5s ease-in-out 4}
-html body.locked #loginOverlay .char .leg-b{animation-delay:-.25s}
-@keyframes legSwing{0%{transform:rotate(0)}25%{transform:rotate(-16deg)}75%{transform:rotate(16deg)}100%{transform:rotate(0)}}
-html body.locked #loginOverlay .char .bag-flap{transform-box:view-box;transform-origin:150px 196px;animation:flapOpen .7s ease 2.1s both}
-@keyframes flapOpen{to{transform:rotate(-165deg) translateY(-6px)}}
-html body.locked #loginOverlay .char .bag-open{opacity:0;animation:bagShow .3s ease 2.3s both}
-@keyframes bagShow{to{opacity:1}}
-html body.locked #loginOverlay .bag-stage .login-box{transform-origin:0% 100%;animation:boxOut .9s cubic-bezier(.2,.9,.3,1.1) 2.6s both}
-@keyframes boxOut{from{opacity:0;transform:translate(-200px,60px) scale(.2)}to{opacity:1;transform:none}}
-html body.locked #loginOverlay .login-box.denied{animation:denied .5s}
-@media (prefers-reduced-motion:reduce){
-  html body.locked #loginOverlay .bag-stage .char,html body.locked #loginOverlay .char .lean,html body.locked #loginOverlay .char .leg,html body.locked #loginOverlay .char .bag-flap,html body.locked #loginOverlay .char .bag-open,html body.locked #loginOverlay .bag-stage .login-box{animation:none!important}
-  html body.locked #loginOverlay .char .lean{transform:rotate(9deg)}
-  html body.locked #loginOverlay .char .bag-flap{transform:rotate(-165deg) translateY(-6px)}
-  html body.locked #loginOverlay .char .bag-open{opacity:1}
-}
-
-/* ===== GERAK LEBIH LUWES: bobbing, ayunan lengan, easing bertahap ===== */
-html body.locked #loginOverlay .bag-stage .char{animation:walkIn 2.4s cubic-bezier(.22,.61,.36,1) both}
-@keyframes walkIn{0%{transform:translateX(-520px)}85%{transform:translateX(12px)}100%{transform:translateX(0)}}
-html body.locked #loginOverlay .char .bob{transform-box:view-box;animation:bob .6s ease-in-out 4}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-html body.locked #loginOverlay .char .leg{transform-box:view-box;transform-origin:center top;animation:legSwing .6s ease-in-out 4}
-html body.locked #loginOverlay .char .leg-b{animation-delay:-.3s}
-@keyframes legSwing{0%,100%{transform:rotate(0)}30%{transform:rotate(-22deg)}70%{transform:rotate(22deg)}}
-html body.locked #loginOverlay .char .arm-l{transform-box:view-box;transform-origin:74px 116px;animation:armSwing .6s ease-in-out 4}
-@keyframes armSwing{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
-html body.locked #loginOverlay .char .lean{transform-box:view-box;transform-origin:110px 345px;animation:leanIn 1.2s cubic-bezier(.45,0,.2,1) 3.2s both}
-@keyframes leanIn{0%{transform:rotate(0)}75%{transform:rotate(11deg)}100%{transform:rotate(9deg)}}
-html body.locked #loginOverlay .char .head{transform-box:view-box;transform-origin:110px 100px;animation:headTilt .8s ease 3.6s both}
-@keyframes headTilt{to{transform:rotate(5deg)}}
-html body.locked #loginOverlay .char .bag-flap{animation:flapOpen .9s cubic-bezier(.34,1.56,.64,1) 2.3s both}
-html body.locked #loginOverlay .bag-stage .login-box{animation:boxOut 1s cubic-bezier(.2,.9,.3,1.08) 2.8s both}
-@media (prefers-reduced-motion:reduce){
-  html body.locked #loginOverlay .char .bob,html body.locked #loginOverlay .char .arm-l,html body.locked #loginOverlay .char .head{animation:none!important}
-}
-
-/* ===== INTERAKSI: fokus input menyalakan glow, karakter merespons, placeholder memudar, tombol hover ===== */
-html body.locked #loginOverlay .login-field input{border:2px solid transparent!important;transition:border-color .25s ease,box-shadow .25s ease,background-color .25s ease!important}
-html body.locked #loginOverlay .login-field input::placeholder{transition:opacity .25s ease,color .25s ease;opacity:1}
-html body.locked #loginOverlay .login-field input:focus{border-color:#3b82f6!important;box-shadow:0 0 0 4px rgba(59,130,246,.25),0 0 18px rgba(59,130,246,.55)!important}
-html body.locked #loginOverlay .login-field input:focus::placeholder{opacity:.4}
-html body.locked #loginOverlay .login-field input:not(:placeholder-shown){background:#f5f9ff!important}
-
-/* karakter: kepala & lengan merespons saat input difokus (tanpa animasi intro yang menahan posisi) */
-html body.locked #loginOverlay .char .head{animation:none;transform:rotate(3deg);transition:transform .45s cubic-bezier(.3,.7,.3,1)}
-html body.locked #loginOverlay .char .arm-l{animation:none;transform:none;transition:transform .45s cubic-bezier(.3,.7,.3,1)}
-html body.locked #loginOverlay .bag-stage:has(input:focus) .char .head{transform:rotate(-7deg)}
-html body.locked #loginOverlay .bag-stage:has(input:focus) .char .arm-l{transform:rotate(-25deg)}
-
-/* tombol: hover membesar dan bayangan naik, klik sedikit menekan */
-html body.locked #loginOverlay .login-btn{transition:transform .2s ease,box-shadow .2s ease,filter .2s ease!important}
-html body.locked #loginOverlay .login-btn:hover{transform:scale(1.04);box-shadow:0 18px 30px -12px rgba(0,0,0,.55)!important}
-html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
-@media (prefers-reduced-motion:reduce){
-  html body.locked #loginOverlay .char .head,html body.locked #loginOverlay .char .arm-l,html body.locked #loginOverlay .login-btn{transition:none!important}
-}
+@media (prefers-reduced-motion:reduce){.site-rig,.site-cable,.cloud,.slab,.login-box::before,.login-box::after,.login-box.denied{animation:none!important}.slab{opacity:1}}
 </style>
 </head>
 <body class="locked" data-view="home">
 
   <div id="loginOverlay">
   <div class="site-wrap">
-    <div class="bag-stage">
-      <svg class="char" viewBox="0 0 220 360" aria-hidden="true" focusable="false">
-        <g class="bob"><g class="lean">
-          <!-- kaki & sepatu -->
-          <rect class="leg leg-a" x="74" y="250" width="32" height="92" rx="8" fill="#1e2b4a"/>
-          <rect class="leg leg-b" x="114" y="250" width="32" height="92" rx="8" fill="#1e2b4a"/>
-          <ellipse cx="90" cy="346" rx="20" ry="9" fill="#1b1b1b"/>
-          <ellipse cx="130" cy="346" rx="20" ry="9" fill="#1b1b1b"/>
-          <!-- kemeja teal & dasi -->
-          <path d="M92 104 L110 140 L128 104 Z" fill="#1fb5a8"/>
-          <path d="M106 128 L114 128 L118 168 L110 180 L102 168 Z" fill="#17968b"/>
-          <!-- jas lab putih -->
-          <path d="M70 102 Q110 92 150 102 L160 258 L60 258 Z" fill="#f4f6f8" stroke="#c9d1da" stroke-width="2"/>
-          <path d="M92 104 L80 150 L96 158 L110 140 Z" fill="#e8ecf1" stroke="#c9d1da" stroke-width="1.5"/>
-          <path d="M128 104 L140 150 L124 158 L110 140 Z" fill="#e8ecf1" stroke="#c9d1da" stroke-width="1.5"/>
-          <line x1="110" y1="140" x2="110" y2="258" stroke="#c9d1da" stroke-width="1.5"/>
-          <!-- lencana palang merah -->
-          <circle cx="140" cy="142" r="8" fill="#ffffff" stroke="#e53935" stroke-width="2"/>
-          <path d="M140 137 V147 M135 142 H145" stroke="#e53935" stroke-width="2.4" stroke-linecap="round"/>
-          <!-- lengan kiri -->
-          <g class="arm-l"><path d="M74 116 Q52 160 56 214" fill="none" stroke="#f4f6f8" stroke-width="24" stroke-linecap="round"/><circle cx="56" cy="224" r="10" fill="#e0a878"/></g>
-          <!-- lengan kanan memegang tas -->
-          <path d="M146 116 Q164 150 160 190" fill="none" stroke="#f4f6f8" stroke-width="24" stroke-linecap="round"/>
-          <circle cx="160" cy="198" r="10" fill="#e0a878"/>
-          <!-- tas kuning (isi terlihat saat terbuka) -->
-          <rect x="150" y="196" width="66" height="60" rx="8" fill="#f5a623" stroke="#b86e0c" stroke-width="3"/>
-          <rect class="bag-open" x="154" y="198" width="58" height="8" rx="3" fill="#3a2a1a"/>
-          <path d="M150 210 H216" stroke="#d97f12" stroke-width="3"/>
-          <rect x="178" y="222" width="16" height="10" rx="2" fill="#3a2a1a"/>
-          <path class="bag-flap" d="M150 196 H216 V208 H150 Z" fill="#d97f12" stroke="#b86e0c" stroke-width="3"/>
-          <path d="M160 196 Q183 170 206 196" fill="none" stroke="#3a2a1a" stroke-width="5" stroke-linecap="round"/>
-          <!-- leher & kepala -->
-          <g class="head"><rect x="101" y="84" width="18" height="22" fill="#e0a878"/>
-          <ellipse cx="110" cy="58" rx="28" ry="30" fill="#e0a878"/>
-          <ellipse cx="82" cy="60" rx="5" ry="7" fill="#e0a878"/>
-          <ellipse cx="138" cy="60" rx="5" ry="7" fill="#e0a878"/>
-          <path d="M81 52 Q82 24 110 24 Q139 24 139 52 Q128 38 110 38 Q94 38 81 52Z" fill="#1f1a17"/>
-          <circle cx="100" cy="60" r="2.8" fill="#1b1b1b"/>
-          <circle cx="120" cy="60" r="2.8" fill="#1b1b1b"/>
-          <path d="M96 52 Q100 49 104 52 M116 52 Q120 49 124 52" fill="none" stroke="#1f1a17" stroke-width="2" stroke-linecap="round"/>
-          <path d="M102 72 Q110 79 118 72" fill="none" stroke="#7a3e1d" stroke-width="2.2" stroke-linecap="round"/></g>
-        </g>
-      </g>
+    <div class="site-scene" aria-hidden="true">
+      <div class="sun"></div><div class="cloud c1"></div><div class="cloud c2"></div>
+      <svg class="site-city" viewBox="0 0 1200 240" preserveAspectRatio="xMidYMax slice" focusable="false">
+        <defs><pattern id="siteWin" width="18" height="20" patternUnits="userSpaceOnUse"><rect x="4" y="5" width="9" height="11" fill="#6fa8d0"/></pattern></defs>
+        <g fill="#b8d8ee" opacity=".8"><rect x="30" y="120" width="90" height="120"/><rect x="130" y="80" width="70" height="160"/><rect x="215" y="145" width="100" height="95"/><rect x="940" y="100" width="80" height="140"/><rect x="1030" y="135" width="100" height="105"/><rect x="1125" y="70" width="70" height="170"/></g>
+        <rect x="700" y="70" width="190" height="170" fill="#e6dfcf"/><rect x="700" y="70" width="190" height="170" fill="url(#siteWin)"/><rect x="696" y="62" width="198" height="9" fill="#8f877a"/>
+        <g fill="#8d949b"><rect x="340" y="46" width="8" height="194"/><rect x="400" y="46" width="8" height="194"/><rect x="460" y="46" width="8" height="194"/><rect x="520" y="46" width="8" height="194"/></g>
+        <g stroke="#7a5f48" stroke-width="2"><path d="M344 46v-14M404 46v-18M464 46v-12M524 46v-16"/></g>
+        <rect x="332" y="196" width="110" height="44" fill="#ddd6c6"/><rect x="332" y="196" width="110" height="44" fill="url(#siteWin)"/>
+        <g fill="#c4c9ce" stroke="#8d949b" stroke-width="1"><rect class="slab" x="332" y="188" width="204" height="9" style="animation-delay:.2s"/><rect class="slab" x="332" y="148" width="204" height="9" style="animation-delay:.6s"/><rect class="slab" x="332" y="108" width="204" height="9" style="animation-delay:1s"/><rect class="slab" x="332" y="68" width="204" height="9" style="animation-delay:1.4s"/></g>
+        <g stroke="#caa000" stroke-width="2" fill="none"><path d="M552 60v180M580 60v180M552 60h28M552 100h28M552 140h28M552 180h28M552 100l28 40M552 140l28 40M552 60l28 40"/></g>
       </svg>
+      <div class="crane-mast"></div><div class="crane-jib"></div><div class="crane-cab"></div><div class="crane-cw"></div><div class="crane-trolley"></div>
+      <div class="site-fence"></div><div class="site-ground"></div>
+      <i class="cone" style="left:4%"></i><i class="cone" style="left:calc(4% + 46px)"></i><i class="cone" style="right:6%"></i>
+    </div>
+    <div class="site-rig">
+      <div class="site-cable"></div><div class="site-hook"></div>
+      <div class="site-slings"><svg viewBox="0 0 100 46" preserveAspectRatio="none" aria-hidden="true"><line x1="50" y1="0" x2="8" y2="46"/><line x1="50" y1="0" x2="92" y2="46"/></svg></div>
       <div class="site-tape" id="siteTape" aria-hidden="true">&#9888; AKSES DITOLAK &#9888; AKSES DITOLAK &#9888; AKSES DITOLAK &#9888;</div>
       <div class="login-box">
       <div class="login-icon"><img src="data:image/jpeg;base64,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" alt="Logo Puskesmas Sanga-sanga" style="width:84px;height:84px;border-radius:50%;object-fit:cover;box-shadow:0 0 18px rgba(111,159,189,.42);"></div>
@@ -1587,7 +1528,7 @@ html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
       <div id="loginPanel">
         <button class="login-btn" onclick="doLogin()"><i class="fa-solid fa-right-to-bracket"></i> Masuk</button>
         <button type="button" class="forgot-link" onclick="showReset(true)">Lupa password?</button>
-        <a class="forgot-link" id="waLink" href="mailto:labpkmsangasanga@gmail.com?subject=Bantuan%20login%20PERMATA%20LAB&body=Halo%20Admin%2C%20saya%20lupa%20username%2Fpassword%20PERMATA%20LAB.%20Mohon%20bantuannya." style="text-decoration:none;margin-top:6px"><i class="fa-solid fa-envelope"></i> Hubungi Admin</a>
+        <a class="forgot-link" id="waLink" href="#" style="text-decoration:none;margin-top:6px"><i class="fa-solid fa-envelope"></i> Hubungi Admin</a>
       </div>
       <div id="resetPanel">
         <p class="reset-note">Masukkan <b>kode pemulihan</b> dari admin lab, lalu buat username &amp; password baru.</p>
@@ -1606,7 +1547,7 @@ html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
         <div id="resetOk" class="reset-ok"></div>
         <button class="login-btn" onclick="doReset()"><i class="fa-solid fa-rotate"></i> Atur Ulang Password</button>
         <p class="reset-sep">Tidak punya kode atau jawabannya?</p>
-        <a class="wa-btn" id="waBtn" href="mailto:labpkmsangasanga@gmail.com?subject=Bantuan%20login%20PERMATA%20LAB&body=Halo%20Admin%2C%20saya%20lupa%20username%2Fpassword%20PERMATA%20LAB.%20Mohon%20bantuannya."><i class="fa-solid fa-envelope"></i> Hubungi Admin via Email</a>
+        <a class="wa-btn" id="waBtn" href="#"><i class="fa-solid fa-envelope"></i> Hubungi Admin via Email</a>
         <button type="button" class="forgot-link" onclick="showReset(false)">← Kembali ke halaman masuk</button>
       </div>
     </div>
@@ -1677,7 +1618,7 @@ html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
     <section class="home-row" data-view="home">
       <div id="homeChartSlot"></div>
       <div class="chart-card act-card">
-        <div class="chart-head"><h3><svg class="ic" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4.5l2.5 1.5"/></svg> Aktivitas Terbaru</h3><button class="pill-btn" onclick="setView('ringkasan')">Lihat Ringkasan Tahunan →</button></div>
+        <div class="chart-head"><h3><svg class="ic" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4.5l2.5 1.5"/></svg> Aktivitas Terbaru</h3><button class="pill-btn" onclick="setView('ringkasan')">Lihat Semua →</button></div>
         <div id="actList"></div>
       </div>
     </section>
@@ -1755,7 +1696,7 @@ html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
         </div>
       </a>
       <a rel="noopener noreferrer" href="https://drive.google.com/drive/folders/1LxOXeWpnMWY8SFb89Jv6JrLBKikapMYn?usp=drive_link" target="_blank" class="card">
-        <div class="icon">🗺️</div>
+        <div class="icon">🛰️</div>
         <div>
           <h3>FORM PEMETAAN LAB 2020-2025</h3>
           <p>Google Drive Folder</p>
