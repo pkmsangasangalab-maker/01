@@ -4163,43 +4163,59 @@ function parseH(rows,src){
  return out;
 }
 function parse(rows,src){return src.group==='hematologi'?parseH(rows,src):parseK(rows,src)}
+function isDate(s){return /^\s*(\d{4}[-\/]\d{1,2}[-\/]\d{1,2}|\d{1,2}[-\/]\d{1,2}[-\/]\d{4}|Date\(\d{4},\s*\d{1,2},\s*\d{1,2}\))/.test(String(s==null?'':s))}
+function lotLike(s){return /\d/.test(s)&&/^[A-Za-z0-9][A-Za-z0-9.\-\/]*$/.test(s)}
 function parseK(rows,src){
  var out=[],heads=[];
- // Cari pasangan kolom Tanggal/Nilai pada masing-masing blok QC.
  rows.forEach(function(r,ri){
   var cells=r.map(function(x){return normQC(x).toUpperCase()});
-  var dates=[];
-  cells.forEach(function(v,c){if(/^TANGGAL$/.test(v))dates.push(c)});
-  dates.forEach(function(d){
-   var v=-1;
-   for(var c=d+1;c<Math.min(r.length,d+4);c++){if(/^NILAI$/.test(cells[c])){v=c;break}}
-   if(v<0&&d+1<r.length)v=d+1;
-   if(v>=0){
-    var label='';
-    for(var y=ri-1;y>=Math.max(0,ri-3);y--){
-     var candidate=normQC(rows[y][d]).toUpperCase();
-     if(/KOLESTEROL/.test(candidate)){label='Kolesterol';break}
-     if(/ASAM\s*URAT/.test(candidate)){label='Asam Urat';break}
-     if(/QC\s*GULA|GULA/.test(candidate)){label='Gula Darah';break}
-    }
-    if(!label){label=d===0?'Gula Darah':d===4?'Kolesterol':d===7?'Asam Urat':''}
-    if(label)heads.push({p:label,d:d,v:v});
+  cells.forEach(function(v,d){
+   if(!/^TANGGAL$/.test(v))return;
+   var vc=-1;
+   for(var c=d+1;c<Math.min(r.length,d+4);c++){if(/^NILAI$/.test(cells[c])){vc=c;break}}
+   if(vc<0&&d+1<r.length)vc=d+1;
+   if(vc<0)return;
+   var label='';
+   for(var y=ri-1;y>=Math.max(0,ri-3);y--){
+    var cand=normQC(rows[y][d]).toUpperCase();
+    if(/KOLESTEROL/.test(cand)){label='Kolesterol';break}
+    if(/ASAM\s*URAT/.test(cand)){label='Asam Urat';break}
+    if(/QC\s*GULA|GULA/.test(cand)){label='Gula Darah';break}
    }
+   if(!label){label=d===0?'Gula Darah':d===4?'Kolesterol':d===7?'Asam Urat':''}
+   if(label)heads.push({p:label,d:d,v:vc});
   });
  });
- // Buang pasangan header ganda.
  var seen={};heads=heads.filter(function(x){var k=x.p+'|'+x.d+'|'+x.v;if(seen[k])return false;seen[k]=1;return true});
  if(!heads.length)heads=[{p:'Gula Darah',d:0,v:1},{p:'Kolesterol',d:4,v:5},{p:'Asam Urat',d:7,v:8}];
  heads.forEach(function(f){
-  var lot='Tidak tercantum',map={};
+  var map={},order=[],lot=null,needNew=false;
   rows.forEach(function(r){
-   var mark=normQC(r[f.d]).toLowerCase().replace(/[.:]/g,'').replace(/\s+/g,' '),
-       lotCell=normQC(r[f.v]).replace(/^(\d+)\.0+$/,'$1');
-   if(/^no\s*lot$/.test(mark)||mark==='nolot'){if(lotCell)lot=lotCell;return}
-   var d=dt(r[f.d]),v=n(r[f.v]);if(!d||v==null)return;
-   (map[lot]||(map[lot]=[])).push({d:d,v:v});
+   var dateRaw=normQC(r[f.d]),raw=normQC(r[f.v]),mark=dateRaw.toLowerCase().replace(/[.:]/g,'').replace(/\s+/g,' ');
+   var lotCell=raw.replace(/^(\d+)\.0+$/,'$1');
+   // 1) Baris penanda "No Lot"
+   if(/^no\s*lot$/.test(mark)||mark==='nolot'){
+    if(lotCell){lot=lotCell;needNew=false}else{lot=null;needNew=true}
+    return;
+   }
+   // 2) Baris tanpa tanggal
+   if(!dateRaw){
+    if(!raw){needNew=true;return}           // baris kosong = pergantian lot
+    if(lotLike(lotCell)){lot=lotCell;needNew=false}  // nomor lot tanpa label
+    return;
+   }
+   // 3) Baris bertanggal
+   if(!isDate(dateRaw))return;
+   var val=n(raw);if(val==null)return;
+   var d=dt(dateRaw);if(!d)return;
+   if(lot==null||needNew){
+    lot='No Lot (tidak terbaca, mulai '+d.toLocaleDateString('id-ID')+')';
+    needNew=false;
+   }
+   if(!map[lot]){map[lot]=[];order.push(lot)}
+   map[lot].push({d:d,v:val});
   });
-  Object.keys(map).forEach(function(l){
+  order.forEach(function(l){
    var pts=map[l].sort(function(a,b){return a.d-b.d}).map(function(x){return {d:x.d.toLocaleDateString('id-ID'),v:x.v}});
    add(out,src.group,src.name,f.p,'Lot '+l,l,pts);
   });
@@ -4271,8 +4287,9 @@ function load(){
    var points=x.data.reduce(function(sum,b){return sum+b.pts.length},0);
    return esc(x.name)+': '+x.data.length+' kelompok / '+points+' nilai';
   }).join(' · ');
+  var kLots=B.filter(function(b){return b.group==='kimia'}).map(function(b){return esc(b.param)+' '+esc(b.lot)+' ('+b.pts.length+')'}).join(' · ');
   $('sdNote').innerHTML=(issues.length?'Sebagian data gagal dimuat: '+esc(issues.map(function(x){return x.name+': '+x.error}).join(' | '))+'<br>':'')+
-   'Data terbaca: '+B.length+' kelompok. '+sourceCounts+'. Hematologi per tahun/TW; Kimia Klinik per parameter/nomor lot. <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">Buka spreadsheet</a>';
+   'Data terbaca: '+B.length+' kelompok. '+sourceCounts+'. Lot Kimia terbaca: '+(kLots||'–')+'. Hematologi per tahun/TW; Kimia Klinik per parameter/nomor lot. <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">Buka spreadsheet</a>';
  })
  .catch(function(e){$('sdNote').textContent='Data gagal dimuat: '+e.message+'. Pastikan akses spreadsheet disetel “Siapa saja yang memiliki link – Pelihat”, lalu muat ulang.'});
 }
