@@ -2079,6 +2079,7 @@ html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
   border-radius:12px;
   padding:10px;
 }
+#sdLive .sd-filter-label{color:#9fc9ff;font-size:.72rem;font-weight:800;letter-spacing:.08em;align-self:center}
 #sdLive select{
   background:#0c2b54;
   color:#f5f9ff;
@@ -2212,10 +2213,12 @@ html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
       <div class="chart-card">
         <div class="stok-tools">
           <select id="sdGroup" aria-label="Pilih kelompok data"><option value="hematologi">Hematologi</option><option value="kimia">Kimia Klinik</option></select>
-          <select id="sdHParam" aria-label="Parameter Hematologi"></select>
+          <span id="sdHLabel" class="sd-filter-label">HEMATOLOGI</span>
+          <select id="sdHParam" aria-label="Pemeriksaan Hematologi"></select>
           <select id="sdHYear" aria-label="Tahun Hematologi"></select>
           <select id="sdHTW" aria-label="Triwulan Hematologi"></select>
-          <select id="sdKParam" aria-label="Parameter Kimia Klinik" style="display:none"></select>
+          <span id="sdKLabel" class="sd-filter-label" style="display:none">KIMIA KLINIK</span>
+          <select id="sdKParam" aria-label="Pemeriksaan Kimia Klinik" style="display:none"></select>
           <select id="sdKLot" aria-label="Nomor lot Kimia Klinik" style="display:none"></select>
           <button class="btn-action" id="sdMuat" type="button">🔄 Muat ulang</button>
         </div>
@@ -4116,7 +4119,7 @@ var SID='1EjhqFF-AkdaHBIsNeOaozPOoH-36YYgIY3zCEk5oxm4',SRC=[{gid:'1252703038',gr
 var $=function(x){return document.getElementById(x)},esc=function(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})},f2=function(x){return x==null||!isFinite(x)?'–':Number(x).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})};
 function csv(t){var a=[],r=[],v='',q=false;t=String(t).replace(/^\uFEFF/,'');for(var i=0;i<t.length;i++){var c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){v+='"';i++}else q=false}else v+=c}else if(c==='"')q=true;else if(c===','){r.push(v);v=''}else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;r.push(v);a.push(r);r=[];v=''}else v+=c}if(v!==''||r.length){r.push(v);a.push(r)}return a}
 function n(x){if(x==null)return null;var s=String(x).trim().replace(/\s/g,'');if(!s||!/[0-9]/.test(s))return null;if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else s=s.replace(',','.');var v=parseFloat(s);return isFinite(v)?v:null}
-function dt(x){if(x instanceof Date&&!isNaN(x))return x;var s=String(x||'').trim(),m=s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);m=s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);var d=new Date(s);return isNaN(d)?null:d}
+function dt(x){if(x instanceof Date&&!isNaN(x))return x;var s=String(x||'').trim(),m=s.match(/^Date\\((\\d{4}),(\\d{1,2}),(\\d{1,2})\\)$/);if(m)return new Date(+m[1],+m[2],+m[3]);m=s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);m=s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);var d=new Date(s);return isNaN(d)?null:d}
 function stats(p){var v=p.map(x=>x.v),m=v.reduce((a,b)=>a+b,0)/v.length,sd=v.length>1?Math.sqrt(v.reduce((a,b)=>a+(b-m)*(b-m),0)/(v.length-1)):0;return {m:m,sd:sd}}
 function add(out,g,src,param,label,lot,pts){if(!pts.length)return;var st=stats(pts);out.push({group:g,source:src,param:param,label:label,lot:lot||'',mean:st.m,sd:st.sd,pts:pts})}
 function parseH(rows,src){
@@ -4160,7 +4163,7 @@ function byGroup(){return B.filter(b=>b.group===$('sdGroup').value)}
 function fill(){
  var h=$('sdGroup').value==='hematologi';
  ['sdHParam','sdHYear','sdHTW'].forEach(id=>$(id).style.display=h?'':'none');
- ['sdKParam','sdKLot'].forEach(id=>$(id).style.display=h?'none':'');
+ ['sdKParam','sdKLot','sdKLabel'].forEach(id=>$(id).style.display=h?'none':'');$('sdHLabel').style.display=h?'':'none';
  var list=byGroup();
  if(h){
   var hp=$('sdHParam'),hy=$('sdHYear'),ht=$('sdHTW'),oldp=hp.value,oldy=hy.value,oldt=ht.value;
