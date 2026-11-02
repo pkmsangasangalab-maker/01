@@ -4106,7 +4106,7 @@ var PANDUAN = [
 
 <script id="sd-qc-js">
 (function(){
-var SID='1EjhqFF-AkdaHBIsNeOaozPOoH-36YYgIY3zCEk5oxm4',SRC=[{gid:'1252703038',group:'hematologi',name:'Data Kontrol Hematologi'},{gid:'18484466',group:'kimia',name:'Data Kontrol Kimia Klinik'}],B=[],ch=null;
+var SID='1EjhqFF-AkdaHBIsNeOaozPOoH-36YYgIY3zCEk5oxm4',SRC=[{gid:'18484466',group:'hematologi',name:'Data Kontrol Hematologi'},{gid:'1252703038',group:'kimia',name:'Data Kontrol Kimia Klinik'}],B=[],ch=null;
 var $=function(x){return document.getElementById(x)},esc=function(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})},f2=function(x){return x==null||!isFinite(x)?'–':Number(x).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})};
 function csv(t){var a=[],r=[],v='',q=false;t=String(t).replace(/^\uFEFF/,'');for(var i=0;i<t.length;i++){var c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){v+='"';i++}else q=false}else v+=c}else if(c==='"')q=true;else if(c===','){r.push(v);v=''}else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;r.push(v);a.push(r);r=[];v=''}else v+=c}if(v!==''||r.length){r.push(v);a.push(r)}return a}
 function n(x){if(x==null)return null;var s=String(x).trim().replace(/\s/g,'');if(!s||!/[0-9]/.test(s))return null;if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else s=s.replace(',','.');var v=parseFloat(s);return isFinite(v)?v:null}
@@ -4122,8 +4122,10 @@ function parseH(rows,src){
   if(cells.indexOf('LEUKOSIT')>=0&&cells.indexOf('ERITROSIT')>=0&&cells.indexOf('HEMOGLOBIN')>=0&&cells.indexOf('HEMATOKRIT')>=0){
    var blocks=[];
    cells.forEach(function(v,c){if(v==='NO')blocks.push({no:c,cols:{}})});
-   ['LEUKOSIT','ERITROSIT','HEMOGLOBIN','HEMATOKRIT'].forEach(function(p){
-    var c=cells.indexOf(p);if(c>=0){var b=blocks.filter(function(x){return x.no<c}).sort(function(a,z){return z.no-a.no})[0];if(b)b.cols[p]=c;}
+   // Satu baris judul bisa memuat beberapa blok berdampingan (mis. TAHUN 2026 dan TAHUN 2025): petakan SEMUA kolom parameter, bukan hanya yang pertama.
+   cells.forEach(function(v,c){
+    if(['LEUKOSIT','ERITROSIT','HEMOGLOBIN','HEMATOKRIT'].indexOf(v)<0)return;
+    var b=blocks.filter(function(x){return x.no<c}).sort(function(a,z){return z.no-a.no})[0];if(b)b.cols[v]=c;
    });
    blocks=blocks.filter(function(b){return Object.keys(b.cols).length>=4});
    if(blocks.length)headerRows.push({row:ri,blocks:blocks});
@@ -4134,16 +4136,16 @@ function parseH(rows,src){
   hd.blocks.forEach(function(block){
    var year=null;
    for(var y=hd.row;y>=Math.max(0,hd.row-5);y--){
-    var ym=normQC(rows[y][block.no]).match(/20(?:25|26)/);
+    var ym=normQC(rows[y][block.no]).match(/20\d\d/);
     if(ym){year=Number(ym[0]);break;}
-    for(var c=block.no;c<Math.min(rows[y].length,block.no+2);c++){ym=normQC(rows[y][c]).match(/20(?:25|26)/);if(ym){year=Number(ym[0]);break}}
+    for(var c=block.no;c<Math.min(rows[y].length,block.no+2);c++){ym=normQC(rows[y][c]).match(/20\d\d/);if(ym){year=Number(ym[0]);break}}
     if(year)break;
    }
    if(!year)year=2026;
    var tw=1,groups={};
    for(var ri=hd.row+1;ri<rows.length;ri++){
     var marker=normQC(rows[ri][block.no]).toUpperCase();
-    var ym2=marker.match(/20(?:25|26)/);if(ym2){year=Number(ym2[0]);continue}
+    var ym2=marker.match(/\b20\d\d\b/);if(ym2){year=Number(ym2[0]);continue}
     var tm=marker.replace(/[\u2010-\u2015]/g,'-').match(/\bTW\s*([1-4])\b/i);
     if(tm){tw=Number(tm[1]);continue}
     var day=n(marker);
