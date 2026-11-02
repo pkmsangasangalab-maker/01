@@ -4144,6 +4144,7 @@ function parseH(rows,src){
  out.forEach(function(x){var st=stats(x.pts);x.mean=st.m;x.sd=st.sd;delete x._key});
  return out;
 }
+function parse(rows,src){return src.group==='hematologi'?parseH(rows,src):parseK(rows,src)}
 function parseK(rows,src){
  var out=[],defs=[{p:'Gula Darah',d:0,v:1},{p:'Kolesterol',d:4,v:5},{p:'Asam Urat',d:7,v:8}];
  defs.forEach(function(f){
