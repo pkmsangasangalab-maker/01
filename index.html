@@ -4194,11 +4194,35 @@ function render(){
  $('sdNote').innerHTML='Sumber: '+esc(b.source)+' · Data diambil per TW untuk Hematologi dan per nomor lot untuk Kimia Klinik. <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">Buka spreadsheet</a>';
 }
 function summary(){$('sdSum').querySelector('tbody').innerHTML=B.map(b=>{var q=calc(b);return '<tr><td>'+esc(b.param)+'</td><td>'+esc(b.label)+'</td><td>'+esc(b.lot||'–')+'</td><td class="num">'+q.pts.length+'</td><td class="num">'+f2(q.m)+'</td><td class="num">'+f2(q.sd)+'</td><td class="num">'+f2(q.cv)+'</td><td><span class="stok-badge '+(q.n3?'st-habis':q.n2?'st-order':'st-aman')+'">'+q.status+'</span></td></tr>'}).join('')}
+function fetchCsv(src){
+ var urls=[
+  'https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&gid='+src.gid+'&_='+Date.now(),
+  'https://docs.google.com/spreadsheets/d/'+SID+'/export?format=csv&gid='+src.gid
+ ];
+ var last='';
+ return urls.reduce(function(chain,url){return chain.catch(function(){return fetch(url,{cache:'no-store',credentials:'omit'}).then(function(r){if(!r.ok)throw Error('HTTP '+r.status);return r.text()}).then(function(t){
+   if(/^\\s*</.test(t)||/accounts\\.google\\.com|ServiceLogin|sign in/i.test(t.slice(0,1200)))throw Error('Google meminta login atau tab tidak dibagikan untuk akses publik');
+   var rows=csv(t);if(!rows.length||!rows.some(function(r){return r.some(function(c){return String(c||'').trim()!==''})}))throw Error('CSV kosong');
+   return rows;
+  }).catch(function(e){last=e.message;throw e})})},Promise.reject()).catch(function(){throw Error(last||'CSV tidak dapat diakses')});
+}
 function load(){
  $('sdNote').textContent='Memuat data dari dua tab QC…';
- Promise.all(SRC.map(src=>fetch('https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&gid='+src.gid+'&_='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.text()}).then(t=>{if(/^\s*</.test(t))throw Error('tab tidak dapat dibaca (periksa izin publik)');var parsed=parse(csv(t),src);console.info('QC source',src.name,'baris',csv(t).length,'blok',parsed.length,parsed.map(x=>[x.param,x.label,x.lot,x.pts.length]));return parsed}).catch(e=>{console.warn(src.name,e);return []})))
- .then(parts=>{B=[].concat.apply([],parts);if(!B.length)throw Error('tidak ditemukan data; periksa gid dan izin akses kedua tab');fill();render();summary();$('sdNote').innerHTML='Data berhasil dibaca. Hematologi dikelompokkan per tahun dan TW; Kimia Klinik dikelompokkan per parameter dan nomor lot. <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">Buka spreadsheet</a>'})
- .catch(e=>{$('sdNote').textContent='Data gagal dimuat: '+e.message+'. Pastikan spreadsheet dapat diakses sebagai CSV.'});
+ Promise.all(SRC.map(function(src){return fetchCsv(src).then(function(rows){
+  var parsed=parse(rows,src);
+  console.info('QC source',src.name,'baris',rows.length,'blok',parsed.length,parsed.map(function(x){return [x.param,x.label,x.lot,x.pts.length]}));
+  if(!parsed.length)throw Error('CSV terbaca ('+rows.length+' baris), tetapi format data tidak cocok atau gid '+src.gid+' bukan tab yang benar');
+  return {data:parsed,name:src.name};
+ }).catch(function(e){console.warn(src.name,e);return {data:[],name:src.name,error:e.message}})}))
+ .then(function(parts){
+  B=[].concat.apply([],parts.map(function(x){return x.data}));
+  if(!B.length)throw Error(parts.map(function(x){return x.name+': '+(x.error||'tidak ada data')}).join(' | '));
+  fill();render();summary();
+  var issues=parts.filter(function(x){return x.error});
+  $('sdNote').innerHTML=(issues.length?'Sebagian data gagal dimuat: '+esc(issues.map(function(x){return x.name+': '+x.error}).join(' | '))+'<br>':'')+
+   'Data terbaca: '+B.length+' kelompok. Hematologi per tahun/TW; Kimia Klinik per parameter/nomor lot. <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">Buka spreadsheet</a>';
+ })
+ .catch(function(e){$('sdNote').textContent='Data gagal dimuat: '+e.message+'. Pastikan akses spreadsheet disetel “Siapa saja yang memiliki link – Pelihat”, lalu muat ulang.'});
 }
 $('sdGroup').addEventListener('change',()=>{fill();render()});
 ['sdHParam','sdHYear','sdHTW','sdKParam','sdKLot'].forEach(id=>$(id).addEventListener('change',()=>{if(id==='sdKParam')fill();if(id==='sdHParam'||id==='sdHYear')fill();render()}));
