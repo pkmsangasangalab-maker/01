@@ -1454,6 +1454,71 @@ html body.locked #loginOverlay .reset-ok{color:#fff!important}
 @keyframes tapeShow{0%{opacity:0;transform:rotate(-6deg) scale(.6)}12%{opacity:1;transform:rotate(-6deg) scale(1.06)}20%{transform:rotate(-6deg) scale(1)}80%{opacity:1}100%{opacity:0}}
 @media (max-width:700px){.char{width:150px}.bag-stage{gap:12px}}
 @media (prefers-reduced-motion:reduce){.char,.login-box,.login-box.denied{animation:none!important}}
+
+/* ===== URUTAN: orang berjalan dari samping -> tas terbuka -> form keluar -> orang bersandar ===== */
+html body.locked #loginOverlay{overflow-x:hidden}
+html body.locked #loginOverlay .bag-stage{min-height:380px;overflow:visible}
+html body.locked #loginOverlay .bag-stage .char{animation:walkIn 2s cubic-bezier(.3,.6,.4,1) both;transform-origin:50% 100%}
+@keyframes walkIn{from{transform:translateX(-520px)}to{transform:translateX(0)}}
+html body.locked #loginOverlay .char .lean{transform-box:view-box;transform-origin:110px 345px;animation:leanIn .9s ease 3.4s both}
+@keyframes leanIn{from{transform:rotate(0)}to{transform:rotate(9deg)}}
+html body.locked #loginOverlay .char .leg{transform-box:view-box;transform-origin:center top;animation:legSwing .5s ease-in-out 4}
+html body.locked #loginOverlay .char .leg-b{animation-delay:-.25s}
+@keyframes legSwing{0%{transform:rotate(0)}25%{transform:rotate(-16deg)}75%{transform:rotate(16deg)}100%{transform:rotate(0)}}
+html body.locked #loginOverlay .char .bag-flap{transform-box:view-box;transform-origin:150px 196px;animation:flapOpen .7s ease 2.1s both}
+@keyframes flapOpen{to{transform:rotate(-165deg) translateY(-6px)}}
+html body.locked #loginOverlay .char .bag-open{opacity:0;animation:bagShow .3s ease 2.3s both}
+@keyframes bagShow{to{opacity:1}}
+html body.locked #loginOverlay .bag-stage .login-box{transform-origin:0% 100%;animation:boxOut .9s cubic-bezier(.2,.9,.3,1.1) 2.6s both}
+@keyframes boxOut{from{opacity:0;transform:translate(-200px,60px) scale(.2)}to{opacity:1;transform:none}}
+html body.locked #loginOverlay .login-box.denied{animation:denied .5s}
+@media (prefers-reduced-motion:reduce){
+  html body.locked #loginOverlay .bag-stage .char,html body.locked #loginOverlay .char .lean,html body.locked #loginOverlay .char .leg,html body.locked #loginOverlay .char .bag-flap,html body.locked #loginOverlay .char .bag-open,html body.locked #loginOverlay .bag-stage .login-box{animation:none!important}
+  html body.locked #loginOverlay .char .lean{transform:rotate(9deg)}
+  html body.locked #loginOverlay .char .bag-flap{transform:rotate(-165deg) translateY(-6px)}
+  html body.locked #loginOverlay .char .bag-open{opacity:1}
+}
+
+/* ===== GERAK LEBIH LUWES: bobbing, ayunan lengan, easing bertahap ===== */
+html body.locked #loginOverlay .bag-stage .char{animation:walkIn 2.4s cubic-bezier(.22,.61,.36,1) both}
+@keyframes walkIn{0%{transform:translateX(-520px)}85%{transform:translateX(12px)}100%{transform:translateX(0)}}
+html body.locked #loginOverlay .char .bob{transform-box:view-box;animation:bob .6s ease-in-out 4}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+html body.locked #loginOverlay .char .leg{transform-box:view-box;transform-origin:center top;animation:legSwing .6s ease-in-out 4}
+html body.locked #loginOverlay .char .leg-b{animation-delay:-.3s}
+@keyframes legSwing{0%,100%{transform:rotate(0)}30%{transform:rotate(-22deg)}70%{transform:rotate(22deg)}}
+html body.locked #loginOverlay .char .arm-l{transform-box:view-box;transform-origin:74px 116px;animation:armSwing .6s ease-in-out 4}
+@keyframes armSwing{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
+html body.locked #loginOverlay .char .lean{transform-box:view-box;transform-origin:110px 345px;animation:leanIn 1.2s cubic-bezier(.45,0,.2,1) 3.2s both}
+@keyframes leanIn{0%{transform:rotate(0)}75%{transform:rotate(11deg)}100%{transform:rotate(9deg)}}
+html body.locked #loginOverlay .char .head{transform-box:view-box;transform-origin:110px 100px;animation:headTilt .8s ease 3.6s both}
+@keyframes headTilt{to{transform:rotate(5deg)}}
+html body.locked #loginOverlay .char .bag-flap{animation:flapOpen .9s cubic-bezier(.34,1.56,.64,1) 2.3s both}
+html body.locked #loginOverlay .bag-stage .login-box{animation:boxOut 1s cubic-bezier(.2,.9,.3,1.08) 2.8s both}
+@media (prefers-reduced-motion:reduce){
+  html body.locked #loginOverlay .char .bob,html body.locked #loginOverlay .char .arm-l,html body.locked #loginOverlay .char .head{animation:none!important}
+}
+
+/* ===== INTERAKSI: fokus input menyalakan glow, karakter merespons, placeholder memudar, tombol hover ===== */
+html body.locked #loginOverlay .login-field input{border:2px solid transparent!important;transition:border-color .25s ease,box-shadow .25s ease,background-color .25s ease!important}
+html body.locked #loginOverlay .login-field input::placeholder{transition:opacity .25s ease,color .25s ease;opacity:1}
+html body.locked #loginOverlay .login-field input:focus{border-color:#3b82f6!important;box-shadow:0 0 0 4px rgba(59,130,246,.25),0 0 18px rgba(59,130,246,.55)!important}
+html body.locked #loginOverlay .login-field input:focus::placeholder{opacity:.4}
+html body.locked #loginOverlay .login-field input:not(:placeholder-shown){background:#f5f9ff!important}
+
+/* karakter: kepala & lengan merespons saat input difokus (tanpa animasi intro yang menahan posisi) */
+html body.locked #loginOverlay .char .head{animation:none;transform:rotate(3deg);transition:transform .45s cubic-bezier(.3,.7,.3,1)}
+html body.locked #loginOverlay .char .arm-l{animation:none;transform:none;transition:transform .45s cubic-bezier(.3,.7,.3,1)}
+html body.locked #loginOverlay .bag-stage:has(input:focus) .char .head{transform:rotate(-7deg)}
+html body.locked #loginOverlay .bag-stage:has(input:focus) .char .arm-l{transform:rotate(-25deg)}
+
+/* tombol: hover membesar dan bayangan naik, klik sedikit menekan */
+html body.locked #loginOverlay .login-btn{transition:transform .2s ease,box-shadow .2s ease,filter .2s ease!important}
+html body.locked #loginOverlay .login-btn:hover{transform:scale(1.04);box-shadow:0 18px 30px -12px rgba(0,0,0,.55)!important}
+html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
+@media (prefers-reduced-motion:reduce){
+  html body.locked #loginOverlay .char .head,html body.locked #loginOverlay .char .arm-l,html body.locked #loginOverlay .login-btn{transition:none!important}
+}
 </style>
 </head>
 <body class="locked" data-view="home">
@@ -1462,48 +1527,47 @@ html body.locked #loginOverlay .reset-ok{color:#fff!important}
   <div class="site-wrap">
     <div class="bag-stage">
       <svg class="char" viewBox="0 0 220 360" aria-hidden="true" focusable="false">
-        <!-- kaki & sepatu -->
-        <rect x="74" y="250" width="32" height="92" rx="8" fill="#1e2b4a"/>
-        <rect x="114" y="250" width="32" height="92" rx="8" fill="#1e2b4a"/>
-        <ellipse cx="88" cy="346" rx="20" ry="9" fill="#1b1b1b"/>
-        <ellipse cx="130" cy="346" rx="20" ry="9" fill="#1b1b1b"/>
-        <!-- kemeja teal & dasi -->
-        <path d="M92 104 L110 140 L128 104 Z" fill="#1fb5a8"/>
-        <path d="M106 128 L114 128 L118 168 L110 180 L102 168 Z" fill="#17968b"/>
-        <!-- jas lab putih -->
-        <path d="M70 102 Q110 92 150 102 L160 258 L60 258 Z" fill="#f4f6f8" stroke="#c9d1da" stroke-width="2"/>
-        <path d="M92 104 L80 150 L96 158 L110 140 Z" fill="#e8ecf1" stroke="#c9d1da" stroke-width="1.5"/>
-        <path d="M128 104 L140 150 L124 158 L110 140 Z" fill="#e8ecf1" stroke="#c9d1da" stroke-width="1.5"/>
-        <line x1="110" y1="140" x2="110" y2="258" stroke="#c9d1da" stroke-width="1.5"/>
-        <!-- lencana palang merah -->
-        <circle cx="140" cy="142" r="8" fill="#ffffff" stroke="#e53935" stroke-width="2"/>
-        <path d="M140 137 V147 M135 142 H145" stroke="#e53935" stroke-width="2.4" stroke-linecap="round"/>
-        <!-- lengan kiri -->
-        <path d="M74 116 Q52 160 56 214" fill="none" stroke="#f4f6f8" stroke-width="24" stroke-linecap="round"/>
-        <path d="M74 116 Q52 160 56 214" fill="none" stroke="#c9d1da" stroke-width="1.5" stroke-linecap="round" transform="translate(-2 0)"/>
-        <circle cx="56" cy="224" r="10" fill="#e0a878"/>
-        <!-- lengan kanan memegang tas -->
-        <path d="M146 116 Q164 150 160 190" fill="none" stroke="#f4f6f8" stroke-width="24" stroke-linecap="round"/>
-        <circle cx="160" cy="198" r="10" fill="#e0a878"/>
-        <!-- tali & tas kuning -->
-        <path d="M160 190 Q168 178 176 190" fill="none" stroke="#3a2a1a" stroke-width="5" stroke-linecap="round"/>
-        <rect x="150" y="196" width="66" height="60" rx="8" fill="#f5a623" stroke="#b86e0c" stroke-width="3"/>
-        <path d="M150 210 H216" stroke="#d97f12" stroke-width="3"/>
-        <rect x="178" y="222" width="16" height="10" rx="2" fill="#3a2a1a"/>
-        <path d="M160 196 Q183 170 206 196" fill="none" stroke="#3a2a1a" stroke-width="5" stroke-linecap="round"/>
-        <!-- leher -->
-        <rect x="101" y="84" width="18" height="22" fill="#e0a878"/>
-        <!-- kepala -->
-        <ellipse cx="110" cy="58" rx="28" ry="30" fill="#e0a878"/>
-        <ellipse cx="82" cy="60" rx="5" ry="7" fill="#e0a878"/>
-        <ellipse cx="138" cy="60" rx="5" ry="7" fill="#e0a878"/>
-        <!-- rambut -->
-        <path d="M81 52 Q82 24 110 24 Q139 24 139 52 Q128 38 110 38 Q94 38 81 52Z" fill="#1f1a17"/>
-        <!-- mata, alis & senyum -->
-        <circle cx="100" cy="60" r="2.8" fill="#1b1b1b"/>
-        <circle cx="120" cy="60" r="2.8" fill="#1b1b1b"/>
-        <path d="M96 52 Q100 49 104 52 M116 52 Q120 49 124 52" fill="none" stroke="#1f1a17" stroke-width="2" stroke-linecap="round"/>
-        <path d="M102 72 Q110 79 118 72" fill="none" stroke="#7a3e1d" stroke-width="2.2" stroke-linecap="round"/>
+        <g class="bob"><g class="lean">
+          <!-- kaki & sepatu -->
+          <rect class="leg leg-a" x="74" y="250" width="32" height="92" rx="8" fill="#1e2b4a"/>
+          <rect class="leg leg-b" x="114" y="250" width="32" height="92" rx="8" fill="#1e2b4a"/>
+          <ellipse cx="90" cy="346" rx="20" ry="9" fill="#1b1b1b"/>
+          <ellipse cx="130" cy="346" rx="20" ry="9" fill="#1b1b1b"/>
+          <!-- kemeja teal & dasi -->
+          <path d="M92 104 L110 140 L128 104 Z" fill="#1fb5a8"/>
+          <path d="M106 128 L114 128 L118 168 L110 180 L102 168 Z" fill="#17968b"/>
+          <!-- jas lab putih -->
+          <path d="M70 102 Q110 92 150 102 L160 258 L60 258 Z" fill="#f4f6f8" stroke="#c9d1da" stroke-width="2"/>
+          <path d="M92 104 L80 150 L96 158 L110 140 Z" fill="#e8ecf1" stroke="#c9d1da" stroke-width="1.5"/>
+          <path d="M128 104 L140 150 L124 158 L110 140 Z" fill="#e8ecf1" stroke="#c9d1da" stroke-width="1.5"/>
+          <line x1="110" y1="140" x2="110" y2="258" stroke="#c9d1da" stroke-width="1.5"/>
+          <!-- lencana palang merah -->
+          <circle cx="140" cy="142" r="8" fill="#ffffff" stroke="#e53935" stroke-width="2"/>
+          <path d="M140 137 V147 M135 142 H145" stroke="#e53935" stroke-width="2.4" stroke-linecap="round"/>
+          <!-- lengan kiri -->
+          <g class="arm-l"><path d="M74 116 Q52 160 56 214" fill="none" stroke="#f4f6f8" stroke-width="24" stroke-linecap="round"/><circle cx="56" cy="224" r="10" fill="#e0a878"/></g>
+          <!-- lengan kanan memegang tas -->
+          <path d="M146 116 Q164 150 160 190" fill="none" stroke="#f4f6f8" stroke-width="24" stroke-linecap="round"/>
+          <circle cx="160" cy="198" r="10" fill="#e0a878"/>
+          <!-- tas kuning (isi terlihat saat terbuka) -->
+          <rect x="150" y="196" width="66" height="60" rx="8" fill="#f5a623" stroke="#b86e0c" stroke-width="3"/>
+          <rect class="bag-open" x="154" y="198" width="58" height="8" rx="3" fill="#3a2a1a"/>
+          <path d="M150 210 H216" stroke="#d97f12" stroke-width="3"/>
+          <rect x="178" y="222" width="16" height="10" rx="2" fill="#3a2a1a"/>
+          <path class="bag-flap" d="M150 196 H216 V208 H150 Z" fill="#d97f12" stroke="#b86e0c" stroke-width="3"/>
+          <path d="M160 196 Q183 170 206 196" fill="none" stroke="#3a2a1a" stroke-width="5" stroke-linecap="round"/>
+          <!-- leher & kepala -->
+          <g class="head"><rect x="101" y="84" width="18" height="22" fill="#e0a878"/>
+          <ellipse cx="110" cy="58" rx="28" ry="30" fill="#e0a878"/>
+          <ellipse cx="82" cy="60" rx="5" ry="7" fill="#e0a878"/>
+          <ellipse cx="138" cy="60" rx="5" ry="7" fill="#e0a878"/>
+          <path d="M81 52 Q82 24 110 24 Q139 24 139 52 Q128 38 110 38 Q94 38 81 52Z" fill="#1f1a17"/>
+          <circle cx="100" cy="60" r="2.8" fill="#1b1b1b"/>
+          <circle cx="120" cy="60" r="2.8" fill="#1b1b1b"/>
+          <path d="M96 52 Q100 49 104 52 M116 52 Q120 49 124 52" fill="none" stroke="#1f1a17" stroke-width="2" stroke-linecap="round"/>
+          <path d="M102 72 Q110 79 118 72" fill="none" stroke="#7a3e1d" stroke-width="2.2" stroke-linecap="round"/></g>
+        </g>
+      </g>
       </svg>
       <div class="site-tape" id="siteTape" aria-hidden="true">&#9888; AKSES DITOLAK &#9888; AKSES DITOLAK &#9888; AKSES DITOLAK &#9888;</div>
       <div class="login-box">
