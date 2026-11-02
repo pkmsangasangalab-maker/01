@@ -2051,7 +2051,73 @@ html body.locked #loginOverlay .login-btn:active{transform:scale(.97)}
           .sa-list{list-style:none;padding:0;margin:0;font-size:.82rem}
           .sa-list li{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid #eef2f7}
           .sa-list li span:last-child{color:#5b6675;text-align:right;white-space:nowrap}
-        </style>
+        
+/* Tema Dashboard Standar Deviasi QC — selaras dengan dashboard Stok Reagensia */
+#sdLive{
+  color:#eaf3ff;
+}
+#sdLive .section-title{
+  color:#f4f8ff;
+  background:linear-gradient(135deg,#071b3a,#0b2d5c);
+  border:1px solid rgba(86,157,255,.35);
+  border-radius:14px;
+  padding:14px 18px;
+  box-shadow:0 8px 24px rgba(2,12,30,.28);
+}
+#sdLive .chart-card{
+  background:linear-gradient(145deg,#071a35,#0a2448);
+  border:1px solid rgba(94,162,255,.28);
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.22);
+  color:#edf5ff;
+}
+#sdLive .chart-head{border-bottom:1px solid rgba(124,180,255,.2)}
+#sdLive .chart-head h3,#sdLive h3{color:#ffffff}
+#sdLive .stok-tools{
+  background:rgba(2,12,30,.38);
+  border:1px solid rgba(104,168,255,.18);
+  border-radius:12px;
+  padding:10px;
+}
+#sdLive select{
+  background:#0c2b54;
+  color:#f5f9ff;
+  border:1px solid #3f79b8;
+}
+#sdLive select option{background:#0b2344;color:#fff}
+#sdLive .btn-action{
+  background:linear-gradient(135deg,#1769c2,#2f8cff);
+  color:#fff;
+  border-color:#63a6ff;
+}
+#sdLive .stok-kpi span{
+  background:#0c2b54;
+  color:#eaf3ff;
+  border:1px solid rgba(99,166,255,.3);
+  border-radius:10px;
+}
+#sdLive .stok-kpi b{color:#fff}
+#sdLive .chart-note,#sdLive #sdNote{color:#c8dcf5}
+#sdLive #sdNote a{color:#82b9ff;font-weight:700}
+#sdLive .stok-wrap{
+  background:#071a35;
+  border:1px solid rgba(96,158,241,.2);
+}
+#sdLive table{color:#edf5ff}
+#sdLive th{
+  background:#0b2d5c;
+  color:#fff;
+  border-color:rgba(117,178,255,.25);
+}
+#sdLive td{
+  color:#e7f1ff;
+  border-color:rgba(117,178,255,.14);
+  background:rgba(7,26,53,.55);
+}
+#sdLive tr:nth-child(even) td{background:rgba(13,45,86,.45)}
+#sdLive canvas{background:rgba(255,255,255,.015);border-radius:10px}
+
+</style>
         <p class="sa-title">Peringatan Reagensia (bulan terpilih)</p>
         <div class="sa-cards" id="saCards"></div>
         <div class="sa-grid" id="saGrid"></div>
