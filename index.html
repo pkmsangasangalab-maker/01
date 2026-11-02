@@ -4165,7 +4165,7 @@ function parseK(rows,src){
  defs.forEach(function(f){
   var lot='Tidak tercantum',map={};
   rows.forEach(function(r){
-   var mark=String(r[f.d]||'').trim().toLowerCase(),lotCell=String(r[f.v]||'').trim().replace(/^(\\d+)\\.0+$/,'$1');
+   var mark=String(r[f.d]||'').trim().toLowerCase(),lotCell=String(r[f.v]||'').trim().replace(/^(\d+)\.0+$/,'$1');
    if(mark==='no lot'||mark==='no. lot'||mark==='nolot'){if(lotCell)lot=lotCell;return}
    var d=dt(r[f.d]),v=n(r[f.v]);if(!d||v==null)return;
    (map[lot]||(map[lot]=[])).push({d:d, v:v});
