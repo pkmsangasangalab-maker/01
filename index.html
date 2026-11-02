@@ -4235,8 +4235,12 @@ function load(){
   if(!B.length)throw Error(parts.map(function(x){return x.name+': '+(x.error||'tidak ada data')}).join(' | '));
   fill();render();summary();
   var issues=parts.filter(function(x){return x.error});
+  var sourceCounts=parts.map(function(x){
+   var points=x.data.reduce(function(sum,b){return sum+b.pts.length},0);
+   return esc(x.name)+': '+x.data.length+' kelompok / '+points+' nilai';
+  }).join(' · ');
   $('sdNote').innerHTML=(issues.length?'Sebagian data gagal dimuat: '+esc(issues.map(function(x){return x.name+': '+x.error}).join(' | '))+'<br>':'')+
-   'Data terbaca: '+B.length+' kelompok. Hematologi per tahun/TW; Kimia Klinik per parameter/nomor lot. <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">Buka spreadsheet</a>';
+   'Data terbaca: '+B.length+' kelompok. '+sourceCounts+'. Hematologi per tahun/TW; Kimia Klinik per parameter/nomor lot. <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">Buka spreadsheet</a>';
  })
  .catch(function(e){$('sdNote').textContent='Data gagal dimuat: '+e.message+'. Pastikan akses spreadsheet disetel “Siapa saja yang memiliki link – Pelihat”, lalu muat ulang.'});
 }
