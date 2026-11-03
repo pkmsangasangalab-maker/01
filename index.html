@@ -2044,27 +2044,36 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
           .sa-list li{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid #eef2f7}
           .sa-list li span:last-child{color:#5b6675;text-align:right;white-space:nowrap}
         
-/* Tema Dashboard Standar Deviasi QC — samakan dengan Stok Reagensia (tema biru terang) */
+/* Tema Dashboard Standar Deviasi QC — latar BIRU MALAM, teks & grafik kontras tinggi */
 #sdLive{color:#1e2f4d}
 #sdLive .section-title{color:#0b3d91;background:#fff;border:1px solid rgba(22,80,160,.12);border-radius:14px;padding:14px 18px;box-shadow:var(--lift);font-weight:600}
 #sdLive .section-title i{color:#1668e3}
-#sdLive .chart-card{background:#fff;border:1px solid rgba(22,80,160,.12);border-radius:18px;box-shadow:var(--lift);color:#1e2f4d}
-#sdLive .chart-head{border-bottom:1px solid rgba(22,80,160,.10)}
-#sdLive .chart-head h3,#sdLive h3{color:#0b3d91;font-weight:600}
-#sdLive .stok-tools{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--lift);padding:10px 14px}
-#sdLive .sd-filter-label{color:#35517d;font-size:.74rem;font-weight:700;letter-spacing:.06em;align-self:center}
-#sdLive select{background:#fff;color:#1e2f4d;border:1px solid #b9cfe8;border-radius:8px;padding:6px 8px;font-size:.9rem}
-#sdLive select option{background:#fff;color:#1e2f4d}
-#sdLive .btn-action{background:#1668e3;color:#fff;border-color:#1668e3}
-#sdLive .stok-kpi span{background:#eaf3fe;color:#1e2f4d;border:1px solid rgba(22,80,160,.14);border-radius:10px;padding:6px 10px}
-#sdLive .stok-kpi b{color:#0b3d91}
-#sdLive .chart-note,#sdLive #sdNote{color:#35517d;font-size:.9rem;line-height:1.6}
-#sdLive #sdNote a{color:#1668e3;font-weight:700}
-#sdLive .stok-wrap{background:#fff;border:1px solid var(--line);border-radius:14px}
-#sdLive table{color:#1e2f4d;font-size:.86rem;border-collapse:collapse;width:100%}
-#sdLive th{background:#eaf3fe;color:#35517d;font-weight:600;text-align:left;padding:9px 8px;white-space:nowrap}
-#sdLive td{color:#1e2f4d;border-top:1px solid var(--line);background:#fff;padding:8px}
-#sdLive tr:nth-child(even) td{background:#f4f9ff}
+/* Kartu: Grafik Levey-Jennings, Rincian hasil kontrol, Ringkasan semua parameter & periode */
+#sdLive .chart-card{background:#0a1a3a!important;border:1px solid rgba(120,160,230,.35)!important;border-radius:18px;box-shadow:0 10px 28px rgba(3,10,30,.35)!important;color:#eaf1ff!important}
+#sdLive .chart-head{border-bottom:1px solid rgba(140,175,235,.28)!important}
+#sdLive .chart-head h3,#sdLive h3{color:#ffffff!important;font-weight:600}
+#sdLive .stok-tools{background:#10264f!important;border:1px solid rgba(140,175,235,.32)!important;border-radius:14px;box-shadow:none!important;padding:10px 14px}
+#sdLive .sd-filter-label{color:#cfe0ff!important;font-size:.74rem;font-weight:700;letter-spacing:.06em;align-self:center}
+#sdLive select{background:#0a1a3a!important;color:#ffffff!important;border:1px solid #5b82c9!important;border-radius:8px;padding:6px 8px;font-size:.9rem;color-scheme:dark}
+#sdLive select option{background:#0a1a3a;color:#ffffff}
+#sdLive .btn-action{background:#2f7bff!important;color:#fff!important;border-color:#2f7bff!important}
+#sdLive .btn-action:hover{background:#4a8dff!important}
+#sdLive .stok-kpi span{background:#10264f!important;color:#eaf1ff!important;border:1px solid rgba(140,175,235,.32)!important;border-radius:10px;padding:6px 10px}
+#sdLive .stok-kpi b{color:#8fd0ff!important}
+#sdLive .chart-note,#sdLive #sdNote{color:#cfe0ff!important;font-size:.9rem;line-height:1.6}
+#sdLive #sdNote a{color:#8fd0ff!important;font-weight:700;text-decoration:underline}
+#sdLive #sdNote summary{color:#ffffff;cursor:pointer}
+#sdLive #sdNote pre{color:#eaf1ff;background:#10264f;border:1px solid rgba(140,175,235,.3);border-radius:8px;padding:8px}
+#sdLive .stok-wrap{background:#0a1a3a!important;border:1px solid rgba(140,175,235,.32)!important;border-radius:14px}
+#sdLive table{color:#eaf1ff;font-size:.86rem;border-collapse:collapse;width:100%}
+#sdLive th{background:#16336a!important;color:#ffffff!important;font-weight:600;text-align:left;padding:9px 8px;white-space:nowrap;position:sticky;top:0;z-index:1}
+#sdLive td{color:#eaf1ff!important;border-top:1px solid rgba(140,175,235,.22)!important;background:#0a1a3a!important;padding:8px}
+#sdLive tr:nth-child(even) td{background:#0f2350!important}
+#sdLive tbody tr:hover td{background:#183670!important}
+#sdLive .stok-badge{font-weight:700}
+#sdLive .st-aman{background:#34d399!important;color:#04251a!important}
+#sdLive .st-order{background:#fbbf24!important;color:#2b1c00!important}
+#sdLive .st-habis{background:#ef4444!important;color:#ffffff!important}
 #sdLive canvas{background:transparent}
 
 </style>
@@ -4233,7 +4242,7 @@ function render(){
  var b=selected();if(!b){$('sdKpi').textContent='Belum ada data untuk filter ini.';if(ch){ch.destroy();ch=null}$('sdTbl').querySelector('tbody').innerHTML='';return}
  var q=calc(b),tone=q.n3?'st-habis':q.n2?'st-order':'st-aman',lt=b.group==='kimia'?' · Lot '+b.lot:'';
  $('sdKpi').innerHTML='<span>Kelompok: <b>'+(b.group==='kimia'?'Kimia Klinik':'Hematologi')+'</b></span><span>Parameter: <b>'+esc(b.param)+'</b></span><span>Periode: <b>'+esc(b.label)+'</b></span><span>Jumlah data: <b>'+q.pts.length+'</b></span><span>Mean: <b>'+f2(q.m)+'</b></span><span>SD: <b>'+f2(q.sd)+'</b></span><span>CV: <b>'+f2(q.cv)+'%</b></span><span>Status: <span class="stok-badge '+tone+'">'+q.status+'</span></span>';
- if(ch)ch.destroy();if(window.Chart){var line=v=>q.pts.map(()=>v);ch=new Chart($('chSdLJ'),{type:'line',data:{labels:q.pts.map(p=>p.d),datasets:[{label:'Hasil QC',data:q.pts.map(p=>p.v),borderColor:'#1668e3',pointRadius:3},{label:'Mean',data:line(q.m),borderColor:'#17784f',pointRadius:0},{label:'+1 SD',data:line(q.m+q.sd),borderColor:'#5b8fd6',borderDash:[4,4],pointRadius:0},{label:'-1 SD',data:line(q.m-q.sd),borderColor:'#5b8fd6',borderDash:[4,4],pointRadius:0},{label:'+2 SD',data:line(q.m+2*q.sd),borderColor:'#c98700',borderDash:[5,4],pointRadius:0},{label:'-2 SD',data:line(q.m-2*q.sd),borderColor:'#c98700',borderDash:[5,4],pointRadius:0},{label:'+3 SD',data:line(q.m+3*q.sd),borderColor:'#ff766f',borderDash:[6,4],pointRadius:0},{label:'-3 SD',data:line(q.m-3*q.sd),borderColor:'#ff766f',borderDash:[6,4],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#1e2f4d'}},title:{display:true,text:b.param+lt,color:'#0b3d91'}},scales:{x:{ticks:{color:'#35517d'}},y:{ticks:{color:'#35517d'}}}}})}
+ if(ch)ch.destroy();if(window.Chart){var line=v=>q.pts.map(()=>v);ch=new Chart($('chSdLJ'),{type:'line',data:{labels:q.pts.map(p=>p.d),datasets:[{label:'Hasil QC',data:q.pts.map(p=>p.v),borderColor:'#5cc8ff',backgroundColor:'#5cc8ff',pointBackgroundColor:'#ffffff',pointBorderColor:'#5cc8ff',pointRadius:4,pointHoverRadius:6,borderWidth:2.5},{label:'Mean',data:line(q.m),borderColor:'#4ade80',borderWidth:2.5,pointRadius:0},{label:'+1 SD',data:line(q.m+q.sd),borderColor:'#a5c4ff',borderWidth:1.8,borderDash:[4,4],pointRadius:0},{label:'-1 SD',data:line(q.m-q.sd),borderColor:'#a5c4ff',borderWidth:1.8,borderDash:[4,4],pointRadius:0},{label:'+2 SD',data:line(q.m+2*q.sd),borderColor:'#fbbf24',borderWidth:1.8,borderDash:[5,4],pointRadius:0},{label:'-2 SD',data:line(q.m-2*q.sd),borderColor:'#fbbf24',borderWidth:1.8,borderDash:[5,4],pointRadius:0},{label:'+3 SD',data:line(q.m+3*q.sd),borderColor:'#ff8a80',borderWidth:1.8,borderDash:[6,4],pointRadius:0},{label:'-3 SD',data:line(q.m-3*q.sd),borderColor:'#ff8a80',borderWidth:1.8,borderDash:[6,4],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#eaf1ff',font:{size:12},usePointStyle:true,boxWidth:10,boxHeight:10}},title:{display:true,text:b.param+lt,color:'#ffffff',font:{size:15,weight:'600'}},tooltip:{backgroundColor:'#050d20',titleColor:'#ffffff',bodyColor:'#eaf1ff',borderColor:'#5b82c9',borderWidth:1}},scales:{x:{ticks:{color:'#d6e5ff'},grid:{color:'rgba(160,190,240,.18)'},border:{color:'rgba(160,190,240,.45)'}},y:{ticks:{color:'#d6e5ff'},grid:{color:'rgba(160,190,240,.18)'},border:{color:'rgba(160,190,240,.45)'}}}}})}
  $('sdTbl').querySelector('tbody').innerHTML=q.pts.map(p=>'<tr><td>'+esc(p.d)+'</td><td class="num">'+f2(p.v)+'</td><td class="num">'+f2(p.v-q.m)+'</td><td class="num">'+f2(p.z)+'</td><td><span class="stok-badge '+(p.st==='ok'?'st-aman':p.st==='tolak'?'st-habis':'st-order')+'">'+(p.st==='ok'?'Sesuai':p.st==='tolak'?'Tolak (>3SD)':'Peringatan (>2SD)')+'</span></td></tr>').join('');
  $('sdNote').innerHTML='Sumber: '+esc(b.source)+' · Data diambil per TW untuk Hematologi dan per nomor lot untuk Kimia Klinik. <a href="https://docs.google.com/spreadsheets/d/'+SID+'/edit" target="_blank" rel="noopener">Buka spreadsheet</a>';
 }
