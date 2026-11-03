@@ -3320,6 +3320,7 @@ var PANDUAN = [
     var el=$('dkExp'); if(!el)return; if(m)DK.mx=m; m=DK.mx; if(!m)return;
     var today=new Date(); today.setHours(0,0,0,0); var K=[], E=[], ada=false;
     m.items.forEach(function(x){
+      if(!(x.e>0))return; // hanya reagen yang stoknya masih ada; stok habis tidak ditampilkan
       var w=String(x.w||'').toUpperCase(), d=dkExD(x.ex), dl=d?Math.round((d-today)/86400000):null, t=null;
       if(w||x.ex)ada=true;
       if(w){ if(/SEGERA|AKAN|HAMPIR/.test(w))t='E'; else if(/KEDALUWARSA|EXPIRED|\bEXP\b|SUDAH|LEWAT/.test(w))t='K'; }
@@ -3331,7 +3332,7 @@ var PANDUAN = [
     function li(r){var x=r.x, sisa=r.dl==null?'':(r.dl<0?'lewat '+(-r.dl)+' hari':r.dl===0?'hari ini':r.dl+' hari lagi');
       return '<li><div class="n">'+esc(x.n)+'<small>stok '+x.e+(x.s?' · '+esc(x.s):'')+'</small></div><div class="r"><b>'+(x.ex?esc(x.ex):'–')+'</b><small>'+sisa+'</small></div></li>';}
     function box(c,t,a){return '<div class="dk-eb '+c+'"><h4>'+t+' ('+a.length+')</h4>'+(a.length?'<ul>'+a.slice(0,lim).map(li).join('')+'</ul>'+(a.length>lim?'<p class="none">…dan '+(a.length-lim)+' lainnya</p>':''):'<p class="none">Tidak ada.</p>')+'</div>';}
-    var head='<div class="dk-eh"><span class="ik">'+dkSvg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')+'</span><div><h3>Peringatan Expired</h3><small>Periode '+esc(m.name+(m.yr?' '+m.yr:''))+' · reagen yang sudah atau segera kedaluwarsa</small></div>'+
+    var head='<div class="dk-eh"><span class="ik">'+dkSvg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')+'</span><div><h3>Peringatan Expired</h3><small>Periode '+esc(m.name+(m.yr?' '+m.yr:''))+' · reagen yang masih ada stok dan sudah atau segera kedaluwarsa</small></div>'+
       '<div class="dk-ec"><span class="k">Sudah kedaluwarsa<b>'+K.length+'</b></span><span class="e">Segera kedaluwarsa<b>'+E.length+'</b></span></div></div>';
     if(!ada){el.innerHTML=head+'<p class="dk-exn">Data tanggal expired belum tersedia untuk periode ini. Pilih periode terbaru untuk melihat peringatan.</p>';return;}
     el.innerHTML=head+'<div class="dk-eg">'+box('k','Sudah kedaluwarsa',K)+box('e','Segera kedaluwarsa',E)+'</div>'+((K.length>6||E.length>6)?'<button type="button" class="dk-btn o dk-exb">'+(DK.ex?'Sembunyikan':'Lihat semua')+'</button>':'');
