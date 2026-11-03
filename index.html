@@ -1359,6 +1359,36 @@ html[data-theme="biru"] .side-link{font-size:.9rem;letter-spacing:0;line-height:
 .dk-eb .none,.dk-exn{font-size:.82rem;color:#cfe0ff;margin:4px 0}
 .dk-exb{margin-top:10px}
 @media(max-width:760px){.dk-eg{grid-template-columns:1fr}.dk-ec{margin-left:0}}
+/* Ringkasan Laporan Tahunan Lab (grafik rinci) & Indikator Mutu Lab — latar BIRU MALAM */
+#ringkasan .section-title.rs-kera,#mutuLive>.section-title{background:#0a1a3a!important;color:#fff!important;border:1px solid rgba(120,160,230,.38)!important;border-left:5px solid #4da3ff!important;box-shadow:0 10px 28px rgba(3,10,30,.3)!important}
+#ringkasan .section-title.rs-kera i,#mutuLive>.section-title i{color:#8fd0ff!important}
+#ringkasan .rs-kera .kpi,#mutuLive .kpi{background:#0a1a3a!important;border:1px solid rgba(120,160,230,.38)!important;border-left:4px solid #4da3ff!important;color:#eaf1ff!important;box-shadow:0 10px 24px rgba(3,10,30,.3)!important}
+#ringkasan .rs-kera .kpi small,#mutuLive .kpi small{color:#cfe0ff!important}
+#ringkasan .rs-kera .kpi b,#mutuLive .kpi b{color:#fff!important}
+#ringkasan .rs-kera .kpi span,#mutuLive .kpi span{color:#cfe0ff!important}
+#ringkasan .rs-kera .kpi .up,#mutuLive .kpi .up{color:#4ade80!important;font-weight:700}
+#ringkasan .rs-kera .kpi .down,#mutuLive .kpi .down{color:#ff8a80!important;font-weight:700}
+#ringkasan .rs-kera.chart-grid>.chart-card,#mutuLive>.chart-card,#mutuLive .chart-grid .chart-card{background:#0a1a3a!important;border:1px solid rgba(120,160,230,.38)!important;box-shadow:0 10px 28px rgba(3,10,30,.35)!important;color:#eaf1ff!important}
+#mutuLive .chart-grid .chart-card{background:#10264f!important;box-shadow:none!important}
+#ringkasan .rs-kera .chart-head,#mutuLive .chart-head{border-bottom:1px solid rgba(140,175,235,.25)}
+#ringkasan .rs-kera .chart-head h3,#mutuLive .chart-head h3{color:#ffffff!important}
+#ringkasan .rs-kera .chart-head select{background:#10264f!important;color:#ffffff!important;border:1px solid #5b82c9!important;color-scheme:dark}
+#ringkasan .rs-kera .chart-head select option{background:#0a1a3a;color:#fff}
+#ringkasan .rs-kera .chart-note,#mutuLive .chart-note,#mutuLive #mutuNote{color:#cfe0ff!important}
+#mutuLive .stok-tools{background:#10264f!important;border:1px solid rgba(140,175,235,.32)!important;box-shadow:none!important}
+#mutuLive .mutu-info{color:#eaf1ff!important}
+#mutuLive .btn-action{background:#2f7bff!important;color:#fff!important;border-color:#2f7bff!important}
+#mutuLive .stok-wrap{background:#0a1a3a!important;border:1px solid rgba(140,175,235,.32)!important;border-radius:14px}
+#mutuLive table{color:#eaf1ff}
+#mutuLive th{background:#16336a!important;color:#ffffff!important}
+#mutuLive td{color:#eaf1ff!important;background:#0a1a3a!important;border-top:1px solid rgba(140,175,235,.22)!important}
+#mutuLive tbody tr:nth-child(even) td{background:#0f2350!important}
+#mutuLive tbody tr:hover td{background:#183670!important}
+#mutuLive tr.tot td{background:#183670!important;color:#fff!important;font-weight:700}
+#mutuLive .mt-b{font-weight:700}
+#mutuLive .mt-baik{background:#34d399!important;color:#04251a!important}
+#mutuLive .mt-ok{background:#fbbf24!important;color:#2b1c00!important}
+#mutuLive .mt-kurang{background:#ff7b72!important;color:#3a0b08!important}
 .dk .dk-filter input::placeholder{color:#8fa6d6}
 .dk .dk-f select{background:transparent!important;color:#fff!important;border:0!important;box-shadow:none!important}
 .dk-pg{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:.75rem;color:#b9c9ee;flex-wrap:wrap;gap:8px}
@@ -2737,18 +2767,18 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
     rsKpi(d,yrs,yi,totals,ranked);
     if(typeof Chart==='undefined'){ $('ringkasanNote').textContent='Library grafik gagal dimuat. Periksa koneksi internet.'; return; }
     if(window.permataChartDefaults){permataChartDefaults();}else{Chart.defaults.color='#6a665f'; Chart.defaults.font.family="'Segoe UI',Tahoma,sans-serif";}
-    var grid={color:'rgba(70,62,52,.09)'};
+    var grid={color:'rgba(160,190,240,.2)'}, MT='#d6e5ff', ML='#eaf1ff', WARNAM=['#4da3ff','#34d399','#fbbf24','#b79cff','#ff8fb1','#a9b8d6'];
     if(charts.tren) charts.tren.destroy(); if(charts.top) charts.top.destroy();
     charts.tren=new Chart($('chTren'),{data:{labels:yrs,datasets:[
-      {type:'bar',label:'Total pemeriksaan',data:totals,backgroundColor:yrs.map(function(_,i){return i==yi?'#6f9fbd':'rgba(111,159,189,.42)';}),borderRadius:6,order:2},
-      {type:'line',label:'Total kunjungan',data:d.visits,borderColor:'#5f9f7f',backgroundColor:'#5f9f7f',tension:.3,pointRadius:4,order:1}]},
-      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-        scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:grid,ticks:{callback:fmt}}},
-        plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+fmt(c.parsed.y);}}}}}});
+      {type:'bar',label:'Total pemeriksaan',data:totals,backgroundColor:yrs.map(function(_,i){return i==yi?'#4da3ff':'rgba(77,163,255,.45)';}),borderRadius:6,order:2},
+      {type:'line',label:'Total kunjungan',data:d.visits,borderColor:'#34d399',backgroundColor:'#34d399',tension:.3,pointRadius:4,order:1}]},
+      options:{responsive:true,maintainAspectRatio:false,color:ML,interaction:{mode:'index',intersect:false},
+        scales:{x:{grid:{display:false},ticks:{color:MT}},y:{beginAtZero:true,grid:grid,ticks:{callback:fmt,color:MT}}},
+        plugins:{legend:{position:'bottom',labels:{color:ML}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+fmt(c.parsed.y);}}}}}});
     var top=ranked.slice(0,10);
-    charts.top=new Chart($('chTop'),{type:'bar',data:{labels:top.map(function(x){return x.n;}),datasets:[{label:'Jumlah pemeriksaan '+yrs[yi],data:top.map(function(x){return x.v;}),backgroundColor:'#5f9f7f',borderRadius:5}]},
-      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-        scales:{x:{beginAtZero:true,grid:grid,ticks:{callback:fmt}},y:{grid:{display:false}}},
+    charts.top=new Chart($('chTop'),{type:'bar',data:{labels:top.map(function(x){return x.n;}),datasets:[{label:'Jumlah pemeriksaan '+yrs[yi],data:top.map(function(x){return x.v;}),backgroundColor:'#34d399',borderRadius:5}]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,color:ML,
+        scales:{x:{beginAtZero:true,grid:grid,ticks:{callback:fmt,color:MT}},y:{grid:{display:false},ticks:{color:MT}}},
         plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return fmt(c.parsed.x)+' pemeriksaan';}}}}}});
     /* ---- Rasio pemeriksaan per kunjungan ---- */
     var rat=yrs.map(function(_,i){return d.visits[i]>0?totals[i]/d.visits[i]:0;});
@@ -2759,28 +2789,28 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
     $('kpi5s').innerHTML=(yi>0&&rat[yi-1]>0)?('<span class="'+(rat[yi]>=rat[yi-1]?'up':'down')+'">'+(rat[yi]>=rat[yi-1]?'▲ ':'▼ ')+Math.abs(rat[yi]-rat[yi-1]).toFixed(2).replace('.',',')+'</span> dibanding '+yrs[yi-1]):'&nbsp;';
     if(charts.rasio) charts.rasio.destroy();
     charts.rasio=new Chart($('chRasio'),{data:{labels:yrs,datasets:[
-      {type:'bar',label:'Pemeriksaan per kunjungan',data:rat,backgroundColor:yrs.map(function(_,i){return i==yi?'#b3a187':'rgba(179,161,135,.45)';}),borderRadius:6,order:2},
-      {type:'line',label:'Rata-rata semua tahun',data:yrs.map(function(){return avgR;}),borderColor:'#c99a52',borderDash:[6,5],pointRadius:0,borderWidth:2,order:1}]},
-      options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:grid}},
-        plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+f2(c.parsed.y);}}}}}});
+      {type:'bar',label:'Pemeriksaan per kunjungan',data:rat,backgroundColor:yrs.map(function(_,i){return i==yi?'#b79cff':'rgba(183,156,255,.5)';}),borderRadius:6,order:2},
+      {type:'line',label:'Rata-rata semua tahun',data:yrs.map(function(){return avgR;}),borderColor:'#fbbf24',borderDash:[6,5],pointRadius:0,borderWidth:2,order:1}]},
+      options:{responsive:true,maintainAspectRatio:false,color:ML,scales:{x:{grid:{display:false},ticks:{color:MT}},y:{beginAtZero:true,grid:grid,ticks:{color:MT}}},
+        plugins:{legend:{position:'bottom',labels:{color:ML}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+f2(c.parsed.y);}}}}}});
     /* ---- Kelompok pemeriksaan ---- */
     var gNames=[], gData={};
     d.exams.forEach(function(e){var g=kelompok(e[0]); if(!gData[g]){gData[g]=yrs.map(function(){return 0;});gNames.push(g);} e[1].forEach(function(v,i){gData[g][i]+=v;});});
     var order=KELOMPOK.map(function(k){return k[0];}).concat(['Lainnya']).filter(function(n){return gData[n];});
     $('kelTitle').textContent='Komposisi Kelompok Pemeriksaan '+yrs[yi];
     if(charts.kel) charts.kel.destroy(); if(charts.kelTren) charts.kelTren.destroy();
-    charts.kel=new Chart($('chKel'),{type:'doughnut',data:{labels:order,datasets:[{data:order.map(function(n){return gData[n][yi];}),backgroundColor:order.map(function(n,i){return WARNA[i%WARNA.length];}),borderWidth:0}]},
-      options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:function(c){var t=c.dataset.data.reduce(function(a,b){return a+b;},0);return c.label+': '+fmt(c.parsed)+(t?' ('+(c.parsed/t*100).toFixed(1).replace('.',',')+'%)':'');}}}}}});
-    charts.kelTren=new Chart($('chKelTren'),{type:'bar',data:{labels:yrs,datasets:order.map(function(n,i){return {label:n,data:gData[n],backgroundColor:WARNA[i%WARNA.length],borderRadius:3};})},
-      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:grid,ticks:{callback:fmt}}},
-        plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+fmt(c.parsed.y);}}}}}});
+    charts.kel=new Chart($('chKel'),{type:'doughnut',data:{labels:order,datasets:[{data:order.map(function(n){return gData[n][yi];}),backgroundColor:order.map(function(n,i){return WARNAM[i%WARNA.length];}),borderWidth:2,borderColor:'#0a1a3a'}]},
+      options:{responsive:true,maintainAspectRatio:false,color:ML,cutout:'58%',plugins:{legend:{position:'bottom',labels:{color:ML}},tooltip:{callbacks:{label:function(c){var t=c.dataset.data.reduce(function(a,b){return a+b;},0);return c.label+': '+fmt(c.parsed)+(t?' ('+(c.parsed/t*100).toFixed(1).replace('.',',')+'%)':'');}}}}}});
+    charts.kelTren=new Chart($('chKelTren'),{type:'bar',data:{labels:yrs,datasets:order.map(function(n,i){return {label:n,data:gData[n],backgroundColor:WARNAM[i%WARNA.length],borderRadius:3};})},
+      options:{responsive:true,maintainAspectRatio:false,color:ML,interaction:{mode:'index',intersect:false},scales:{x:{stacked:true,grid:{display:false},ticks:{color:MT}},y:{stacked:true,beginAtZero:true,grid:grid,ticks:{callback:fmt,color:MT}}},
+        plugins:{legend:{position:'bottom',labels:{color:ML}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+fmt(c.parsed.y);}}}}}});
     var es=$('examSel'), curE=es.value;
     es.innerHTML=''; ranked.forEach(function(x){var o=document.createElement('option');o.value=x.n;o.textContent=x.n;es.appendChild(o);});
     if(curE&&ranked.some(function(x){return x.n===curE;}))es.value=curE;
     var ex=d.exams.filter(function(e){return e[0]===es.value;})[0]||d.exams[0];
     if(charts.exam) charts.exam.destroy();
-    charts.exam=new Chart($('chExam'),{type:'line',data:{labels:yrs,datasets:[{label:ex[0],data:ex[1],borderColor:'#c99a52',backgroundColor:'rgba(201,154,82,.2)',fill:true,tension:.3,pointRadius:4}]},
-      options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:grid,ticks:{callback:fmt}}},
+    charts.exam=new Chart($('chExam'),{type:'line',data:{labels:yrs,datasets:[{label:ex[0],data:ex[1],borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,.2)',fill:true,tension:.3,pointRadius:4}]},
+      options:{responsive:true,maintainAspectRatio:false,color:ML,scales:{x:{grid:{display:false},ticks:{color:MT}},y:{beginAtZero:true,grid:grid,ticks:{callback:fmt,color:MT}}},
         plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return fmt(c.parsed.y)+' pemeriksaan';}}}}}});
     rsCharts(d,yrs,yi,totals,order,gData);
     $('ringkasanNote').textContent=(live?'Data langsung dari Google Sheets "Laporan Tahunan Lab".':'Menampilkan data cadangan (sheet tidak dapat dimuat).')+' Periode '+yrs[0]+'–'+yrs[last]+'. '+(live?'Dimuat: '+new Date().toLocaleString('id-ID')+'.':'')+(window.DATA_DIPERBARUI?' Data diperbarui admin: '+window.DATA_DIPERBARUI+'.':'');
@@ -3406,7 +3436,7 @@ var PANDUAN = [
   var BAIK=95, TARGET=80;
   var BLN=['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'];
   var SHORT=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-  var PAL=['#6f9fbd','#c99a52','#b3a187','#34d399','#f472b6','#fb923c','#60a5fa','#e879f9'];
+  var PAL=['#4da3ff','#fbbf24','#b79cff','#34d399','#f472b6','#fb923c','#60a5fa','#e879f9'];
   var N=null;
   var FALL={2025:[80,89,78,90,100,93,98,97,98,96,96,96],2026:[85,71,95,55,80,63,67,62,70,N,N,N]};
   var DATA=JSON.parse(JSON.stringify(FALL)), C={}, live=false, timer;
@@ -3458,7 +3488,7 @@ var PANDUAN = [
   function pc(n){return n==null?'–':fmt(n,Math.abs(n-Math.round(n))<1e-9?0:1)+'%';}
   function stat(p){return p==null?['','']:p>=BAIK?['Sangat baik','mt-baik']:p>=TARGET?['Memenuhi','mt-ok']:['Perlu perbaikan','mt-kurang'];}
   function badge(p){var s=stat(p);return s[0]?'<span class="mt-b '+s[1]+'">'+s[0]+'</span>':'';}
-  function col(p){return p==null?'#8a857d':p>=BAIK?'#4a9a6e':p>=TARGET?'#d4a73a':'#c9615a';}
+  function col(p){return p==null?'#9fb0cf':p>=BAIK?'#34d399':p>=TARGET?'#fbbf24':'#ff8a80';}
   function filled(a){return a.filter(function(v){return v!=null;});}
   function avg(a){var x=filled(a);return x.length?Math.round(x.reduce(function(s,v){return s+v;},0)/x.length*10)/10:null;}
   function last(a){for(var i=11;i>=0;i--)if(a[i]!=null)return i;return -1;}
@@ -3480,7 +3510,7 @@ var PANDUAN = [
     var dif=ys.length>1,A=dif?DATA[ys[ys.length-2]]:null,B=dif?DATA[ys[ys.length-1]]:null;
     if(dif)hd+='<th class="num">Selisih '+ys[ys.length-1]+' vs '+ys[ys.length-2]+' (poin)</th>';
     $('mutuTbl').querySelector('thead').innerHTML=hd+'</tr>';
-    function dc(a,b){if(a==null||b==null)return '<td class="num">–</td>';var d=b-a;return '<td class="num"><span style="color:'+(d>=0?'#3f8a68':'#c9615a')+'">'+(d>=0?'+':'−')+fmt(Math.abs(d),1)+'</span></td>';}
+    function dc(a,b){if(a==null||b==null)return '<td class="num">–</td>';var d=b-a;return '<td class="num"><span style="color:'+(d>=0?'#4ade80':'#ff8a80')+'">'+(d>=0?'+':'−')+fmt(Math.abs(d),1)+'</span></td>';}
     for(i=0;i<12;i++){h+='<tr><td>'+SHORT[i]+'</td>';
       ys.forEach(function(y){var v=DATA[y][i];h+='<td class="num">'+pc(v)+'</td><td>'+badge(v)+'</td>';});
       if(dif)h+=dc(A[i],B[i]);h+='</tr>';}
@@ -3494,7 +3524,7 @@ var PANDUAN = [
     if($('mutuTrenH'))$('mutuTrenH').textContent='Tren Kesesuaian Waktu Tunggu '+rng+' (%)';
     if($('mutuBandH'))$('mutuBandH').textContent=ys.length>1?'Perbandingan '+ys.join(' vs ')+' per Bulan (%)':'Kesesuaian per Bulan '+rng+' (%)';
     if(typeof Chart==='undefined')return;
-    var tc='#6a665f',gc='rgba(70,62,52,.09)';
+    var tc='#d6e5ff',gc='rgba(160,190,240,.2)';
     function base(){return {responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+(c.parsed.y==null?'–':fmt(c.parsed.y,1)+'%');}}}},scales:{x:{ticks:{color:tc,maxRotation:60},grid:{color:gc}},y:{min:0,max:100,ticks:{color:tc,callback:function(v){return v+'%';}},grid:{color:gc}}}};}
     var L=[],V=[];
     ys.forEach(function(y,k){var d=DATA[y],n=k===ys.length-1?last(d)+1:12;
@@ -3502,11 +3532,11 @@ var PANDUAN = [
     kill('t');
     C.t=new Chart($('chMutuTren'),{type:'bar',data:{labels:L,datasets:[
       {label:'% sesuai waktu tunggu',data:V,backgroundColor:V.map(col),borderRadius:4},
-      {type:'line',label:'Sangat baik ('+BAIK+'%)',data:L.map(function(){return BAIK;}),borderColor:'#4a9a6e',borderDash:[6,5],pointRadius:0,borderWidth:1.5},
-      {type:'line',label:'Target ('+TARGET+'%)',data:L.map(function(){return TARGET;}),borderColor:'#d4a73a',borderDash:[6,5],pointRadius:0,borderWidth:1.5}]},options:base()});
+      {type:'line',label:'Sangat baik ('+BAIK+'%)',data:L.map(function(){return BAIK;}),borderColor:'#34d399',borderDash:[6,5],pointRadius:0,borderWidth:1.5},
+      {type:'line',label:'Target ('+TARGET+'%)',data:L.map(function(){return TARGET;}),borderColor:'#fbbf24',borderDash:[6,5],pointRadius:0,borderWidth:1.5}]},options:base()});
     kill('b');
     var ds=ys.map(function(y,k){var c=PAL[k%PAL.length];return {label:String(y),data:DATA[y],borderColor:c,backgroundColor:c,tension:.25,pointRadius:4,spanGaps:false};});
-    ds.push({label:'Target ('+TARGET+'%)',data:SHORT.map(function(){return TARGET;}),borderColor:'#d4a73a',borderDash:[6,5],pointRadius:0,borderWidth:1.5});
+    ds.push({label:'Target ('+TARGET+'%)',data:SHORT.map(function(){return TARGET;}),borderColor:'#fbbf24',borderDash:[6,5],pointRadius:0,borderWidth:1.5});
     C.b=new Chart($('chMutuBanding'),{type:'line',data:{labels:SHORT,datasets:ds},options:base()});
     rsMutu(ys);}
   // Grafik mutu untuk dashboard tema biru (gelap)
