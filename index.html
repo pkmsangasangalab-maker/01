@@ -2774,7 +2774,7 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
       {type:'line',label:'Total kunjungan',data:d.visits,borderColor:'#34d399',backgroundColor:'#34d399',tension:.3,pointRadius:4,order:1}]},
       options:{responsive:true,maintainAspectRatio:false,color:ML,interaction:{mode:'index',intersect:false},
         scales:{x:{grid:{display:false},ticks:{color:'#000'}},y:{beginAtZero:true,grid:grid,ticks:{callback:fmt,color:'#000'}}},
-        plugins:{legend:{position:'bottom',labels:{color:ML}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+fmt(c.parsed.y);}}}}}});
+        plugins:{legend:{position:'bottom',labels:{color:'#000'}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+fmt(c.parsed.y);}}}}}});
     var top=ranked.slice(0,10);
     charts.top=new Chart($('chTop'),{type:'bar',data:{labels:top.map(function(x){return x.n;}),datasets:[{label:'Jumlah pemeriksaan '+yrs[yi],data:top.map(function(x){return x.v;}),backgroundColor:'#34d399',borderRadius:5}]},
       options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,color:ML,
