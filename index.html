@@ -1157,7 +1157,7 @@ html[data-theme="biru"] #themeBtn{background:#fff;color:#0b3d91}
 
 /* ---- Dashboard Ringkasan Laporan Tahunan: tema biru (panel navy gelap) ---- */
 .rs-biru{display:none}
-#ringkasan:not(.rs-more-open) .rs-kera{display:none!important}
+#ringkasan .rs-kera{display:none!important}
 .rs-r1{grid-template-columns:minmax(0,1fr)}
 #mutuLive .rs-banner{margin:14px 0 4px}
 #mutuLive .chart-box{height:300px}
@@ -2016,7 +2016,7 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
       <div class="rs-biru rs-dash" id="rsDash">
         <div class="rs-top">
           <h2>Ringkasan Laporan Tahunan</h2>
-          <div class="rs-ctl"><label for="rsTahun">Tahun</label><select id="rsTahun" aria-label="Pilih tahun"></select><button type="button" class="rs-more-btn" id="rsMoreBtn" aria-expanded="false">Grafik rinci</button></div>
+          <div class="rs-ctl"><label for="rsTahun">Tahun</label><select id="rsTahun" aria-label="Pilih tahun"></select></div>
         </div>
         <div class="rs-kpis" id="rsKpi"></div>
         <div class="rs-row rs-r2">
@@ -2847,7 +2847,6 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
   FALLBACK.years=YEARS; FALLBACK.exams=FALLBACK.exams.map(function(e){return [e[0],e[1]];});
   $('yearSel').addEventListener('change',function(){render(D,D.live);});
   $('rsTahun').addEventListener('change',function(){$('yearSel').value=this.value;render(D,D.live);});
-  $('rsMoreBtn').addEventListener('click',function(){var o=$('ringkasan').classList.toggle('rs-more-open');this.setAttribute('aria-expanded',o?'true':'false');this.textContent=o?'Sembunyikan grafik rinci':'Grafik rinci';});
   $('examSel').addEventListener('change',function(){render(D,D.live);});
   render(D,false);
   fetch(CSV_URL).then(function(r){if(!r.ok)throw new Error(r.status);return r.text();})
