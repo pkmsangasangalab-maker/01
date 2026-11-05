@@ -1197,6 +1197,12 @@ html[data-theme="biru"] #themeBtn{background:#fff;color:#0b3d91}
 .rs-hr-t td.r{width:34px;color:#ffa726;font-weight:700}
 .rs-hr-note{font-size:.72rem;color:#9fb6e6;margin:8px 0 0;line-height:1.5}
 .rs-hr-note a{color:#7cc4ff}
+.rs-bl-scroll{max-height:250px;overflow:auto}
+#rsBlTab tr.sel td{background:rgba(47,140,255,.22)}#rsBlTab tr.off td{color:#7f95c4}#rsBlTab tr{cursor:pointer}
+#rsBlKatLeg{list-style:none;margin:0;padding:0;flex:1;min-width:0;font-size:.82rem;color:#dbe8ff}
+#rsBlKatLeg li{display:flex;align-items:center;gap:8px;padding:4px 0}
+#rsBlKatLeg i{width:10px;height:10px;border-radius:50%;flex:none}
+#rsBlKatLeg b{margin-left:auto;color:#fff;white-space:nowrap}
 
 .rs-donut{display:flex;align-items:center;gap:12px}
 .rs-dbox{flex:0 0 44%;width:44%;height:220px}.rs-card{min-width:0}
@@ -2028,6 +2034,20 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
           </div>
           <div class="rs-card"><h3>5 Hari Tersibuk</h3><table class="rs-hr-t"><thead><tr><th></th><th>Hari / Tanggal</th><th class="n">Pasien</th><th class="n">Pemeriksaan</th></tr></thead><tbody id="rsHrTop"><tr><td colspan="4">Memuat data…</td></tr></tbody></table></div>
           <p class="rs-hr-note" id="rsHrNote">Memuat data harian…</p>
+        </div>
+        <div class="rs-hr" id="rsBl">
+          <div class="rs-hr-top"><h3>Dashboard Pemeriksaan per Bulan 2026</h3>
+            <div class="rs-ctl"><label for="rsBlBln">Bulan</label><select id="rsBlBln" aria-label="Pilih bulan pemeriksaan"></select></div></div>
+          <div class="rs-kpis" id="rsBlKpi"></div>
+          <div class="rs-row rs-r2">
+            <div class="rs-card"><h3>Jumlah Pemeriksaan tiap Bulan 2026</h3><div class="rs-box"><canvas id="chRsBlBln" role="img" aria-label="Grafik batang jumlah pemeriksaan per bulan tahun 2026"></canvas></div></div>
+            <div class="rs-card"><h3 id="rsBlTopH">10 Jenis Pemeriksaan Terbanyak</h3><div class="rs-box"><canvas id="chRsBlTop" role="img" aria-label="Grafik batang jenis pemeriksaan terbanyak"></canvas></div></div>
+          </div>
+          <div class="rs-row rs-r2">
+            <div class="rs-card"><h3 id="rsBlKatH">Komposisi Kategori Pemeriksaan</h3><div class="rs-donut"><div class="rs-box rs-dbox"><canvas id="chRsBlKat" role="img" aria-label="Grafik donat komposisi kategori pemeriksaan"></canvas></div><ul id="rsBlKatLeg"></ul></div></div>
+            <div class="rs-card"><h3>Rekap Pemeriksaan per Bulan</h3><div class="rs-bl-scroll"><table class="rs-hr-t"><thead><tr><th>Bulan</th><th class="n">Pemeriksaan</th><th class="n">% tahun</th><th>Terbanyak</th></tr></thead><tbody id="rsBlTab"><tr><td colspan="4">Memuat data…</td></tr></tbody></table></div></div>
+          </div>
+          <p class="rs-hr-note" id="rsBlNote">Memuat data pemeriksaan bulanan…</p>
         </div>
         <div class="rs-banner"><span class="rs-ok">✓</span><p id="rsBanner">Memuat data mutu…</p><div class="rs-tag"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg><span>Mutu layanan terus meningkat,<br>untuk pelayanan yang lebih baik.</span></div></div>
       </div>
@@ -4137,6 +4157,123 @@ var PANDUAN = [
   }
   $('rsHrBln').addEventListener('change',render);
   load(); timer=setInterval(load,300000);
+})();
+</script>
+
+<script>
+// ===== Dashboard pemeriksaan per bulan 2026 (Google Sheets, tab "REKAP TAHUNAN": jenis pemeriksaan x JAN–DES) =====
+(function(){
+  var SID='1axwil6eYFLv8OPg44DwEL0SHawrB5r_tdzWnhR78clg', TABNAME='REKAP TAHUNAN';
+  var URL_SHEET='https://docs.google.com/spreadsheets/d/'+SID+'/edit';
+  var URL_CSV=function(){return 'https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(TABNAME)+'&_='+Date.now();};
+  var BNM=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  var MON=['JAN','FEB','MAR','APR','MEI','JUN','JUL','AGU','SEP','OKT','NOV','DES'];
+  var TK='#cfe0ff', GR='rgba(160,190,255,.14)', BAR='#2f8cff', HI='#ffa726';
+  var PAL=['#2f8cff','#34d399','#ffa726','#a78bfa','#f472b6','#22d3ee','#facc15','#fb7185'];
+  var D=null, C={};
+  function $(i){return document.getElementById(i);}
+  function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function fmt(n){return Number(n).toLocaleString('id-ID');}
+  function f1(n){return Number(n).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1});}
+  function ic(p){return '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';}
+  function csv(t){var r=[],row=[],f='',q=false,i,c;t=String(t).replace(/^﻿/,'');
+    for(i=0;i<t.length;i++){c=t[i];
+      if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+      else if(c==='"')q=true; else if(c===','){row.push(f);f='';}
+      else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(f);r.push(row);row=[];f='';}
+      else f+=c;}
+    if(f!==''||row.length){row.push(f);r.push(row);} return r;}
+  function num(v){var x=String(v==null?'':v).replace(/[^\d]/g,''); return x===''?0:parseInt(x,10);}
+
+  // Header: "Kategori,Jenis pemeriksaan,JAN,...,DES,Total,%"; baris data berhenti saat kolom jenis kosong.
+  function parse(rows){
+    var hd=-1,i,k,col={};
+    for(i=0;i<rows.length&&hd<0;i++){
+      if(String(rows[i][0]||'').trim().toLowerCase()==='kategori'&&String(rows[i][2]||'').trim().toUpperCase()==='JAN')hd=i;
+    }
+    if(hd<0)return null;
+    rows[hd].forEach(function(x,j){var t=String(x||'').trim().toUpperCase(),m=MON.indexOf(t); if(m>=0&&col[m]==null)col[m]=j;});
+    if(Object.keys(col).length<12)return null;
+    var items=[],tot=[0,0,0,0,0,0,0,0,0,0,0,0];
+    for(i=hd+1;i<rows.length;i++){
+      var kat=String(rows[i][0]||'').trim(), jn=String(rows[i][1]||'').trim();
+      if(!jn)break;
+      var v=[]; for(k=0;k<12;k++){v[k]=num(rows[i][col[k]]);tot[k]+=v[k];}
+      items.push({kat:kat||'Lainnya',n:jn,v:v});
+    }
+    return items.length?{items:items,tot:tot}:null;
+  }
+  function sel(){var v=$('rsBlBln').value; return v==='all'?-1:+v;}
+  function val(it,m){return m<0?it.v.reduce(function(a,b){return a+b;},0):it.v[m];}
+  function fillSel(){
+    var s=$('rsBlBln'),cur=s.value;
+    s.innerHTML='<option value="all">Semua bulan (Jan–Des)</option>'+BNM.map(function(b,i){return '<option value="'+i+'">'+b+' 2026</option>';}).join('');
+    s.value=cur||'all';
+  }
+  function kpi(cls,ico,t,v,sub,sm){return '<div class="rs-k '+cls+'"><span class="ico">'+ico+'</span><div><b class="t">'+t+'</b><strong'+(sm?' class="sm"':'')+'>'+v+'</strong><small>'+sub+'</small></div></div>';}
+  function kill(){Object.keys(C).forEach(function(k){if(C[k]){C[k].destroy();C[k]=null;}});}
+
+  function render(){
+    if(!D)return;
+    var m=sel(), T=D.tot, grand=T.reduce(function(a,b){return a+b;},0);
+    var rows=D.items.map(function(it){return {kat:it.kat,n:it.n,v:val(it,m)};});
+    var total=m<0?grand:T[m];
+    var ranked=rows.filter(function(r){return r.v>0;}).sort(function(a,b){return b.v-a.v;});
+    var act=T.filter(function(x){return x>0;}).length;
+    var label=m<0?'Januari–Desember 2026':BNM[m]+' 2026';
+
+    var sub2;
+    if(m<0)sub2=act?'dari '+act+' bulan berdata':'&nbsp;';
+    else if(m>0&&T[m-1]>0){var p=(T[m]-T[m-1])/T[m-1]*100;sub2='<span class="'+(p>=0?'up':'down')+'">'+(p>=0?'▲ ':'▼ ')+Math.abs(p).toFixed(1).replace('.',',')+'%</span> dibanding '+BNM[m-1];}
+    else sub2='&nbsp;';
+    var best=-1; T.forEach(function(x,i){if(best<0||x>T[best])best=i;});
+    $('rsBlKpi').innerHTML=
+      kpi('k1',ic('<path d="M9 3h6M10 3v13a2 2 0 0 0 4 0V3M10 8h4"/>'),'Total Pemeriksaan',fmt(total),esc(label))+
+      kpi('k2',ic('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/>'),m<0?'Rata-rata per Bulan':'Porsi dari Total Tahun',m<0?(act?f1(grand/act):'–'):(grand?f1(T[m]/grand*100)+'%':'–'),sub2)+
+      kpi('k3',ic('<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>'),'Pemeriksaan Terbanyak',ranked[0]?esc(ranked[0].n):'–',ranked[0]?fmt(ranked[0].v)+' pemeriksaan':'&nbsp;',true)+
+      kpi('k4',ic('<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c.4-3.6 3-5.4 6-5.4s5.6 1.8 6 5.4"/>'),m<0?'Bulan Tersibuk':'Jenis Pemeriksaan Aktif',m<0?(T[best]>0?BNM[best]:'–'):String(ranked.length),m<0?(T[best]>0?fmt(T[best])+' pemeriksaan':'&nbsp;'):'dari '+rows.length+' jenis',m<0);
+
+    // tabel rekap bulanan
+    $('rsBlTab').innerHTML=BNM.map(function(b,i){
+      var top=null; D.items.forEach(function(it){if(it.v[i]>0&&(!top||it.v[i]>top.v[i]))top=it;});
+      return '<tr data-m="'+i+'" class="'+(i===m?'sel':'')+(T[i]>0?'':' off')+'"><td>'+b+'</td><td class="n"><b>'+fmt(T[i])+'</b></td><td class="n">'+(grand&&T[i]?f1(T[i]/grand*100)+'%':'–')+'</td><td>'+(top?esc(top.n):'–')+'</td></tr>';
+    }).join('')+'<tr><td><b>Total 2026</b></td><td class="n"><b>'+fmt(grand)+'</b></td><td class="n">100%</td><td></td></tr>';
+
+    $('rsBlTopH').textContent='10 Jenis Pemeriksaan Terbanyak – '+(m<0?'Tahun 2026':BNM[m]+' 2026');
+    var kmap={}; rows.forEach(function(r){kmap[r.kat]=(kmap[r.kat]||0)+r.v;});
+    var kat=Object.keys(kmap).filter(function(k){return kmap[k]>0;}).sort(function(a,b){return kmap[b]-kmap[a];});
+    $('rsBlKatH').textContent='Komposisi Kategori – '+(m<0?'Tahun 2026':BNM[m]+' 2026');
+    $('rsBlKatLeg').innerHTML=kat.map(function(k,i){return '<li><i style="background:'+PAL[i%PAL.length]+'"></i>'+esc(k)+'<b>'+fmt(kmap[k])+' ('+f1(total?kmap[k]/total*100:0)+'%)</b></li>';}).join('')||'<li>Belum ada data.</li>';
+
+    if(typeof Chart==='undefined')return;
+    kill();
+    var scl=function(extra){return {x:{grid:{display:false},ticks:{color:TK}},y:Object.assign({beginAtZero:true,grid:{color:GR},border:{display:false},ticks:{color:TK,precision:0}},extra||{})};};
+    C.b=new Chart($('chRsBlBln'),{type:'bar',data:{labels:MON.map(function(x){return x.charAt(0)+x.slice(1).toLowerCase();}),
+      datasets:[{label:'Pemeriksaan',data:T.map(function(x){return x>0?x:null;}),backgroundColor:T.map(function(x,i){return (m<0||i===m)?(i===best&&m<0?HI:BAR):'rgba(47,140,255,.35)';}),borderRadius:4}]},
+      options:{responsive:true,maintainAspectRatio:false,onClick:function(e,els){if(els.length){$('rsBlBln').value=String(els[0].index);render();}},
+        onHover:function(e,els){e.native.target.style.cursor=els.length?'pointer':'default';},
+        scales:scl(),plugins:{legend:{display:false},tooltip:{callbacks:{title:function(it){return BNM[it[0].dataIndex]+' 2026';},label:function(c){return fmt(c.parsed.y)+' pemeriksaan';}}}}}});
+    var top10=ranked.slice(0,10);
+    C.t=new Chart($('chRsBlTop'),{type:'bar',data:{labels:top10.map(function(r){return r.n;}),datasets:[{label:'Pemeriksaan',data:top10.map(function(r){return r.v;}),backgroundColor:'#34d399',borderRadius:4}]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{beginAtZero:true,grid:{color:GR},border:{display:false},ticks:{color:TK,precision:0}},y:{grid:{display:false},ticks:{color:TK,autoSkip:false}}},plugins:{legend:{display:false}}}});
+    C.k=new Chart($('chRsBlKat'),{type:'doughnut',data:{labels:kat,datasets:[{data:kat.map(function(k){return kmap[k];}),backgroundColor:kat.map(function(k,i){return PAL[i%PAL.length];}),borderColor:'#0b1f44',borderWidth:2}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:false}}}});
+  }
+  function load(){
+    fetch(URL_CSV(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+      .then(function(t){if(/^\s*</.test(t))throw new Error('sheet belum publik / perlu login');var d=parse(csv(t));if(!d)throw new Error('format tab '+TABNAME+' tidak dikenali');return d;})
+      .then(function(d){
+        D=d; if(!$('rsBlBln').options.length)fillSel(); render();
+        $('rsBlNote').innerHTML='Data langsung dari Google Sheets (tab REKAP TAHUNAN). Klik batang bulan atau baris tabel untuk memfilter. Bulan tanpa data tampil 0. Diperbarui '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'. <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
+      }).catch(function(e){
+        if(!$('rsBlBln').options.length)fillSel();
+        $('rsBlNote').innerHTML='Data pemeriksaan bulanan gagal dimuat ['+esc(e&&e.message?e.message:'gagal terhubung')+']. Pastikan sheet bisa dilihat siapa pun yang punya link. <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
+        if(!D)$('rsBlTab').innerHTML='<tr><td colspan="4">Data belum tersedia.</td></tr>';
+      });
+  }
+  $('rsBlBln').addEventListener('change',render);
+  $('rsBlTab').addEventListener('click',function(e){var tr=e.target.closest('tr[data-m]');if(!tr)return;$('rsBlBln').value=tr.getAttribute('data-m');render();});
+  fillSel(); load(); setInterval(load,300000);
 })();
 </script>
 
