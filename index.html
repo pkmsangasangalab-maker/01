@@ -4165,7 +4165,11 @@ var PANDUAN = [
 (function(){
   var SID='1axwil6eYFLv8OPg44DwEL0SHawrB5r_tdzWnhR78clg', TABNAME='REKAP TAHUNAN';
   var URL_SHEET='https://docs.google.com/spreadsheets/d/'+SID+'/edit';
-  var URL_CSV=function(){return 'https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(TABNAME)+'&_='+Date.now();};
+  var GIDTAB='780669091';
+  var URLS=function(){var b='https://docs.google.com/spreadsheets/d/'+SID,q='&_='+Date.now();return [
+    b+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(TABNAME)+q,
+    b+'/gviz/tq?tqx=out:csv&gid='+GIDTAB+q,
+    b+'/export?format=csv&gid='+GIDTAB];};
   var BNM=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   var MON=['JAN','FEB','MAR','APR','MEI','JUN','JUL','AGU','SEP','OKT','NOV','DES'];
   var TK='#cfe0ff', GR='rgba(160,190,255,.14)', BAR='#2f8cff', HI='#ffa726';
@@ -4259,9 +4263,14 @@ var PANDUAN = [
     C.k=new Chart($('chRsBlKat'),{type:'doughnut',data:{labels:kat,datasets:[{data:kat.map(function(k){return kmap[k];}),backgroundColor:kat.map(function(k,i){return PAL[i%PAL.length];}),borderColor:'#0b1f44',borderWidth:2}]},
       options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:false}}}});
   }
+  function tryUrl(list,i,errs){
+    if(i>=list.length)return Promise.reject(new Error(errs.join(' | ')));
+    return fetch(list[i],{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+      .then(function(t){if(/^\s*</.test(t))throw new Error('halaman login / sheet belum publik');var d=parse(csv(t));if(!d)throw new Error('format tab '+TABNAME+' tidak dikenali');return d;})
+      .catch(function(e){errs.push('#'+(i+1)+': '+(e&&e.message?e.message:'gagal terhubung'));return tryUrl(list,i+1,errs);});
+  }
   function load(){
-    fetch(URL_CSV(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
-      .then(function(t){if(/^\s*</.test(t))throw new Error('sheet belum publik / perlu login');var d=parse(csv(t));if(!d)throw new Error('format tab '+TABNAME+' tidak dikenali');return d;})
+    tryUrl(URLS(),0,[])
       .then(function(d){
         D=d; if(!$('rsBlBln').options.length)fillSel(); render();
         $('rsBlNote').innerHTML='Data langsung dari Google Sheets (tab REKAP TAHUNAN). Klik batang bulan atau baris tabel untuk memfilter. Bulan tanpa data tampil 0. Diperbarui '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'. <a href="'+URL_SHEET+'" target="_blank" rel="noopener noreferrer">Buka spreadsheet</a>';
