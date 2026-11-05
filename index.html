@@ -2047,6 +2047,11 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
             <div class="rs-card"><h3 id="rsBlKatH">Komposisi Kategori Pemeriksaan</h3><div class="rs-donut"><div class="rs-box rs-dbox"><canvas id="chRsBlKat" role="img" aria-label="Grafik donat komposisi kategori pemeriksaan"></canvas></div><ul id="rsBlKatLeg"></ul></div></div>
             <div class="rs-card"><h3>Rekap Pemeriksaan per Bulan</h3><div class="rs-bl-scroll"><table class="rs-hr-t"><thead><tr><th>Bulan</th><th class="n">Pemeriksaan</th><th class="n">% tahun</th><th>Terbanyak</th></tr></thead><tbody id="rsBlTab"><tr><td colspan="4">Memuat data…</td></tr></tbody></table></div></div>
           </div>
+          <div class="rs-card" id="rsAvgCard">
+            <div class="rs-hr-top" style="margin-bottom:8px"><h3 style="font-size:1rem">Rata-rata per Bulan tiap Jenis Pemeriksaan 2026</h3>
+              <div class="rs-ctl"><label for="rsAvgDiv">Dibagi</label><select id="rsAvgDiv" aria-label="Pilih pembagi rata-rata"></select></div></div>
+            <div class="rs-bl-scroll" style="max-height:420px"><table class="rs-hr-t"><thead><tr><th>Kategori</th><th>Jenis pemeriksaan</th><th class="n">Total 2026</th><th class="n">Rata-rata / bulan</th><th class="n">Tertinggi</th></tr></thead><tbody id="rsAvgTab"><tr><td colspan="5">Memuat data…</td></tr></tbody></table></div>
+          </div>
           <p class="rs-hr-note" id="rsBlNote">Memuat data pemeriksaan bulanan…</p>
         </div>
         <div class="rs-banner"><span class="rs-ok">✓</span><p id="rsBanner">Memuat data mutu…</p><div class="rs-tag"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg><span>Mutu layanan terus meningkat,<br>untuk pelayanan yang lebih baik.</span></div></div>
@@ -4243,6 +4248,15 @@ var PANDUAN = [
       return '<tr data-m="'+i+'" class="'+(i===m?'sel':'')+(T[i]>0?'':' off')+'"><td>'+b+'</td><td class="n"><b>'+fmt(T[i])+'</b></td><td class="n">'+(grand&&T[i]?f1(T[i]/grand*100)+'%':'–')+'</td><td>'+(top?esc(top.n):'–')+'</td></tr>';
     }).join('')+'<tr><td><b>Total 2026</b></td><td class="n"><b>'+fmt(grand)+'</b></td><td class="n">100%</td><td></td></tr>';
 
+    // rata-rata per bulan tiap jenis pemeriksaan (selalu setahun penuh, tidak mengikuti filter bulan)
+    var ds=$('rsAvgDiv'); if(!ds.options.length){ds.innerHTML='<option value="act">Bulan berdata ('+act+' bulan)</option><option value="12">12 bulan</option>';}
+    else if(ds.options[0].text.indexOf('('+act+' ')<0){var cv=ds.value;ds.options[0].text='Bulan berdata ('+act+' bulan)';ds.value=cv;}
+    var dv=ds.value==='12'?12:Math.max(act,1);
+    var avgRows=D.items.map(function(it){var t=it.v.reduce(function(a,b){return a+b;},0),mx=0,mi=-1;it.v.forEach(function(x,i){if(x>mx){mx=x;mi=i;}});return {kat:it.kat,n:it.n,t:t,a:t/dv,mx:mx,mi:mi};})
+      .sort(function(a,b){return b.a-a.a||a.n.localeCompare(b.n);});
+    $('rsAvgTab').innerHTML=avgRows.map(function(r){return '<tr><td>'+esc(r.kat)+'</td><td>'+esc(r.n)+'</td><td class="n">'+fmt(r.t)+'</td><td class="n"><b>'+f1(r.a)+'</b></td><td class="n">'+(r.mx>0?fmt(r.mx)+' ('+BNM[r.mi].slice(0,3)+')':'–')+'</td></tr>';}).join('')
+      +'<tr><td colspan="2"><b>Semua pemeriksaan</b></td><td class="n"><b>'+fmt(grand)+'</b></td><td class="n"><b>'+f1(grand/dv)+'</b></td><td></td></tr>';
+
     $('rsBlTopH').textContent='10 Jenis Pemeriksaan Terbanyak – '+(m<0?'Tahun 2026':BNM[m]+' 2026');
     var kmap={}; rows.forEach(function(r){kmap[r.kat]=(kmap[r.kat]||0)+r.v;});
     var kat=Object.keys(kmap).filter(function(k){return kmap[k]>0;}).sort(function(a,b){return kmap[b]-kmap[a];});
@@ -4281,6 +4295,7 @@ var PANDUAN = [
       });
   }
   $('rsBlBln').addEventListener('change',render);
+  $('rsAvgDiv').addEventListener('change',render);
   $('rsBlTab').addEventListener('click',function(e){var tr=e.target.closest('tr[data-m]');if(!tr)return;$('rsBlBln').value=tr.getAttribute('data-m');render();});
   fillSel(); load(); setInterval(load,300000);
 })();
