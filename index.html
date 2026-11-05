@@ -717,6 +717,7 @@ body:not([data-view="panduan"]) [data-view="panduan"],
 body:not([data-view="kelurahan"]) [data-view="kelurahan"],
 body:not([data-view="tentang"]) [data-view="tentang"]{display:none!important}
 body:not([data-view="sdqc"]) [data-view="sdqc"]{display:none!important}
+body:not([data-view="mutu"]) [data-view="mutu"]{display:none!important}
 /* tautan layanan hanya di Beranda + Mode Petugas */
 body:not(.staff) .section-title[data-category],body:not(.staff) .horizontal-grid[data-group],body:not(.staff) #favWrap,body:not(.staff) #emptyMsg,body:not(.staff) .control-panel,body:not(.staff) #staffNotice,
 body:not([data-view="links"]) .section-title[data-category],body:not([data-view="links"]) .horizontal-grid[data-group],body:not([data-view="links"]) #favWrap,body:not([data-view="links"]) #emptyMsg,body:not([data-view="links"]) .control-panel,body:not([data-view="links"]) #staffNotice{display:none!important}
@@ -1157,7 +1158,9 @@ html[data-theme="biru"] #themeBtn{background:#fff;color:#0b3d91}
 /* ---- Dashboard Ringkasan Laporan Tahunan: tema biru (panel navy gelap) ---- */
 .rs-biru{display:none}
 #ringkasan:not(.rs-more-open) .rs-kera{display:none!important}
-#mutuLive .chart-grid{display:none}
+.rs-r1{grid-template-columns:minmax(0,1fr)}
+#mutuLive .rs-banner{margin:14px 0 4px}
+#mutuLive .chart-box{height:300px}
 .rs-dash{display:block;margin-bottom:22px;padding:22px;border-radius:24px;color:#e8f0ff;background:linear-gradient(160deg,#0d2552,#0a1a3b 70%);border:1px solid rgba(90,150,255,.25);box-shadow:0 24px 50px -24px rgba(8,30,80,.7)}
 .rs-top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
 .rs-top h2{font-size:1.35rem;font-weight:600;color:#fff;margin:0}
@@ -1675,6 +1678,7 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
       <button class="side-link staff-only" data-nav="tasks" onclick="setView('tasks', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg><span class="lbl">Dashboard Tasks</span></button>
       <button class="side-link" data-nav="stok" onclick="setView('stok', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6L5 19a1.6 1.6 0 0 0 1.4 2.3h11.2A1.6 1.6 0 0 0 19 19l-5-10V3"/><path d="M7.5 15h9"/></svg><span class="lbl">Stok Reagensia</span></button>
       <button class="side-link" data-nav="ringkasan" onclick="setView('ringkasan', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="m5 15 4-4 3 3 6-7"/><path d="M15 7h3v3"/></svg><span class="lbl">Ringkasan Laporan<br>Tahunan Lab</span></button>
+      <button class="side-link" data-nav="mutu" onclick="setView('mutu', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9M9.5 3h5M12 5.5V3"/><path d="m16.2 7.2 1.2-1.2"/></svg><span class="lbl">Indikator Mutu Lab</span></button>
       <button class="side-link" data-nav="kelurahan" onclick="setView('kelurahan', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg><span class="lbl">Tren per Kelurahan</span></button>
       <button class="side-link" data-nav="sdqc" onclick="setView('sdqc', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M5 15l3-3 3 2 4-5 4 3"/><path d="M5 8h14" stroke-dasharray="2 3"/></svg><span class="lbl">Standar Deviasi QC</span></button>
       <div class="side-label staff-only">MENU PETUGAS</div>
@@ -2019,10 +2023,8 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
           <div class="rs-card"><h3>Tren Tahunan Pemeriksaan Laboratorium</h3><div class="rs-box"><canvas id="chRsTren" role="img" aria-label="Grafik garis tren tahunan jumlah pemeriksaan"></canvas></div></div>
           <div class="rs-card"><h3>Tren Pemeriksaan per Kelompok</h3><div class="rs-box"><canvas id="chRsKel" role="img" aria-label="Grafik garis tren pemeriksaan per kelompok"></canvas></div></div>
         </div>
-        <div class="rs-row rs-r3">
-          <div class="rs-card"><h3>Indikator Mutu – Waktu Tunggu Pelayanan Laboratorium</h3><div class="rs-box"><canvas id="chRsMutu" role="img" aria-label="Grafik batang kesesuaian waktu tunggu per bulan"></canvas></div></div>
-          <div class="rs-card"><h3 id="rsBandH">Perbandingan Capaian Indikator Mutu</h3><div class="rs-box"><canvas id="chRsBand" role="img" aria-label="Grafik batang perbandingan capaian mutu antar tahun"></canvas></div></div>
-          <div class="rs-card"><h3 id="rsDonutH">Rekap Jenis Pemeriksaan</h3><div class="rs-donut"><div class="rs-box rs-dbox"><canvas id="chRsDonut" role="img" aria-label="Grafik donat komposisi kelompok pemeriksaan"></canvas></div><ul id="rsDonutLeg"></ul></div></div>
+        <div class="rs-row rs-r1">
+                    <div class="rs-card"><h3 id="rsDonutH">Rekap Jenis Pemeriksaan</h3><div class="rs-donut"><div class="rs-box rs-dbox"><canvas id="chRsDonut" role="img" aria-label="Grafik donat komposisi kelompok pemeriksaan"></canvas></div><ul id="rsDonutLeg"></ul></div></div>
         </div>
         <div class="rs-hr" id="rsHr">
           <div class="rs-hr-top"><h3>Pemeriksaan Berdasarkan Hari</h3>
@@ -2054,8 +2056,7 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
           </div>
           <p class="rs-hr-note" id="rsBlNote">Memuat data pemeriksaan bulanan…</p>
         </div>
-        <div class="rs-banner"><span class="rs-ok">✓</span><p id="rsBanner">Memuat data mutu…</p><div class="rs-tag"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg><span>Mutu layanan terus meningkat,<br>untuk pelayanan yang lebih baik.</span></div></div>
-      </div>
+              </div>
       <div class="section-title rs-kera"><i class="fa-solid fa-chart-line"></i> RINGKASAN LAPORAN TAHUNAN LAB</div>
       <div class="kpi-grid rs-kera">
         <div class="kpi"><small id="kpi1t">Total pemeriksaan</small><b id="kpi1">–</b><span id="kpi1s">&nbsp;</span></div>
@@ -2205,7 +2206,7 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
     </section>
 
 
-    <section id="mutuLive" data-view="ringkasan">
+    <section id="mutuLive" data-view="mutu">
       <div class="section-title"><i class="fa-solid fa-stopwatch"></i> INDIKATOR MUTU LAB: WAKTU TUNGGU PELAYANAN</div>
       <div class="chart-card">
         <div class="stok-tools">
@@ -2218,6 +2219,7 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
             <p class="chart-note">Hijau ≥95% (sangat baik), kuning 80–94,9% (memenuhi), merah &lt;80%. Garis putus-putus: 95% dan 80%.</p></div>
           <div class="chart-card wide"><div class="chart-head"><h3 id="mutuBandH">Perbandingan per Bulan (%)</h3></div><div class="chart-box"><canvas id="chMutuBanding"></canvas></div></div>
         </div>
+        <div class="rs-banner"><span class="rs-ok">✓</span><p id="rsBanner">Memuat data mutu…</p><div class="rs-tag"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg><span>Mutu layanan terus meningkat,<br>untuk pelayanan yang lebih baik.</span></div></div>
         <div class="stok-wrap"><table id="mutuTbl"><thead></thead><tbody></tbody></table></div>
         <p id="mutuNote">Memuat data…</p>
       </div>
