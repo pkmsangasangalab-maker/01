@@ -1380,7 +1380,7 @@ html[data-theme="biru"] .side-link{font-size:.9rem;letter-spacing:0;line-height:
 .dk-cuk-k small{display:block;font-size:.72rem;color:#cfe0ff}
 .dk-cuk-k b{display:block;font-size:1.45rem;line-height:1.15;font-weight:600;color:#fff}
 .dk-cuk-k.bad{border-left-color:#ef4444}.dk-cuk-k.warn{border-left-color:#fbbf24}.dk-cuk-k.ok{border-left-color:#34d399}.dk-cuk-k.ord{border-left-color:#4da3ff}
-.dk-cuk-w{overflow:auto;max-height:560px;border:1px solid rgba(140,175,235,.22);border-radius:10px}
+.dk-cuk-w{overflow-x:auto;border:1px solid rgba(140,175,235,.22);border-radius:10px}
 .dk-cuk-t th{position:sticky;top:0;z-index:1;background:#16336a;color:#fff}
 .dk-cuk-t td{vertical-align:middle}
 .dk-cuk-t td small{display:block;font-size:.68rem;color:#b6c9ee}
@@ -3367,9 +3367,10 @@ var PANDUAN = [
     $('dkExp').addEventListener('click',function(e){if(!e.target.closest('.dk-exb'))return;DK.ex=!DK.ex;dkExp();});
     $('dkRbBtn').addEventListener('click',function(){DK.rb=!DK.rb;this.textContent=DK.rb?'Sembunyikan':'Lihat Detail';this.setAttribute('aria-expanded',DK.rb?'true':'false');dkRb();});
     $('dkP').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;DK.p=Math.max(1,+b.dataset.p);dkTbl();});
-    $('dkCukQ').addEventListener('input',function(){dkCuk();});
-    $('dkCukL').addEventListener('change',function(){dkCuk();});
-    $('dkCukS').addEventListener('change',function(){dkCuk();});
+    $('dkCukQ').addEventListener('input',function(){DK.cp=1;dkCuk();});
+    $('dkCukL').addEventListener('change',function(){DK.cp=1;dkCuk();});
+    $('dkCukS').addEventListener('change',function(){DK.cp=1;dkCuk();});
+    $('dkCukP').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;DK.cp=Math.max(1,+b.dataset.p);dkCuk();});
     $('dkCukSalin').addEventListener('click',dkCukSalin);
     $('dkT').addEventListener('click',function(e){var b=e.target.closest('.dk-lihat');if(!b)return;var r=b.closest('tr').nextElementSibling;if(r)r.hidden=!r.hidden;});
   }
@@ -3441,6 +3442,7 @@ var PANDUAN = [
       '<div class="dk-filter"><input id="dkCukQ" type="search" autocomplete="off" placeholder="Cari reagensia..." aria-label="Cari reagensia"><select id="dkCukL" aria-label="Filter tingkat kecukupan"><option value="">Semua Tingkat</option><option value="bad">Kritis (kurang dari '+CUK.kritis+' bulan)</option><option value="warn">Waspada ('+CUK.kritis+'–'+CUK.waspada+' bulan)</option><option value="ok">Cukup ('+CUK.waspada+' bulan atau lebih)</option><option value="na">Tanpa pemakaian</option></select>'+
       '<select id="dkCukS" aria-label="Urutkan"><option value="cover">Urut: paling sedikit dulu</option><option value="order">Urut: saran order terbanyak</option><option value="nama">Urut: nama A–Z</option></select></div>'+
       '<div class="dk-cuk-w"><table class="dk-t dk-cuk-t" id="dkCukT"><thead><tr><th>No</th><th>Nama Reagensia</th><th>Stok akhir</th><th>Pakai / bulan</th><th>Kecukupan</th><th>Perkiraan habis</th><th>Saran order</th><th>Tingkat</th></tr></thead><tbody></tbody></table></div>'+
+      '<div class="dk-pg"><span id="dkCukPI"></span><div id="dkCukP"></div></div>'+
       '<p class="dk-cuk-n" id="dkCukI"></p></div>';
   }
   function dkCukBase(m){ // tanggal acuan perkiraan habis: akhir periode, atau hari ini bila periode belum berakhir
@@ -3475,15 +3477,20 @@ var PANDUAN = [
       if(so==='nama')return a.x.n.localeCompare(b.x.n);
       if(so==='order')return (b.need-a.need)||((a.cov==null?9e9:a.cov)-(b.cov==null?9e9:b.cov));
       return (a.cov==null?9e9:a.cov)-(b.cov==null?9e9:b.cov)||a.x.n.localeCompare(b.x.n);});
-    var rows=f.map(function(r,i){var x=r.x, sa=x.sa?' '+esc(x.sa):'';
+    var per=10, pg=Math.max(1,Math.ceil(f.length/per)); DK.cp=Math.min(Math.max(1,DK.cp||1),pg);
+    var a0=(DK.cp-1)*per, rows=f.slice(a0,a0+per).map(function(r,i){var x=r.x, sa=x.sa?' '+esc(x.sa):'';
       var w=r.cov==null?0:Math.max(r.cov>0?4:0,Math.min(r.cov,CUK.target)/CUK.target*100);
       var bar='<div class="dk-cuk-b"><div class="trk"><i class="'+r.lv+'" style="width:'+w+'%"></i><u style="left:'+(CUK.kritis/CUK.target*100)+'%" title="batas kritis"></u></div><span>'+(r.cov==null?'–':cuF(r.cov)+' bln')+'</span></div>';
       var hb=r.hab==null?'<span class="dk-cuk-mut">–</span>':(r.cov<=0?'<b>Sudah habis</b>':r.hab.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}));
       var od=r.avg>0?(r.need>0?'<span class="dk-cuk-ord"><b>'+r.need+'</b>'+sa+'</span>':'<span class="dk-cuk-mut">Tidak perlu</span>'):'<span class="dk-cuk-mut">–</span>';
-      return '<tr><td>'+(i+1)+'</td><td>'+esc(x.n)+(x.s?'<small>'+esc(x.s)+'</small>':'')+'</td><td class="num"'+(x.e<=0?' style="color:#ff6b6b;font-weight:600"':'')+'>'+x.e+sa+'</td><td class="num">'+(r.avg>0?cuF(r.avg)+sa:'–')+'</td><td>'+bar+'</td><td>'+hb+'</td><td class="num">'+od+'</td><td><span class="dk-pill '+r.lv+'">'+CUKL[r.lv]+'</span></td></tr>';}).join('');
+      return '<tr><td>'+(a0+i+1)+'</td><td>'+esc(x.n)+(x.s?'<small>'+esc(x.s)+'</small>':'')+'</td><td class="num"'+(x.e<=0?' style="color:#ff6b6b;font-weight:600"':'')+'>'+x.e+sa+'</td><td class="num">'+(r.avg>0?cuF(r.avg)+sa:'–')+'</td><td>'+bar+'</td><td>'+hb+'</td><td class="num">'+od+'</td><td><span class="dk-pill '+r.lv+'">'+CUKL[r.lv]+'</span></td></tr>';}).join('');
     $('dkCukT').tBodies[0].innerHTML=rows||'<tr><td colspan="8">Tidak ada reagensia yang cocok.</td></tr>';
     $('dkCukNote').textContent='Periode '+m.name+(m.yr?' '+m.yr:'')+'. Kecukupan = stok akhir dibagi rata-rata pemakaian '+CUK.jendela+' bulan terakhir. Kritis bila kurang dari '+CUK.kritis+' bulan. Saran order = pemakaian '+CUK.target+' bulan dikurangi stok akhir.';
-    $('dkCukI').textContent='Menampilkan '+f.length+' dari '+all.length+' reagensia. Garis putih pada bar = batas kritis ('+CUK.kritis+' bulan); bar penuh = '+CUK.target+' bulan atau lebih. Perkiraan habis dihitung dari laju pemakaian rata-rata dan bisa berubah bila pemakaian berubah.';
+    $('dkCukPI').textContent='Menampilkan '+(f.length?a0+1:0)+' - '+Math.min(a0+per,f.length)+' dari '+f.length+' reagensia (halaman '+DK.cp+' dari '+pg+')';
+    var s0=Math.max(1,Math.min(DK.cp-2,pg-4)), pb='<button type="button" data-p="'+(DK.cp-1)+'" aria-label="Halaman sebelumnya">‹</button>';
+    for(var pi=s0;pi<=Math.min(pg,s0+4);pi++)pb+='<button type="button" data-p="'+pi+'"'+(pi===DK.cp?' class="on"':'')+'>'+pi+'</button>';
+    $('dkCukP').innerHTML=pb+'<button type="button" data-p="'+(DK.cp+1)+'" aria-label="Halaman berikutnya">›</button>';
+    $('dkCukI').textContent='Total '+all.length+' reagensia. Garis putih pada bar = batas kritis ('+CUK.kritis+' bulan); bar penuh = '+CUK.target+' bulan atau lebih. Perkiraan habis dihitung dari laju pemakaian rata-rata dan bisa berubah bila pemakaian berubah.';
   }
   function dkCukSalin(ev){
     var m=DK.cm; if(!m||!DK.cu)return;
