@@ -1111,6 +1111,12 @@ html[data-theme="biru"] #themeBtn{background:#fff;color:#0b3d91}
 .sk-kpi.tot{background:linear-gradient(135deg,#e6f1fd,#fff)}.sk-kpi.tot .ico{background:#1668e3}.sk-kpi.tot .t{color:#0b3d91}
 .sk-filter{display:flex;gap:10px;margin-bottom:12px}
 .sk-filter input{flex:1;min-width:0}.sk-filter select{width:150px}
+.sk-copybar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.sk-copybar select{width:190px}
+.sk-copy-mini{border:0;cursor:pointer;border-radius:10px;padding:9px 16px;background:linear-gradient(180deg,#2b7cf0,#1668e3);color:#fff;font-weight:600;font-size:.85rem;font-family:inherit;white-space:nowrap}
+.sk-copy-mini:hover{filter:brightness(1.06)}
+.sk-copybar small{color:#5b6675;font-size:.78rem}
+@media(max-width:560px){.sk-copybar select,.sk-copy-mini{width:100%}}
 .sk-scroll{max-height:420px;overflow:auto;border-radius:12px}
 #skTbl{width:100%;border-collapse:collapse;font-size:.8rem}
 #skTbl th{position:sticky;top:0;background:#eaf3fe;color:#35517d;text-align:left;font-weight:600;padding:9px 8px;white-space:nowrap;z-index:1}
@@ -2210,6 +2216,7 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
           <div class="sk-card sk-tbl-card">
             <h3 class="sk-h">Informasi Ketersediaan Reagensia</h3>
             <div class="sk-filter"><input id="stokCariB" type="search" autocomplete="off" placeholder="Cari nama reagensia..." aria-label="Cari nama reagensia"><select id="stokStatusB" autocomplete="off" aria-label="Filter status"><option value="">Semua Status</option><option value="Order">Perlu Order</option><option value="Habis">Habis</option><option value="Aman">Aman</option></select></div>
+            <div class="sk-copybar staff-only"><select id="skSalinMode" autocomplete="off" aria-label="Pilih daftar yang disalin"><option value="both">Habis + Perlu Order</option><option value="Habis">Habis saja</option><option value="Order">Perlu Order saja</option></select><button type="button" class="sk-copy-mini" id="skSalinBtn">📋 Salin daftar reagen</button><small id="skSalinInfo" aria-live="polite"></small></div>
             <div class="sk-scroll"><table id="skTbl"><thead><tr><th>No</th><th>Nama Reagensia</th><th>Stok Saat Ini</th><th>Status</th><th>Aksi</th></tr></thead><tbody><tr><td colspan="5">Memuat data…</td></tr></tbody></table></div>
           </div>
           <div class="sk-card sk-crit-card">
@@ -3324,6 +3331,23 @@ var PANDUAN = [
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,function(){prompt('Salin teks ini:',t);});}
     else prompt('Salin teks ini:',t);
   }
+  // Salin daftar reagen berstatus Habis dan/atau Perlu Order (bulan yang sedang dipilih). mode: 'both' | 'Habis' | 'Order'
+  function salinStatus(mode,b){
+    var m=bulan[$('stokBulan').selectedIndex]; if(!m||!b)return;
+    var o=b.innerHTML, done=function(msg){b.textContent=msg;setTimeout(function(){b.innerHTML=o;},1800);};
+    function baris(x,i){var u=x.sa?' '+x.sa:'';
+      return (i+1)+'. '+x.n+' - stok akhir '+x.e+u+(x.b!=null?', buffer '+x.b+u+(x.b>x.e?' (kurang '+(x.b-x.e)+u+')':''):'');}
+    var hb=m.items.filter(function(x){return status(x)==='Habis';}),
+        od=m.items.filter(function(x){return status(x)==='Order';}),
+        per=m.name+(m.yr?' '+m.yr:''), t, n=0;
+    if(mode==='Habis'){ n=hb.length; t='Reagen HABIS - '+per+':\n'+(n?hb.map(baris).join('\n'):'Tidak ada reagen yang habis.'); }
+    else if(mode==='Order'){ n=od.length; t='Reagen PERLU ORDER - '+per+':\n'+(n?od.map(baris).join('\n'):'Tidak ada reagen yang perlu order.'); }
+    else { n=hb.length+od.length; t='Daftar reagen HABIS dan PERLU ORDER - '+per+':\n'+(n?
+      (hb.length?'\nHABIS ('+hb.length+'):\n'+hb.map(baris).join('\n')+'\n':'')+(od.length?'\nPERLU ORDER ('+od.length+'):\n'+od.map(baris).join('\n'):''):'Tidak ada reagen yang habis atau perlu order.'); t=t.replace(/\n+$/,''); }
+    var info=$('skSalinInfo'); if(info)info.textContent=n?(n+' reagen disalin.'):'Tidak ada reagen pada daftar ini.';
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){done('✔ Tersalin ('+n+')');},function(){prompt('Salin teks ini:',t);});}
+    else prompt('Salin teks ini:',t);
+  }
 
   /* ===== Tampilan gelap (sesuai mockup): kartu ringkasan, daftar stok, grafik kategori & status ===== */
   var DK={p:1,ok:0,it:[]}, DKCOL=['#1d6fe0','#12a36c','#f5a800','#8b4ee0','#10b8d6','#8a96b0'], DKCAT=['Kimia Klinik','Imunologi','Mikrobiologi','Hematologi','Urinalisa','Lain-lain'], DKL={ok:'Aman',warn:'Perlu Order',bad:'Habis'};
@@ -3353,6 +3377,7 @@ var PANDUAN = [
       '<div class="dk-grid"><div class="dk-p"><h3>Daftar Stok Reagensia</h3>'+
       '<div class="dk-filter"><input id="dkQ" type="search" autocomplete="off" placeholder="Cari reagensia..."><select id="dkC"><option value="">Semua Kategori</option>'+DKCAT.map(function(c,i){return '<option value="'+i+'">'+c+'</option>';}).join('')+'</select><select id="dkSr" aria-label="Filter sumber reagen"><option value="">Semua Sumber</option></select>'+
       '<select id="dkSt"><option value="">Semua Status</option><option value="ok">Aman</option><option value="warn">Perlu Order</option><option value="bad">Habis</option></select></div>'+
+      '<div class="dk-filter staff-only"><select id="dkSalinMode" aria-label="Pilih daftar yang disalin"><option value="both">Habis + Perlu Order</option><option value="Habis">Habis saja</option><option value="Order">Perlu Order saja</option></select><button type="button" class="dk-btn o" id="dkSalinBtn">📋 Salin daftar reagen</button></div>'+
       '<div style="overflow-x:auto"><table class="dk-t" id="dkT"><thead><tr><th>No</th><th>Nama Reagensia</th><th>Kategori</th><th>Sumber</th><th>Stok Saat Ini</th><th>Satuan</th><th>Status</th><th>Tanggal Expired</th><th>Aksi</th></tr></thead><tbody></tbody></table></div>'+
       '<div class="dk-pg"><span id="dkI"></span><div id="dkP"></div></div></div>'+
       '<div><div class="dk-p"><h3>Stok Reagensia per Kategori</h3><div class="dk-ch"><canvas id="dkBar"></canvas></div></div>'+
@@ -3364,6 +3389,7 @@ var PANDUAN = [
     $('dkTgl').textContent=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
     ['dkQ','dkC','dkSr','dkSt'].forEach(function(i){$(i).addEventListener(i==='dkQ'?'input':'change',function(){DK.p=1;dkTbl();});});
     $('dkBln').addEventListener('change',function(){$('stokBulan').selectedIndex=+this.value;DK.p=1;render();});
+    $('dkSalinBtn').addEventListener('click',function(ev){salinStatus($('dkSalinMode').value,ev.currentTarget);});
     $('dkExp').addEventListener('click',function(e){if(!e.target.closest('.dk-exb'))return;DK.ex=!DK.ex;dkExp();});
     $('dkRbBtn').addEventListener('click',function(){DK.rb=!DK.rb;this.textContent=DK.rb?'Sembunyikan':'Lihat Detail';this.setAttribute('aria-expanded',DK.rb?'true':'false');dkRb();});
     $('dkP').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;DK.p=Math.max(1,+b.dataset.p);dkTbl();});
@@ -3558,6 +3584,7 @@ var PANDUAN = [
   $('stokCari').addEventListener('input',function(){skSync($('stokCari'),$('stokCariB'));}); $('stokStatus').addEventListener('change',function(){skSync($('stokStatus'),$('stokStatusB'));}); $('stokSalinB').addEventListener('click',salin);
   $('skTbl').addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.sk-det-btn'); if(!b)return; var tr=b.closest('tr').nextElementSibling; if(tr)tr.hidden=!tr.hidden;});
    $('stokReagen').addEventListener('change',usage); $('skReagen').addEventListener('change',skUsage); $('stokTahun').addEventListener('change',function(){applyTahun(false);render();}); $('stokMuat').addEventListener('click',load); $('stokSalin').addEventListener('click',salin);
+  $('skSalinBtn').addEventListener('click',function(ev){salinStatus($('skSalinMode').value,ev.currentTarget);});
   var _t=window.toggleStaff; window.toggleStaff=function(){_t.apply(this,arguments);sync();};
   window.__stokParse=parse; window.__stokCsv=csv;
   sync();
