@@ -2714,6 +2714,97 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
 })();
 </script>
 <script>
+/* Gaya batang seperti ilustrasi 3D: badan putih ke biru dengan sudut atas membulat,
+   alas biru tebal, dan untuk grafik berlabel bulan/tahun ditambah garis tren dengan bulatan. */
+(function(){
+  if(typeof Chart==='undefined') return;
+  var cv=document.createElement('canvas').getContext('2d'), cache={};
+  var MON=/^(jan|feb|mar|apr|mei|may|jun|jul|agu|aug|sep|okt|oct|nov|des|dec)/i;
+  function rgb(c){
+    if(cache[c]) return cache[c];
+    cv.fillStyle='#000000'; cv.fillStyle=c;
+    var s=cv.fillStyle, m=/^#([0-9a-f]{6})$/i.exec(s), r,g,b;
+    if(m){var n=parseInt(m[1],16); r=n>>16; g=(n>>8)&255; b=n&255;}
+    else{var q=(s.match(/[\d.]+/g)||[0,0,0]); r=+q[0]; g=+q[1]; b=+q[2];}
+    return (cache[c]=[r,g,b]);
+  }
+  function mix(k,t,a){return 'rgb('+[0,1,2].map(function(i){return Math.round(k[i]+(t-k[i])*a);}).join(',')+')';}
+  function colorOf(ds,i){
+    var c=ds.backgroundColor; if(Array.isArray(c)) c=c[i%c.length];
+    return (typeof c==='string')?c:'#1aaee6';
+  }
+  function isBar(ch,m){return m && m.type==='bar' && !m.hidden && ch.options.indexAxis!=='y';}
+  function timeLabels(ch){
+    var L=ch.data.labels||[]; if(L.length<3) return false; var n=0;
+    L.forEach(function(l){var s=String(l); if(MON.test(s)||/^(19|20)\d{2}\b/.test(s)) n++;});
+    return n>=L.length*0.7;
+  }
+  function roundPath(ctx,L,T,R,B,rt,rb){
+    ctx.beginPath(); ctx.moveTo(L,B); ctx.lineTo(L,T+rt); ctx.arcTo(L,T,L+rt,T,rt);
+    ctx.lineTo(R-rt,T); ctx.arcTo(R,T,R,T+rt,rt); ctx.lineTo(R,B-rb); ctx.arcTo(R,B,R-rb,B,rb);
+    ctx.lineTo(L+rb,B); ctx.arcTo(L,B,L,B-rb,rb); ctx.closePath();
+  }
+  function body(ctx,el,c){
+    var w=el.width, x=el.x, L=x-w/2, R=x+w/2;
+    var T=Math.min(el.y,el.base), B=Math.max(el.y,el.base), H=B-T;
+    if(H<2) return;
+    var k=rgb(c), r=Math.min(w*0.22,16), hb=H>50?Math.min(14,H*0.2):0;
+    var bodyB=B-hb;
+    if(bodyB-T>2){
+      var g=ctx.createLinearGradient(0,T,0,bodyB);
+      g.addColorStop(0,mix(k,255,.93)); g.addColorStop(.6,mix(k,255,.7)); g.addColorStop(1,mix(k,255,.45));
+      roundPath(ctx,L,T,R,bodyB,Math.min(r,(bodyB-T)/2),2);
+      ctx.fillStyle=g; ctx.fill();
+      var s=ctx.createLinearGradient(L,0,R,0);
+      s.addColorStop(0,'rgba(255,255,255,.75)'); s.addColorStop(.3,'rgba(255,255,255,.15)'); s.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.fillStyle=s; ctx.fill();
+    }
+    if(hb){
+      var sl=L-4, sr=R+4, sg=ctx.createLinearGradient(0,B-hb,0,B);
+      sg.addColorStop(0,mix(k,255,.25)); sg.addColorStop(1,mix(k,0,.15));
+      roundPath(ctx,sl,B-hb,sr,B,5,5);
+      ctx.fillStyle=sg; ctx.fill();
+      var hl=ctx.createLinearGradient(sl,0,sl+(sr-sl)*0.4,0);
+      hl.addColorStop(0,'rgba(255,255,255,.45)'); hl.addColorStop(1,'rgba(255,255,255,0)');
+      roundPath(ctx,sl,B-hb,sr,B,5,5); ctx.fillStyle=hl; ctx.fill();
+    }
+  }
+  function trend(ctx,m,c){
+    var pts=[];
+    m.data.forEach(function(e){ if(e && e.width) pts.push({x:e.x, y:Math.min(e.y,e.base)-10}); });
+    if(pts.length<3) return;
+    var k=rgb(c), line=mix(k,0,.05);
+    ctx.save();
+    ctx.lineJoin='round'; ctx.lineCap='round';
+    ctx.strokeStyle=mix(k,0,.1); ctx.lineWidth=4;
+    ctx.beginPath(); pts.forEach(function(p,i){ i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y); }); ctx.stroke();
+    pts.forEach(function(p){
+      var rg=ctx.createRadialGradient(p.x-2,p.y-3,1,p.x,p.y,8);
+      rg.addColorStop(0,'#ffffff'); rg.addColorStop(.35,mix(k,255,.35)); rg.addColorStop(1,mix(k,0,.1));
+      ctx.shadowColor='rgba(0,60,120,.35)'; ctx.shadowBlur=6; ctx.shadowOffsetY=2;
+      ctx.beginPath(); ctx.arc(p.x,p.y,7,0,Math.PI*2); ctx.fillStyle=rg; ctx.fill();
+    });
+    ctx.restore();
+  }
+  Chart.register({id:'bar3d',
+    beforeDatasetDraw:function(ch,args){
+      if(!isBar(ch,args.meta)) return;
+      ch.ctx.save(); ch.ctx.globalAlpha=0;
+    },
+    afterDatasetDraw:function(ch,args){
+      var m=args.meta; if(!isBar(ch,m)) return;
+      var ctx=ch.ctx, ds=ch.data.datasets[args.index];
+      ctx.restore();
+      ctx.save();
+      m.data.forEach(function(el,i){ if(el && el.width) body(ctx,el,colorOf(ds,i)); });
+      ctx.restore();
+      var first=ch.data.datasets.findIndex(function(d,j){return isBar(ch,ch.getDatasetMeta(j));});
+      if(args.index===first && timeLabels(ch)) trend(ctx,m,colorOf(ds,0));
+    }
+  });
+})();
+</script>
+<script>
 /* Animasi grafik dibuat singkat dan hanya saat grafik pertama kali dirender.
    Tidak ada reset/update berulang saat pengguna menggulir halaman. */
 (function(){
