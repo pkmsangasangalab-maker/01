@@ -4787,7 +4787,12 @@ var sdGlow={id:'sdGlow',
  beforeDraw:function(ch){var a=ch.chartArea;if(!a)return;var cx=(a.left+a.right)/2,cy=(a.top+a.bottom)/2,R=Math.max(a.right-a.left,a.bottom-a.top)*0.6;var g=ch.ctx.createRadialGradient(cx,cy,0,cx,cy,R);g.addColorStop(0,'rgba(40,130,210,.22)');g.addColorStop(1,'rgba(10,26,58,0)');ch.ctx.save();ch.ctx.fillStyle=g;ch.ctx.fillRect(a.left,a.top,a.right-a.left,a.bottom-a.top);ch.ctx.restore();},
  beforeDatasetDraw:function(ch,args){if(args.index!==0)return;ch.ctx.save();ch.ctx.shadowColor='rgba(56,232,255,.65)';ch.ctx.shadowBlur=14;},
  afterDatasetDraw:function(ch,args){if(args.index!==0)return;var ctx=ch.ctx,m=args.meta,sts=ch.data.datasets[0].sdSt||[];ctx.restore();
-   m.data.forEach(function(el,i){var st=sts[i];if(!el||st==='ok'||st==null)return;var col=st==='tolak'?'255,107,107':'251,191,36';ctx.save();ctx.beginPath();ctx.arc(el.x,el.y,13,0,Math.PI*2);ctx.fillStyle='rgba('+col+',.22)';ctx.fill();ctx.lineWidth=1.5;ctx.strokeStyle='rgba('+col+',.85)';ctx.stroke();ctx.restore();});}
+   m.data.forEach(function(el,i){var st=sts[i];if(!el||st==='ok'||st==null)return;var red=st==='tolak',col=red?'255,107,107':'251,191,36',tag=red?'1-3s':'1-2s';
+     ctx.save();ctx.beginPath();ctx.arc(el.x,el.y,13,0,Math.PI*2);ctx.fillStyle='rgba('+col+',.22)';ctx.fill();ctx.lineWidth=1.5;ctx.strokeStyle='rgba('+col+',.85)';ctx.stroke();ctx.restore();
+     /* label aturan Westgard di atas titik */
+     ctx.save();ctx.font='700 11px Segoe UI, Tahoma, sans-serif';var w=ctx.measureText(tag).width+12,y=el.y-26;
+     ctx.beginPath();ctx.roundRect?ctx.roundRect(el.x-w/2,y-9,w,18,9):ctx.rect(el.x-w/2,y-9,w,18);ctx.fillStyle='rgba(5,13,32,.92)';ctx.fill();ctx.strokeStyle='rgba('+col+',.9)';ctx.lineWidth=1;ctx.stroke();
+     ctx.fillStyle='rgb('+col+')';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(tag,el.x,y+0.5);ctx.restore();});}
 };
 function render(){
  var b=selected();if(!b){$('sdKpi').textContent='Belum ada data untuk filter ini.';if(ch){ch.destroy();ch=null}$('sdTbl').querySelector('tbody').innerHTML='';return}
