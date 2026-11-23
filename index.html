@@ -22,6 +22,25 @@
     updateThemeBtn();
     if(window.permataChartRefresh){try{permataChartRefresh();}catch(e){}}}
   document.addEventListener('DOMContentLoaded',updateThemeBtn);
+
+  // Sidebar: tutup (kolom ikon) / perluas. Pilihan disimpan per perangkat.
+  (function(){try{if(localStorage.getItem('permata_side')==='1')document.documentElement.classList.add('side-collapsed');}catch(e){}})();
+  function updateSideBtn(){
+    var col=document.documentElement.classList.contains('side-collapsed');
+    var b=document.getElementById('sideToggle');
+    if(b){var l=b.querySelector('.lbl');if(l)l.textContent=col?'Buka menu':'Tutup menu';
+      b.setAttribute('aria-label',col?'Perluas menu':'Tutup menu');b.setAttribute('aria-expanded',col?'false':'true');
+      if(col)b.setAttribute('title','Perluas menu');else b.removeAttribute('title');}
+    document.querySelectorAll('.app-sidebar .side-link').forEach(function(x){
+      if(col){var l=x.querySelector('.lbl');
+        if(l)x.setAttribute('title',l.innerHTML.replace(/<br\s*\/?>/gi,' ').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim());}
+      else x.removeAttribute('title');});}
+  function toggleSidebar(){
+    var col=document.documentElement.classList.toggle('side-collapsed');
+    try{localStorage.setItem('permata_side',col?'1':'0');}catch(e){}
+    updateSideBtn();
+    setTimeout(function(){try{window.dispatchEvent(new Event('resize'));}catch(e){}},300);}
+  document.addEventListener('DOMContentLoaded',updateSideBtn);
   </script>
   <style>
     :root {
@@ -705,6 +724,32 @@ body.locked .app-sidebar{display:none}
 .sidebar-brand{margin-top:auto;padding:26px 12px;display:flex;gap:14px;align-items:flex-start;color:var(--pampas)}
 .sidebar-brand strong{display:block;color:var(--ink-2);font-size:1rem;font-weight:500;letter-spacing:.14em}
 .sidebar-brand small{display:block;color:var(--ink-3);font-size:.8rem;line-height:1.55;margin-top:6px}
+
+/* ---------- Sidebar: tutup / perluas (desktop) ---------- */
+body{transition:padding-left .25s ease}
+footer{transition:margin-left .25s ease,padding-left .25s ease}
+.app-sidebar{transition:width .25s ease}
+.side-toggle{display:flex;align-items:center;gap:12px;width:100%;padding:10px 16px;margin-bottom:8px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.55);color:var(--ink-2);font-size:.85rem;cursor:pointer;transition:background .2s,color .2s}
+.side-toggle:hover{background:rgba(255,255,255,.9);color:var(--ink)}
+.side-toggle .ic{flex:0 0 auto;transition:transform .25s ease}
+html[data-theme="biru"] .side-toggle{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);color:#fff}
+html[data-theme="biru"] .side-toggle:hover{background:rgba(255,255,255,.22)}
+@media(min-width:901px){
+  html.side-collapsed{--side-w:78px}
+  html.side-collapsed .app-sidebar{padding-left:12px;padding-right:12px;overflow-x:hidden}
+  html.side-collapsed .side-toggle{justify-content:center;padding:10px 0}
+  html.side-collapsed .side-toggle .ic{transform:rotate(180deg)}
+  html.side-collapsed .side-toggle .lbl,
+  html.side-collapsed .side-link .lbl,
+  html.side-collapsed .side-link .chev,
+  html.side-collapsed .sidebar-brand>div{display:none}
+  html.side-collapsed .side-link{justify-content:center;padding:13px 0;gap:0}
+  html.side-collapsed .side-label{font-size:0;height:1px;padding:0;margin:10px 8px;background:var(--line)}
+  html[data-theme="biru"].side-collapsed .side-label{background:rgba(255,255,255,.25)}
+  html.side-collapsed .sidebar-brand{justify-content:center;padding:26px 0}
+}
+@media(max-width:900px){.side-toggle{display:none}}
+@media(prefers-reduced-motion:reduce){body,footer,.app-sidebar,.side-toggle .ic{transition:none}}
 
 /* ---------- Konten (logika tampilan menu — tidak diubah) ---------- */
 .dashboard-container{width:100%;max-width:none;margin:0;padding:26px 28px 34px;flex:1}
@@ -1708,6 +1753,7 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
 
 
   <aside class="app-sidebar" aria-label="Navigasi utama">
+    <button class="side-toggle" id="sideToggle" type="button" onclick="toggleSidebar()" aria-label="Tutup menu" aria-expanded="true"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></svg><span class="lbl">Tutup menu</span></button>
     <nav class="side-nav">
       <button class="side-link active" data-nav="home" onclick="setView('home', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-6h4v6"/></svg><span class="lbl">Beranda</span></button>
       <button class="side-link staff-only" data-nav="tasks" onclick="setView('tasks', this)"><svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg><span class="lbl">Dashboard Tasks</span></button>
