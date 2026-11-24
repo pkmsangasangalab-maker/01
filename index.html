@@ -3036,6 +3036,7 @@ tr.ex-hot td{background:rgba(229,56,59,.2)!important}
     $('kpi4').textContent=act; $('kpi4s').textContent='dari '+d.exams.length+' jenis tercatat';
 
     rsKpi(d,yrs,yi,totals,ranked);
+    window.__kpi_year={yrs:yrs,yi:yi,totals:totals,visits:d.visits,exams:d.exams}; window.dispatchEvent(new Event('kpi:data'));
     if(typeof Chart==='undefined'){ $('ringkasanNote').textContent='Library grafik gagal dimuat. Periksa koneksi internet.'; return; }
     if(window.permataChartDefaults){permataChartDefaults();}else{Chart.defaults.color='#6a665f'; Chart.defaults.font.family="'Segoe UI',Tahoma,sans-serif";}
     var grid={color:'rgba(160,190,240,.2)'}, MT='#d6e5ff', ML='#eaf1ff', WARNAM=['#4da3ff','#34d399','#fbbf24','#b79cff','#ff8fb1','#a9b8d6'];
@@ -3371,6 +3372,7 @@ var PANDUAN = [
     $('stokN').textContent=m.items.length; $('stokH').textContent=h; $('stokM').textContent=w;
     $('stokA').textContent=m.items.filter(function(x){return status(x)==='Aman';}).length;
     charts(m); usage(); skRender(m); dkS(m); alertRender(m);
+    window.__kpi_stok={bulan:bulan,idx:$('stokBulan').selectedIndex,status:status}; window.dispatchEvent(new Event('kpi:data'));
   }
   var sc={};
   function charts(m){
@@ -3930,6 +3932,7 @@ var PANDUAN = [
     el.innerHTML='Tingkat kesesuaian waktu tunggu pelayanan laboratorium (≥'+TARGET+'%) '+(ca>=TARGET?'tercapai':'belum tercapai')+' dengan capaian rata-rata <b>'+pc(ca)+'</b> pada tahun '+cy+
       (pa!=null?', <span class="'+(ca>=pa?'up':'down')+'">'+(ca>pa?'meningkat dari ':ca<pa?'menurun dari ':'sama dengan ')+pc(pa)+'</span> pada tahun '+py:'')+'.';}
   function render(){kpi();table();charts();rsBanner();
+    window.__kpi_mutu={DATA:DATA,BAIK:BAIK,TARGET:TARGET,SHORT:SHORT,years:years()}; window.dispatchEvent(new Event('kpi:data'));
     var n=[];
     n.push(live?'Data langsung dari Google Sheets (tahun '+years().join(', ')+').':'Menampilkan data cadangan (Google Sheets belum terbaca; pastikan dibagikan "siapa saja yang memiliki link").');
     n.push('Rata-rata dihitung dari bulan yang sudah terisi (bulan kosong tidak dihitung), bukan dari kolom total di sheet.');
@@ -4009,13 +4012,15 @@ var PANDUAN = [
     $('hdUpdated').textContent='Data diperbarui: '+d.getDate()+' '+m+' '+d.getFullYear()+' '+fmtT(d);
   }
   function sync(){
-    $('hk1').textContent=txt('kpi1')||'–'; $('hk1s').innerHTML=($('kpi1s')&&$('kpi1s').innerHTML)||'&nbsp;';
     var h=txt('stokH'),m=txt('stokM'),a=txt('stokA'),n=txt('stokN');
+    if(!window.__kpiHome){ /* kartu KPI beranda dipegang modul KPI interaktif bila aktif */
+    $('hk1').textContent=txt('kpi1')||'–'; $('hk1s').innerHTML=($('kpi1s')&&$('kpi1s').innerHTML)||'&nbsp;';
     $('hk2').textContent=(m&&m!=='–')?m:'–';
     $('hk2s').textContent=(h&&h!=='–')?('Habis '+h+' · Aman '+a+' · dari '+n+' jenis'):' ';
     $('hk3').textContent=txt('kpi2')||'–'; $('hk3s').innerHTML=($('kpi2s')&&$('kpi2s').innerHTML)||'&nbsp;';
     var mk=document.querySelectorAll('#mutuKpi .kpi');
     if(mk.length>1){ $('hk4').textContent=mk[1].querySelector('b').textContent; var sm=mk[1].querySelector('small'); $('hk4s').textContent=sm?sm.textContent:' '; }
+    }
     var pend=txt('taskPending')||'0';
     var items=[
       ['tasks','Dashboard Tasks',pend+' tugas belum selesai','ic-a'],
@@ -4569,6 +4574,7 @@ var PANDUAN = [
   function render(){
     if(!D)return;
     var m=sel(), T=D.tot, grand=T.reduce(function(a,b){return a+b;},0);
+    window.__kpi_bln={tot:T,items:D.items,BNM:BNM}; window.dispatchEvent(new Event('kpi:data'));
     var rows=D.items.map(function(it){return {kat:it.kat,n:it.n,v:val(it,m)};});
     var total=m<0?grand:T[m];
     var ranked=rows.filter(function(r){return r.v>0;}).sort(function(a,b){return b.v-a.v;});
@@ -4905,5 +4911,372 @@ $('sdGroup').addEventListener('change',()=>{fill();render();summary()});
 $('sdMuat').addEventListener('click',load);load();setInterval(load,300000);
 })();
 </script>
+<!-- ===== KPI INTERAKTIF (Beranda + Ringkasan Laporan Tahunan) ===== -->
+<style id="kxStyle">
+.kx-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin:0 0 14px;color:var(--ink-2,#6a665f);font-size:.9rem}
+.kx-bar label{font-weight:500;color:var(--ink,#3a3835)}
+.kx-bar select{font:inherit;padding:8px 12px;border-radius:999px;border:1px solid rgba(90,100,120,.28);background:#fff;color:#2b2f36;cursor:pointer}
+.kx-bar .kx-note{flex:1 1 220px;font-size:.82rem;color:var(--ink-3,#908a81)}
+.kx-bar button{font:inherit;font-size:.84rem;padding:7px 14px;border-radius:999px;border:1px solid rgba(90,100,120,.28);background:transparent;color:var(--ink-2,#6a665f);cursor:pointer}
+.kx-bar button:hover{background:rgba(90,130,180,.12)}
+.hk[data-kx]{--kx:var(--sky-deep,#4a7894);cursor:pointer;position:relative;transition:transform .18s ease,box-shadow .18s ease}
+html[data-theme="biru"] .hk[data-kx]{--kx:#1668e3}
+.hk[data-kx]>div:last-child{min-width:0;flex:1}
+.hk[data-kx]{padding:20px 22px;gap:14px}
+.hk[data-kx] .hk-ic{width:60px;height:60px}
+.hk[data-kx] .hk-ic .ic{width:28px;height:28px}
+.hk[data-kx] small{font-size:.92rem}
+.hk[data-kx] b{font-size:2.1rem}
+.hk[data-kx] .hk-sub{display:block;font-size:.8rem;line-height:1.4}
+@media(max-width:929px){.hk[data-kx]{padding:16px}.hk[data-kx] b{font-size:1.8rem}}
+.hk[data-kx]:hover,.hk[data-kx]:focus-visible{transform:translateY(-3px)}
+.hk[data-kx][aria-expanded="true"]{outline:2px solid var(--kx);outline-offset:-2px}
+.hk[data-kx]::after{content:"›";position:absolute;top:12px;right:16px;font-size:1.3rem;line-height:1;color:var(--kx);opacity:.55;transition:transform .2s}
+.hk[data-kx][aria-expanded="true"]::after{transform:rotate(90deg);opacity:1}
+.kx-chip{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.74rem;font-weight:600;white-space:nowrap}
+.hk-sub .kx-chip{margin-left:6px}
+.kx-ok{background:rgba(52,160,110,.16);color:#1d7a50}.kx-mid{background:rgba(230,170,40,.2);color:#8a6100}.kx-bad{background:rgba(220,80,70,.16);color:#b4372e}
+.kx-sp{display:block;margin-top:6px;height:34px;max-width:170px;color:var(--kx,#4a7894)}
+#ringkasan .kx-sp{--kx:#7db8ff}
+.kx-sp svg{width:100%;height:100%;display:block;overflow:visible}
+.kx-sp .kx-pt{fill:transparent;stroke:none;cursor:crosshair}
+.kx-sp .kx-pt:hover{fill:currentColor}
+.kx-sp .kx-pt.kx-hi{fill:currentColor;stroke:#fff;stroke-width:1.5}
+.rs-k[data-kx]{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
+.rs-k[data-kx]:hover,.rs-k[data-kx]:focus-visible{transform:translateY(-3px);box-shadow:0 12px 24px -12px rgba(0,0,0,.5)}
+.rs-k .kx-sp{color:#bcd6ff;max-width:150px}
+@media(prefers-reduced-motion:reduce){.rs-k[data-kx]{transition:none}.rs-k[data-kx]:hover,.rs-k[data-kx]:focus-visible{transform:none}}
+#ringkasan .rs-kera .kpi[data-kx]{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
+#ringkasan .rs-kera .kpi[data-kx]:hover,#ringkasan .rs-kera .kpi[data-kx]:focus-visible{transform:translateY(-3px)}
+.kx-pulse{animation:kxPulse 1.6s ease}
+@keyframes kxPulse{0%,100%{box-shadow:0 0 0 0 rgba(77,163,255,0)}25%{box-shadow:0 0 0 4px rgba(77,163,255,.65)}}
+.kx-tip{position:fixed;z-index:9999;pointer-events:none;padding:6px 10px;border-radius:8px;background:#1b2740;color:#fff;font-size:.78rem;line-height:1.35;box-shadow:0 8px 20px rgba(0,0,0,.28);opacity:0;transform:translate(-50%,-110%);transition:opacity .12s;white-space:nowrap}
+.kx-tip.on{opacity:1}
+.kx-detail{margin:0 0 22px;padding:20px 24px;border-radius:24px;background:#fff;border:1px solid rgba(22,80,160,.14);box-shadow:var(--lift,0 14px 30px -16px rgba(22,80,160,.35));color:var(--ink,#3a3835)}
+.kx-detail[hidden]{display:none}
+.kx-dhead{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px}
+.kx-dhead h3{margin:0;font-size:1.08rem;font-weight:600;flex:1 1 240px}
+.kx-dhead button{font:inherit;font-size:.85rem;padding:8px 16px;border-radius:999px;border:1px solid rgba(90,100,120,.28);background:transparent;color:inherit;cursor:pointer}
+.kx-dhead button:hover{background:rgba(90,130,180,.14)}
+.kx-dhead .kx-go{background:#1668e3;border-color:#1668e3;color:#fff}.kx-dhead .kx-go:hover{background:#1257c9}
+.kx-dbody{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px;align-items:start}
+.kx-dchart{position:relative;height:270px}
+.kx-dlist{max-height:310px;overflow:auto;font-size:.88rem}
+.kx-dlist table{width:100%;border-collapse:collapse}
+.kx-dlist th{position:sticky;top:0;background:#fff;text-align:left;font-weight:600;font-size:.76rem;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-3,#908a81);padding:6px 8px}
+.kx-dlist td{padding:7px 8px;border-top:1px solid rgba(90,100,120,.14)}
+.kx-dlist .n{text-align:right;font-variant-numeric:tabular-nums}
+.kx-dlist tr.sel td{background:rgba(22,104,227,.1)}
+.kx-dlist tr[data-p]{cursor:pointer}.kx-dlist tr[data-p]:hover td{background:rgba(22,104,227,.07)}
+.kx-bar2{display:block;height:6px;border-radius:4px;background:rgba(90,130,180,.18);margin-top:4px;overflow:hidden}
+.kx-bar2 i{display:block;height:100%;background:#1668e3;border-radius:4px}
+.kx-empty{padding:18px 4px;color:var(--ink-3,#908a81)}
+.kx-copy{margin:0 0 10px;font:inherit;font-size:.82rem;padding:6px 14px;border-radius:999px;border:1px solid rgba(90,100,120,.28);background:transparent;color:inherit;cursor:pointer}
+@media(max-width:860px){.kx-dbody{grid-template-columns:1fr}.kx-dchart{height:230px}.kx-detail{padding:16px}}
+@media(prefers-reduced-motion:reduce){.hk[data-kx],#ringkasan .rs-kera .kpi[data-kx],.kx-tip{transition:none}.hk[data-kx]:hover,.hk[data-kx]:focus-visible,#ringkasan .rs-kera .kpi[data-kx]:hover{transform:none}.kx-pulse{animation:none;outline:3px solid rgba(77,163,255,.7)}}
+</style>
+<script id="kxScript">
+(function(){
+  'use strict';
+  var $=function(i){return document.getElementById(i);};
+  var BLN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  var SH=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  var REDUCE=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var S={month:'all',open:0}, chart=null, tip=null;
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function fmt(n){return n==null||isNaN(n)?'–':Number(n).toLocaleString('id-ID',{maximumFractionDigits:0});}
+  function f1(n){return Number(n).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1});}
+  function f2(n){return Number(n).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function pct(n){return n==null?'–':Number(n).toLocaleString('id-ID',{maximumFractionDigits:1})+'%';}
+  function cssv(n,d){var v=getComputedStyle(document.documentElement).getPropertyValue(n).trim();return v||d;}
+  function Y(){return window.__kpi_year;} function ST(){return window.__kpi_stok;} function MU(){return window.__kpi_mutu;} function BL(){return window.__kpi_bln;}
+  function curYear(){var y=Y();return y?y.yrs[y.yi]:null;}
+  function lastNN(a){for(var i=a.length-1;i>=0;i--)if(a[i]!=null)return i;return -1;}
+  function lastIdx(a){for(var i=a.length-1;i>=0;i--)if(a[i]!=null&&a[i]>0)return i;return -1;}
+
+  /* ---------- angka naik (count-up) ---------- */
+  function countTo(el,to,fn){
+    if(!el)return; fn=fn||fmt;
+    var from=el.__kxv; el.__kxv=to; if(from==null&&!REDUCE)from=0;
+    if(REDUCE||isNaN(from)||from===to){el.textContent=fn(to);return;}
+    var t0=performance.now(),D=650; cancelAnimationFrame(el.__kxraf);
+    (function step(t){var p=Math.min(1,(t-t0)/D),e=1-Math.pow(1-p,3); el.textContent=fn(from+(to-from)*e);
+      if(p<1)el.__kxraf=requestAnimationFrame(step);else{el.textContent=fn(to);}})(t0);
+  }
+
+  /* ---------- sparkline (SVG) + tooltip ---------- */
+  function spark(vals,labels,hi,fn){
+    var W=150,H=34,P=4,pts=[],mn=Infinity,mx=-Infinity,i,v;
+    for(i=0;i<vals.length;i++){v=vals[i];if(v!=null&&!isNaN(v)){mn=Math.min(mn,v);mx=Math.max(mx,v);}}
+    if(!isFinite(mn))return '';
+    if(mx===mn){mx+=1;mn-=1;}
+    var n=vals.length,X=function(k){return n>1?P+k*(W-2*P)/(n-1):W/2;},Yv=function(x){return H-P-(x-mn)/(mx-mn)*(H-2*P);};
+    var d='',seg=false,area='',first=-1,lastK=-1;
+    for(i=0;i<n;i++){v=vals[i]; if(v==null||isNaN(v)){seg=false;continue;}
+      d+=(seg?'L':'M')+X(i).toFixed(1)+' '+Yv(v).toFixed(1)+' '; seg=true; if(first<0)first=i; lastK=i;}
+    if(first>=0&&lastK>first)area=d+'L'+X(lastK).toFixed(1)+' '+(H-P)+' L'+X(first).toFixed(1)+' '+(H-P)+' Z';
+    var g='<svg viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+
+      (area&&d.indexOf('M',1)<0?'<path d="'+area+'" fill="currentColor" opacity=".13"/>':'')+
+      '<path d="'+d+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+    for(i=0;i<n;i++){v=vals[i]; if(v==null||isNaN(v))continue;
+      g+='<circle class="kx-pt'+(i===hi?' kx-hi':'')+'" cx="'+X(i).toFixed(1)+'" cy="'+Yv(v).toFixed(1)+'" r="'+(i===hi?3.6:5)+'" data-t="'+esc(labels[i]+': '+(fn||fmt)(v))+'"/>';}
+    return g+'</svg>';
+  }
+  function ensureTip(){if(!tip){tip=document.createElement('div');tip.className='kx-tip';tip.setAttribute('role','tooltip');document.body.appendChild(tip);}return tip;}
+  document.addEventListener('pointerover',function(e){var t=e.target.closest&&e.target.closest('.kx-pt'); if(!t)return;
+    var b=t.getBoundingClientRect(),el=ensureTip(); el.textContent=t.getAttribute('data-t'); el.style.left=(b.left+b.width/2)+'px'; el.style.top=b.top+'px'; el.classList.add('on');});
+  document.addEventListener('pointerout',function(e){var t=e.target.closest&&e.target.closest('.kx-pt'); if(t&&tip)tip.classList.remove('on');});
+
+  /* ---------- model data tiap kartu beranda ---------- */
+  function J(a){return a.filter(Boolean).join(' · ');}
+  function delta(cur,prev,lbl,inverse,dec){
+    if(prev==null||cur==null||isNaN(prev))return '';
+    var d=cur-prev; if(Math.abs(d)<1e-9)return '= sama dengan '+lbl;
+    var good=inverse?d<0:d>=0, p=prev?Math.abs(d/prev*100):null;
+    return '<span class="'+(good?'up':'down')+'">'+(d>0?'▲ ':'▼ ')+(dec?f1(Math.abs(d)):(p!=null&&!dec?f1(p)+'%':fmt(Math.abs(d))))+'</span> dibanding '+lbl;
+  }
+  function mPemeriksaan(){
+    var y=Y(); if(!y)return null; var b=BL(), yr=y.yrs[y.yi], m=S.month;
+    if(m!=='all'&&b&&yr===2026&&b.tot[m]!=null){
+      var v=b.tot[m],pv=m>0?b.tot[m-1]:null, li=Math.max(lastIdx(b.tot),m);
+      return {v:v,fn:fmt,sub:J([pv>0?delta(v,pv,BLN[m-1]):'',BLN[m]+' 2026']),
+        sp:b.tot.slice(0,li+1),lb:SH.slice(0,li+1).map(function(s){return s+' 2026';}),hi:m,mode:'bulan'};
+    }
+    var pv2=y.yi>0?y.totals[y.yi-1]:null;
+    return {v:y.totals[y.yi],fn:fmt,sub:J([pv2>0?delta(y.totals[y.yi],pv2,y.yrs[y.yi-1]):'',m!=='all'?'data bulanan hanya 2026':'tahun '+yr]),
+      sp:y.totals,lb:y.yrs.map(String),hi:y.yi,mode:'tahun'};
+  }
+  function mKunjungan(){
+    var y=Y(); if(!y)return null; var pv=y.yi>0?y.visits[y.yi-1]:null;
+    return {v:y.visits[y.yi],fn:fmt,sub:J([pv>0?delta(y.visits[y.yi],pv,y.yrs[y.yi-1]):'',S.month!=='all'?'data tahunan':'tahun '+y.yrs[y.yi]]),
+      sp:y.visits,lb:y.yrs.map(String),hi:y.yi};
+  }
+  function stokMonth(){
+    var s=ST(); if(!s||!s.bulan.length)return null; var idx=s.idx<0?0:s.idx, note='';
+    if(S.month!=='all'){var k=-1;s.bulan.forEach(function(b,i){if(b.name.toLowerCase()===BLN[S.month].toLowerCase())k=i;}); if(k>=0)idx=k;else note=' · '+BLN[S.month]+' belum ada data';}
+    return {s:s,idx:idx,note:note};
+  }
+  function stokCount(s,mi){var h=0,w=0,a=0;s.bulan[mi].items.forEach(function(x){var st=s.status(x);if(st==='Habis'){h++;w++;}else if(st==='Order')w++;else if(st==='Aman')a++;});return {h:h,w:w,a:a,n:s.bulan[mi].items.length};}
+  function mReagen(){
+    var sm=stokMonth(); if(!sm)return null; var s=sm.s,c=stokCount(s,sm.idx),b=s.bulan[sm.idx];
+    var series=s.bulan.map(function(_,i){return stokCount(s,i).w;});
+    var pv=sm.idx>0?series[sm.idx-1]:null;
+    return {v:c.w,fn:fmt,sub:'Habis '+c.h+' · Aman '+c.a+' · dari '+c.n+' jenis'+esc(sm.note)+' · '+esc(b.name)+' '+b.yr+(pv!=null&&pv!==c.w?'<span class="kx-chip '+(c.w>pv?'kx-bad':'kx-ok')+'">'+(c.w>pv?'▲ +':'▼ −')+Math.abs(c.w-pv)+' vs '+esc(s.bulan[sm.idx-1].name.slice(0,3))+'</span>':''),
+      sp:series,lb:s.bulan.map(function(x){return x.name+' '+x.yr;}),hi:sm.idx,series:series,sm:sm,c:c};
+  }
+  function mutuStat(p,m){return p==null?['','']:p>=m.BAIK?['Sangat baik','kx-ok']:p>=m.TARGET?['Memenuhi','kx-mid']:['Perlu perbaikan','kx-bad'];}
+  function mWaktu(){
+    var m=MU(); if(!m||!m.years.length)return null; var yr=curYear(); if(m.DATA[yr]==null)yr=m.years[m.years.length-1];
+    var d=m.DATA[yr],f=d.filter(function(x){return x!=null;}),mo=S.month,v,lbl,hi,pv=null,pl='';
+    if(mo!=='all'){v=d[mo];lbl=BLN[mo]+' '+yr;hi=mo;if(mo>0&&d[mo-1]!=null){pv=d[mo-1];pl=BLN[mo-1];}}
+    else{v=f.length?f.reduce(function(a,b){return a+b;},0)/f.length:null;lbl='rata-rata '+f.length+' bln '+yr;hi=lastNN(d);
+      var py=m.years[m.years.indexOf(yr)-1]; if(py&&m.DATA[py]){var pf=m.DATA[py].filter(function(x){return x!=null;});if(pf.length){pv=pf.reduce(function(a,b){return a+b;},0)/pf.length;pl=String(py);}}}
+    var st=mutuStat(v,m), li=Math.max(lastNN(d),0);
+    var dd=(v!=null&&pv!=null)?'<span class="'+(v>=pv?'up':'down')+'">'+(v>=pv?'▲ ':'▼ ')+f1(Math.abs(v-pv))+' poin</span> vs '+pl+' · ':'';
+    return {v:v,fn:function(n){return n==null?'–':(Math.abs(n-Math.round(n))<1e-9?String(Math.round(n)):f1(n))+'%';},
+      sub:dd+esc(lbl)+(st[0]?'<span class="kx-chip '+st[1]+'">'+st[0]+'</span>':(v==null?' · belum ada data':'')),
+      sp:d.slice(0,li+1),lb:SH.slice(0,li+1).map(function(s){return s+' '+yr;}),hi:hi,m:m,yr:yr,d:d,mo:mo};
+  }
+
+  /* ---------- render kartu beranda ---------- */
+  var MODEL=[null,mPemeriksaan,mReagen,mKunjungan,mWaktu];
+  function renderHome(){
+    window.__kpiHome=true;
+    for(var i=1;i<=4;i++){
+      var m=MODEL[i](), el=$('hk'+i), sub=$('hk'+i+'s'), sp=$('kxSp'+i);
+      if(!m){continue;}
+      if(m.v==null){el.__kxv=null;el.textContent='–';}else countTo(el,m.v,m.fn);
+      sub.innerHTML=m.sub||'&nbsp;'; if(sp)sp.innerHTML=spark(m.sp,m.lb,m.hi,m.fn);
+    }
+    if(S.open)renderDetail(S.open);
+  }
+
+  /* ---------- panel detail ---------- */
+  var DETAIL={};
+  function killChart(){if(chart){chart.destroy();chart=null;}}
+  function mkChart(cfg){killChart(); if(typeof Chart==='undefined'){$('kxDChart').parentNode.innerHTML='<div class="kx-empty">Library grafik belum termuat.</div>';return;}
+    var ink=cssv('--ink-2','#5b6577'); Chart.defaults.color=ink; chart=new Chart($('kxDChart'),cfg);}
+  function baseOpts(extra){var o={responsive:true,maintainAspectRatio:false,animation:REDUCE?false:{duration:500},plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:'rgba(90,110,150,.16)'}}}};
+    for(var k in extra)o[k]=extra[k]; return o;}
+  function setMonth(m){S.month=m; $('kxMonth').value=String(m); renderHome();}
+  function setYear(y){var s=$('yearSel'); if(!s)return; s.value=String(y); s.dispatchEvent(new Event('change'));}
+
+  DETAIL[1]=function(){
+    var m=mPemeriksaan(); if(!m)return; var y=Y(),b=BL(),mon=m.mode==='bulan';
+    $('kxDTitle').textContent=mon?'Total Pemeriksaan per Bulan 2026':'Total Pemeriksaan per Tahun'; $('kxGo').onclick=function(){go('ringkasan');};
+    var labels=mon?m.lb.map(function(s){return s.replace(' 2026','');}):m.lb,data=m.sp;
+    mkChart({type:'bar',data:{labels:labels,datasets:[{label:'Pemeriksaan',data:data,borderRadius:6,backgroundColor:data.map(function(_,i){return i===m.hi?'#1668e3':'rgba(22,104,227,.38)';})}]},
+      options:baseOpts({onClick:function(e,els){if(!els.length)return; var i=els[0].index; if(mon)setMonth(i); else setYear(y.yrs[i]);},
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return fmt(c.parsed.y)+' pemeriksaan';}}}}})});
+    var rows=[],tot=0;
+    if(mon){b.items.forEach(function(it){var v=it.v[S.month];if(v>0){rows.push([it.n,v]);tot+=v;}});}
+    else{y.exams.forEach(function(e){var v=e[1][y.yi];if(v>0){rows.push([e[0],v]);tot+=v;}});}
+    rows.sort(function(a,c){return c[1]-a[1];}); var mx=rows.length?rows[0][1]:1;
+    $('kxDList').innerHTML=rows.length?'<table><thead><tr><th>Jenis pemeriksaan ('+esc(mon?BLN[S.month]+' 2026':y.yrs[y.yi])+')</th><th class="n">Jumlah</th></tr></thead><tbody>'+
+      rows.slice(0,8).map(function(r){return '<tr><td>'+esc(r[0])+'<span class="kx-bar2"><i style="width:'+(r[1]/mx*100).toFixed(1)+'%"></i></span></td><td class="n"><b>'+fmt(r[1])+'</b><br><small>'+f1(r[1]/tot*100)+'%</small></td></tr>';}).join('')+'</tbody></table>':'<div class="kx-empty">Belum ada data pemeriksaan pada periode ini.</div>';
+  };
+  DETAIL[3]=function(){
+    var y=Y(); if(!y)return; $('kxDTitle').textContent='Kunjungan Pasien & Pemeriksaan per Kunjungan'; $('kxGo').onclick=function(){go('ringkasan');};
+    var rat=y.yrs.map(function(_,i){return y.visits[i]>0?y.totals[i]/y.visits[i]:null;});
+    mkChart({data:{labels:y.yrs.map(String),datasets:[
+      {type:'bar',label:'Kunjungan',data:y.visits,yAxisID:'y',borderRadius:6,backgroundColor:y.yrs.map(function(_,i){return i===y.yi?'#1668e3':'rgba(22,104,227,.38)';})},
+      {type:'line',label:'Pemeriksaan per kunjungan',data:rat,yAxisID:'y2',borderColor:'#e0902a',backgroundColor:'#e0902a',tension:.3,pointRadius:4}]},
+      options:baseOpts({onClick:function(e,els){if(els.length)setYear(y.yrs[els[0].index]);},
+        plugins:{legend:{display:true,position:'bottom'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+(c.datasetIndex?f2(c.parsed.y):fmt(c.parsed.y));}}}},
+        scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:'rgba(90,110,150,.16)'}},y2:{position:'right',beginAtZero:true,grid:{display:false}}}})});
+    $('kxDList').innerHTML='<table><thead><tr><th>Tahun</th><th class="n">Kunjungan</th><th class="n">Pemeriksaan</th><th class="n">Rasio</th></tr></thead><tbody>'+
+      y.yrs.map(function(yr,i){return '<tr data-p="'+yr+'" class="'+(i===y.yi?'sel':'')+'"><td><b>'+yr+'</b></td><td class="n">'+fmt(y.visits[i])+'</td><td class="n">'+fmt(y.totals[i])+'</td><td class="n">'+(rat[i]?f2(rat[i]):'–')+'</td></tr>';}).reverse().join('')+'</tbody></table>';
+  };
+  DETAIL[2]=function(){
+    var m=mReagen(); if(!m)return; var s=m.sm.s,b=s.bulan[m.sm.idx]; $('kxGo').onclick=function(){go('stok');};
+    $('kxDTitle').textContent='Reagensia Perlu Order – '+b.name+' '+b.yr;
+    mkChart({type:'bar',data:{labels:s.bulan.map(function(x){return x.name.slice(0,3);}),datasets:[{label:'Habis + perlu order',data:m.series,borderRadius:6,backgroundColor:m.series.map(function(_,i){return i===m.sm.idx?'#d9534f':'rgba(217,83,79,.35)';})}]},
+      options:baseOpts({onClick:function(e,els){if(els.length){var nm=s.bulan[els[0].index].name.toLowerCase(),k=BLN.map(function(x){return x.toLowerCase();}).indexOf(nm); if(k>=0)setMonth(k);}},
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.parsed.y+' reagen perlu order';}}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,ticks:{precision:0},grid:{color:'rgba(90,110,150,.16)'}}}})});
+    var rows=b.items.map(function(x){return {x:x,st:s.status(x)};}).filter(function(r){return r.st==='Habis'||r.st==='Order';})
+      .sort(function(a,c){var pa=a.x.b>0?a.x.e/a.x.b:0,pc=c.x.b>0?c.x.e/c.x.b:0;return pa-pc;});
+    var txt=rows.map(function(r){return '- '+r.x.n+' (stok '+r.x.e+(r.x.b!=null?', buffer '+r.x.b:'')+')'+(r.st==='Habis'?' HABIS':'');}).join('\n');
+    $('kxDList').innerHTML=rows.length?'<button class="kx-copy" id="kxCopy" type="button">📋 Salin daftar order</button><table><thead><tr><th>Reagen</th><th class="n">Stok</th><th class="n">Buffer</th><th>Status</th></tr></thead><tbody>'+
+      rows.slice(0,14).map(function(r){return '<tr><td>'+esc(r.x.n)+'</td><td class="n"><b>'+r.x.e+'</b></td><td class="n">'+(r.x.b==null?'–':r.x.b)+'</td><td><span class="kx-chip '+(r.st==='Habis'?'kx-bad':'kx-mid')+'">'+(r.st==='Habis'?'Habis':'Order')+'</span></td></tr>';}).join('')+
+      (rows.length>14?'<tr><td colspan="4"><small>+ '+(rows.length-14)+' reagen lainnya – buka halaman lengkap.</small></td></tr>':'')+'</tbody></table>':'<div class="kx-empty">Tidak ada reagen yang perlu order pada bulan ini. 👍</div>';
+    var cb=$('kxCopy'); if(cb)cb.onclick=function(){var done=function(){cb.textContent='✓ Tersalin';setTimeout(function(){cb.textContent='📋 Salin daftar order';},1800);};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText('Daftar order reagensia '+b.name+' '+b.yr+':\n'+txt).then(done,function(){});else{var t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand('copy');done();}catch(e){}t.remove();}};
+  };
+  DETAIL[4]=function(){
+    var m=mWaktu(); if(!m)return; var mu=m.m; $('kxGo').onclick=function(){go('mutu');};
+    $('kxDTitle').textContent='Kesesuaian Waktu Tunggu per Bulan '+m.yr;
+    var n=Math.max(lastNN(m.d)+1,1),d=m.d.slice(0,n),LB=SH.slice(0,n),col=function(p){return p==null?'#9fb0cf':p>=mu.BAIK?'#2fae79':p>=mu.TARGET?'#e5a82e':'#e0584f';};
+    mkChart({data:{labels:LB,datasets:[
+      {type:'bar',label:'% sesuai waktu tunggu',data:d,borderRadius:5,backgroundColor:d.map(function(p,i){var c=col(p);return (m.mo!=='all'&&i!==m.mo)?c+'66':c;})},
+      {type:'line',label:'Sangat baik ('+mu.BAIK+'%)',data:LB.map(function(){return mu.BAIK;}),borderColor:'#2fae79',borderDash:[6,5],pointRadius:0,borderWidth:1.5},
+      {type:'line',label:'Target ('+mu.TARGET+'%)',data:LB.map(function(){return mu.TARGET;}),borderColor:'#e5a82e',borderDash:[6,5],pointRadius:0,borderWidth:1.5}]},
+      options:baseOpts({onClick:function(e,els){if(els.length&&els[0].datasetIndex===0)setMonth(els[0].index);},
+        plugins:{legend:{display:true,position:'bottom'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+(c.parsed.y==null?'–':pct(c.parsed.y));}}}},
+        scales:{x:{grid:{display:false}},y:{min:0,max:100,ticks:{callback:function(v){return v+'%';}},grid:{color:'rgba(90,110,150,.16)'}}}})});
+    var f=d.filter(function(x){return x!=null;});
+    $('kxDList').innerHTML='<table><thead><tr><th>Bulan</th><th class="n">Capaian</th><th>Status</th></tr></thead><tbody>'+
+      d.map(function(p,i){if(p==null)return ''; var st=mutuStat(p,mu); return '<tr data-p="'+i+'" class="'+(m.mo===i?'sel':'')+'"><td>'+BLN[i]+'</td><td class="n"><b>'+pct(p)+'</b></td><td><span class="kx-chip '+st[1]+'">'+st[0]+'</span></td></tr>';}).join('')+
+      '</tbody></table><p><small>'+f.filter(function(p){return p>=mu.TARGET;}).length+' dari '+f.length+' bulan terisi memenuhi target ≥'+mu.TARGET+'%.</small></p>';
+  };
+  function renderDetail(k){var box=$('kxDetail'); if(!DETAIL[k]){return;} box.hidden=false; DETAIL[k]();}
+  function go(v){if(window.setView)window.setView(v,document.querySelector('[data-nav="'+v+'"]'));}
+  function toggle(k){
+    var cards=document.querySelectorAll('.hk[data-kx]');
+    if(S.open===k){S.open=0;$('kxDetail').hidden=true;killChart();}
+    else{S.open=k;renderDetail(k);}
+    cards.forEach(function(c){c.setAttribute('aria-expanded',String(+c.getAttribute('data-kx')===S.open));});
+    if(S.open&&!REDUCE){var d=$('kxDetail');d.scrollIntoView({block:'nearest',behavior:'smooth'});}
+  }
+
+  /* ---------- pasang kontrol & kartu beranda ---------- */
+  function setupHome(){
+    var sec=document.querySelector('.home-kpis'); if(!sec||$('kxBar'))return;
+    var bar=document.createElement('div'); bar.className='kx-bar'; bar.id='kxBar'; bar.setAttribute('data-view','home');
+    bar.innerHTML='<label for="kxYear">Periode</label><select id="kxYear" aria-label="Pilih tahun KPI"></select>'+
+      '<select id="kxMonth" aria-label="Pilih bulan KPI"><option value="all">Setahun penuh</option>'+BLN.map(function(b,i){return '<option value="'+i+'">'+b+'</option>';}).join('')+'</select>'+
+      '<button type="button" id="kxReset">Atur ulang</button><span class="kx-note" id="kxNote">Klik kartu untuk melihat rincian. Pemeriksaan bulanan tersedia untuk 2026; kunjungan hanya tahunan.</span>';
+    sec.parentNode.insertBefore(bar,sec);
+    var det=document.createElement('section'); det.className='kx-detail'; det.id='kxDetail'; det.hidden=true; det.setAttribute('data-view','home');
+    det.innerHTML='<div class="kx-dhead"><h3 id="kxDTitle"></h3><button type="button" class="kx-go" id="kxGo">Buka halaman lengkap ›</button><button type="button" id="kxClose" aria-label="Tutup rincian">✕ Tutup</button></div>'+
+      '<div class="kx-dbody"><div class="kx-dchart"><canvas id="kxDChart" role="img" aria-label="Grafik rincian KPI"></canvas></div><div class="kx-dlist" id="kxDList"></div></div>';
+    sec.parentNode.insertBefore(det,sec.nextSibling);
+    document.querySelectorAll('.hk').forEach(function(c,i){
+      var k=i+1; c.setAttribute('data-kx',k); c.setAttribute('role','button'); c.setAttribute('tabindex','0'); c.setAttribute('aria-expanded','false'); c.setAttribute('aria-controls','kxDetail');
+      var sp=document.createElement('span'); sp.className='kx-sp'; sp.id='kxSp'+k; c.lastElementChild.appendChild(sp);
+      c.addEventListener('click',function(){toggle(k);});
+      c.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle(k);}});
+    });
+    $('kxClose').onclick=function(){if(S.open)toggle(S.open);};
+    $('kxMonth').addEventListener('change',function(){S.month=this.value==='all'?'all':+this.value;renderHome();});
+    $('kxYear').addEventListener('change',function(){setYear(this.value);});
+    $('kxReset').addEventListener('click',function(){S.month='all';$('kxMonth').value='all';var y=Y();if(y)setYear(y.yrs[y.yrs.length-1]);else renderHome();});
+    $('kxDList').addEventListener('click',function(e){var tr=e.target.closest('tr[data-p]');if(!tr)return;var p=tr.getAttribute('data-p');
+      if(S.open===3)setYear(p);else if(S.open===4)setMonth(+p);});
+  }
+  function syncYearSel(){var y=Y(),s=$('kxYear'); if(!y||!s)return; s.innerHTML=y.yrs.slice().reverse().map(function(v){return '<option value="'+v+'"'+(v===y.yrs[y.yi]?' selected':'')+'>'+v+'</option>';}).join('');}
+
+  /* ---------- KPI Ringkasan Laporan Tahunan (5 kartu) ---------- */
+  var RS=[{id:'kpi1',cv:'chTren'},{id:'kpi2',cv:'chTren'},{id:'kpi3',cv:'chTop'},{id:'kpi4',cv:'chTop'},{id:'kpi5',cv:'chRasio'}];
+  function rsSeries(i,y){
+    var yrs=y.yrs;
+    switch(i){
+      case 0:return {v:y.totals,fn:fmt};
+      case 1:return {v:y.visits,fn:fmt};
+      case 2:var nm=($('kpi3')||{}).textContent,ex=y.exams.filter(function(e){return e[0]===nm;})[0]; return {v:ex?ex[1]:[],fn:fmt};
+      case 3:return {v:yrs.map(function(_,k){return y.exams.filter(function(e){return e[1][k]>0;}).length;}),fn:fmt};
+      default:return {v:yrs.map(function(_,k){return y.visits[k]>0?y.totals[k]/y.visits[k]:null;}),fn:f2};}
+  }
+  function setupRs(){
+    RS.forEach(function(r,i){
+      var b=$(r.id); if(!b)return; var card=b.closest('.kpi'); if(!card||card.getAttribute('data-kx'))return;
+      card.setAttribute('data-kx',i+1); card.setAttribute('role','button'); card.setAttribute('tabindex','0'); card.title='Klik untuk melihat grafik terkait';
+      var sp=document.createElement('span'); sp.className='kx-sp'; sp.id='kxRs'+i; card.appendChild(sp);
+      var act=function(){var cv=$(r.cv); if(!cv)return; var t=cv.closest('.chart-card,.rs-card')||cv; t.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'center'}); t.classList.remove('kx-pulse'); void t.offsetWidth; t.classList.add('kx-pulse'); setTimeout(function(){t.classList.remove('kx-pulse');},1700);};
+      card.addEventListener('click',act); card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();act();}});
+      /* angka naik saat nilai diperbarui oleh halaman */
+      if(i!==2){new MutationObserver(function(){
+        var t=b.textContent.trim(); if(t===b.__kxlast||!/^\d[\d.]*(,\d+)?$/.test(t))return;
+        var dec=(t.split(',')[1]||'').length, to=parseFloat(t.replace(/\./g,'').replace(',','.')), fn=function(n){return Number(n).toLocaleString('id-ID',{minimumFractionDigits:dec,maximumFractionDigits:dec});};
+        var from=b.__kxv; b.__kxv=to; cancelAnimationFrame(b.__kxraf);
+        if(REDUCE||from==null||from===to||isNaN(from)){b.__kxlast=t;return;}
+        var t0=performance.now();
+        (function step(now){var p=Math.min(1,(now-t0)/650),e=1-Math.pow(1-p,3),w=fn(p<1?from+(to-from)*e:to); b.__kxlast=w; b.textContent=w; if(p<1)b.__kxraf=requestAnimationFrame(step);})(t0);
+      }).observe(b,{childList:true,characterData:true,subtree:true});}
+    });
+  }
+  function renderRs(){
+    var y=Y(); if(!y)return; setupRs();
+    RS.forEach(function(r,i){var sp=$('kxRs'+i); if(!sp)return; var s=rsSeries(i,y); sp.innerHTML=spark(s.v,y.yrs.map(String),y.yi,s.fn);
+      var b=$(r.id); if(b&&b.__kxv==null){var t=b.textContent.trim(); if(/^\d[\d.]*(,\d+)?$/.test(t))b.__kxv=parseFloat(t.replace(/\./g,'').replace(',','.'));}});
+  }
+
+  /* ---------- kartu KPI dashboard Ringkasan (tema biru): #rsKpi tahunan & #rsBlKpi bulanan ---------- */
+  var PREV={};
+  function pulseTo(cvId){var cv=$(cvId); if(!cv)return; var t=cv.closest('.rs-card,.chart-card')||cv; t.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'center'}); t.classList.remove('kx-pulse'); void t.offsetWidth; t.classList.add('kx-pulse'); setTimeout(function(){t.classList.remove('kx-pulse');},1700);}
+  function decorateRsK(boxId,mapper){
+    var box=$(boxId); if(!box)return;
+    box.querySelectorAll('.rs-k').forEach(function(card,i){
+      if(card.getAttribute('data-kx'))return;
+      var cfg=mapper(i,card); if(!cfg)return;
+      card.setAttribute('data-kx','1'); card.setAttribute('role','button'); card.setAttribute('tabindex','0'); card.title='Klik untuk melihat grafik terkait';
+      var st=card.querySelector('strong'), key=boxId+i;
+      if(st&&!st.classList.contains('sm')){
+        var t=st.textContent.trim();
+        if(/^\d[\d.]*(,\d+)?$/.test(t)){
+          var dec=(t.split(',')[1]||'').length, to=parseFloat(t.replace(/\./g,'').replace(',','.')), from=PREV[key]; PREV[key]=to;
+          var fn=function(n){return Number(n).toLocaleString('id-ID',{minimumFractionDigits:dec,maximumFractionDigits:dec});};
+          if(!REDUCE){ if(from==null||isNaN(from))from=0; if(from!==to){ st.textContent=fn(from); var t0=performance.now();
+            (function step(now){var p=Math.min(1,(now-t0)/700),e=1-Math.pow(1-p,3); if(!st.isConnected)return; st.textContent=fn(p<1?from+(to-from)*e:to); if(p<1)requestAnimationFrame(step);})(t0);} }
+        }
+      }
+      if(cfg.sp){var sp=document.createElement('span'); sp.className='kx-sp'; sp.innerHTML=spark(cfg.sp,cfg.lb,cfg.hi,cfg.fn); card.lastElementChild.appendChild(sp);}
+      var act=function(){pulseTo(cfg.cv);};
+      card.addEventListener('click',act); card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();act();}});
+    });
+  }
+  function renderRsK(){
+    var y=Y(); if(y){
+      var yl=y.yrs.map(String), rat=y.yrs.map(function(_,k){return y.visits[k]>0?y.totals[k]/y.visits[k]:null;});
+      decorateRsK('rsKpi',function(i,card){
+        var nm=(card.querySelector('strong')||{}).textContent, ex=y.exams.filter(function(e){return e[0]===nm;})[0];
+        return [{sp:y.visits,fn:fmt,cv:'chRsTren'},{sp:y.totals,fn:fmt,cv:'chRsTren'},{sp:ex?ex[1]:null,fn:fmt,cv:'chRsDonut'},{sp:rat,fn:f2,cv:'chRsTren'}].map(function(c){c.lb=yl;c.hi=y.yi;return c;})[i];
+      });
+    }
+    var b=BL(); if(b){
+      var li=Math.max(lastIdx(b.tot),0), lb=SH.slice(0,li+1).map(function(s){return s+' 2026';});
+      decorateRsK('rsBlKpi',function(i){return [{sp:b.tot.slice(0,li+1),lb:lb,hi:$('rsBlBln')&&$('rsBlBln').value!=='all'?+$('rsBlBln').value:li,fn:fmt,cv:'chRsBlBln'},{cv:'chRsBlBln'},{cv:'chRsBlTop'},{cv:'chRsBlKat'}][i];});
+    }
+  }
+  var rkT=0; function watchRsK(){['rsKpi','rsBlKpi'].forEach(function(id){var el=$(id); if(!el||el.__kxw)return; el.__kxw=1; new MutationObserver(function(){clearTimeout(rkT);rkT=setTimeout(renderRsK,80);}).observe(el,{childList:true});});}
+
+  /* ---------- siklus ---------- */
+  var pend=0;
+  function refresh(){ if(pend)return; pend=1; setTimeout(function(){pend=0; try{setupHome(); syncYearSel(); renderHome(); renderRs(); watchRsK(); renderRsK();}catch(e){if(window.console)console.warn('KPI interaktif:',e);}},60); }
+  window.addEventListener('kpi:data',refresh);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh);else refresh();
+  window.addEventListener('resize',function(){if(chart)chart.resize();});
+})();
+</script>
+
 </body>
 </html>
